@@ -604,7 +604,56 @@ function showView(sh){
     var x = list[i];
     if(x.place) cnt[x.place] = (cnt[x.place]||0) + 1;
   }
-  var h='<h2>'+SHOWS[sh]+'</h2><p class="hint">Pick a song for each running order slot. Tap the running order number to change it. Tap your tile to give 1–10 points.</p>';
+
+  // Calculate total points per jury member for this specific show
+  var juryTotals = {};
+  for(var j=0; j<S.jury.length; j++){ juryTotals[S.jury[j].id] = 0; }
+  for(var i=0; i<list.length; i++){
+    var e = list[i];
+    if(e.songId){
+      var r = getRatings(e);
+      for(var j=0; j<S.jury.length; j++){
+        var jId = S.jury[j].id;
+        if(r[jId]) juryTotals[jId] += r[jId];
+      }
+    }
+  }
+
+  // Find max and min points for styling (only if total > 0 and no absolute tie across all)
+  var maxPts = -1, minPts = Infinity;
+  var hasValues = false;
+  for(var j=0; j<S.jury.length; j++){
+    var pts = juryTotals[S.jury[j].id];
+    if(pts > 0) hasValues = true;
+    if(pts > maxPts) maxPts = pts;
+    if(pts < minPts) minPts = pts;
+  }
+  
+  var allSame = true;
+  var firstVal = -1;
+  for(var j=0; j<S.jury.length; j++){
+    var pts = juryTotals[S.jury[j].id];
+    if(firstVal === -1) firstVal = pts;
+    else if(pts !== firstVal) allSame = false;
+  }
+
+  var totalsHtml = '<div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:16px 0 20px">';
+  for(var j=0; j<S.jury.length; j++){
+    var jur = S.jury[j];
+    var pts = juryTotals[jur.id];
+    var bubbleStyle = "background:var(--panel2);border:1px solid var(--line);";
+    if(hasValues && !allSame){
+      if(pts === maxPts) bubbleStyle = "background:rgba(24,150,80,0.25);border:1px solid #189650;box-shadow:0 0 12px rgba(24,150,80,0.35);";
+      else if(pts === minPts) bubbleStyle = "background:rgba(214,40,57,0.25);border:1px solid #d62839;box-shadow:0 0 12px rgba(214,40,57,0.35);";
+    }
+    totalsHtml += '<div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;'+bubbleStyle+'">' +
+      '<span style="font-family:var(--display);font-weight:700;color:var(--muted)">'+esc(jur.name)+'</span>' +
+      '<span style="font-family:var(--display);font-weight:800;font-size:1.1rem">'+pts+' <small style="font-size:0.75rem;font-weight:600">pts</small></span>' +
+    '</div>';
+  }
+  totalsHtml += '</div>';
+
+  var h='<h2>'+SHOWS[sh]+'</h2><p class="hint">Pick a song for each running order slot. Tap the running order number to change it. Tap your tile to give 1–10 points.</p>'+totalsHtml;
   
   var rowsHtml = "";
   for(var i=0; i<list.length; i++){
