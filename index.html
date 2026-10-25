@@ -272,7 +272,7 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){alert(
 function clearEntry(id){var e=findEntry(id);if(e)delete e.place;delete S.ratings[id];delete S.pred[id];delete S.notes[id];}
 
 /* ---------- shared database (Firebase Realtime Database, REST) ---------- */
-var DB=(localStorage.getItem("esc-db")||"https://dein-projekt-name-default-rtdb.firebaseio.com").replace(/\/+$/,"");
+var DB=(localStorage.getItem("esc-db")||"https://esc-connect-7bdfe-default-rtdb.europe-west1.firebasedatabase.app").replace(/\/+$/,"");
 var lastFlat={},busy=0,net=DB?"connecting":"local";
 var netText=function(){return {local:"Local only",connecting:"Connecting…",online:"● Shared",error:"Offline, retrying"}[net];};
 var badge=function(){var n=$("#net");if(n)n.textContent=netText();};
