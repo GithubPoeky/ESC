@@ -435,7 +435,11 @@ var pc=function(p){
   var rgb=t<.5?mix(R,W,t*2):mix(W,G,(t-.5)*2);
   var r=rgb[0],g=rgb[1],b=rgb[2];
   var lum=(r*299+g*587+b*114)/1000;
-  return "background:rgb("+r+","+g+","+b+");color:"+(lum>150?"#1d1d1d":"#fff");
+  var style = "background:rgb("+r+","+g+","+b+");color:"+(lum>150?"#1d1d1d":"#fff");
+  if(Number(p) === 10){
+    style += ";border:2.5px solid var(--gold);box-shadow:0 0 10px rgba(255,209,102,0.8)";
+  }
+  return style;
 };
 var idx=function(id){return +String(id).split("-").pop();};
 
