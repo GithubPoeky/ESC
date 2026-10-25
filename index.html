@@ -271,7 +271,29 @@ var S=load();
 var me=localStorage.getItem(MEKEY)||"j1";
 var ui={big:null,q:"",view:"home",yearId:null,tab:"sf1",sbShow:"final",resShow:"final",bA:null,bB:null,assign:null,editSong:null,pickE:null,pickJur:null,libYear:"",libSort:"name",compareCc:null};
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){showAlert("Error", "Could not save in this browser.");}push();}
-function clearEntry(id){var e=findEntry(id);if(e)delete e.place;delete S.ratings[id];delete S.pred[id];delete S.notes[id];}
+function clearEntry(id){
+  var e=findEntry(id);
+  if(e){
+    delete e.place;
+    if(e.songId) delete S.ratings[e.songId];
+    delete S.ratings[id];
+    delete S.notes[id];
+  }
+}
+
+function getRatings(e){
+  if(!e) return {};
+  if(e.songId && S.ratings[e.songId]) return S.ratings[e.songId];
+  if(S.ratings[e.id]) return S.ratings[e.id];
+  return {};
+}
+
+function getNotes(e){
+  if(!e) return {};
+  if(e.songId && S.notes[e.songId]) return S.notes[e.songId];
+  if(S.notes[e.id]) return S.notes[e.id];
+  return {};
+}
 
 /* ---------- Custom Modal Helpers ---------- */
 var dlg=$("#dlg");
@@ -514,7 +536,7 @@ function home(){
       for(var k=0; k<list.length; k++){
         if(list[k].songId){
           songCount++;
-          var r = S.ratings[list[k].id] || {};
+          var r = getRatings(list[k]);
           for(var j=0; j<S.jury.length; j++){
             if(r[S.jury[j].id]) totalPts += r[S.jury[j].id];
           }
@@ -588,10 +610,10 @@ function showView(sh){
   for(var i=0; i<list.length; i++){
     var e = list[i];
     var s = songById(e.songId);
-    var r = S.ratings[e.id]||{};
+    var r = getRatings(e);
     var activeJur = (me === "admin" && ui.pickJur) ? ui.pickJur : me;
     var mine = r[activeJur];
-    var nt = S.notes[e.id]||{};
+    var nt = getNotes(e);
     
     var vals = [];
     for(var j=0; j<S.jury.length; j++){
@@ -692,7 +714,7 @@ function overview(){
     for(var i=0; i<list.length; i++){
       var e = list[i];
       var s = songById(e.songId);
-      var r = S.ratings[e.id]||{};
+      var r = getRatings(e);
       
       var pts = '<div class="ov-pts">';
       for(var j=0; j<S.jury.length; j++){
@@ -782,7 +804,7 @@ function scoreboard(){
   for(var i=0; i<rawList.length; i++){
     var e = rawList[i];
     if(songById(e.songId) && !e.dq){
-      var r = S.ratings[e.id]||{};
+      var r = getRatings(e);
       var vals = [];
       for(var j=0; j<S.jury.length; j++){if(r[S.jury[j].id]) vals.push(r[S.jury[j].id]); }
       var sum = 0; for(var v=0; v<vals.length; v++){ sum+=vals[v]; }
@@ -841,14 +863,24 @@ function compareView(){
   var entries = [];
   for(var i=0; i<S.years.length; i++){
     var y = S.years[i];
+    var yearEntries = [];
     for(var sh in y.shows){
       var list = y.shows[sh];
       for(var k=0; k<list.length; k++){
         var entry = list[k];
         var song = songById(entry.songId);
         if(song && song.cc === ui.compareCc){
-          entries.push({yearObj: y, showName: SHOWS[sh], entry: entry, song: song});
+          yearEntries.push({yearObj: y, showKey: sh, showName: SHOWS[sh], entry: entry, song: song});
         }
+      }
+    }
+    
+    if(yearEntries.length > 0){
+      var finalEntry = yearEntries.find(function(item){ return item.showKey === 'final'; });
+      if(finalEntry){
+        entries.push(finalEntry);
+      } else {
+        entries.push(yearEntries[0]);
       }
     }
   }
@@ -865,7 +897,7 @@ function compareView(){
     var rowsHtml = "";
     for(var i=0; i<entries.length; i++){
       var item = entries[i];
-      var r = S.ratings[item.entry.id]||{};
+      var r = getRatings(item.entry);
       var vals = [];
       for(var j=0; j<S.jury.length; j++){ if(r[S.jury[j].id]) vals.push(r[S.jury[j].id]); }
       var sum = 0; for(var v=0; v<vals.length; v++){ sum+=vals[v]; }
@@ -884,7 +916,7 @@ function compareView(){
         '<td><b>'+labelYear+'</b><br><small>'+item.showName+'</small></td>'+
         '<td>'+flag(item.song.cc)+' <b>'+esc(item.song.title)+'</b><br><small>'+esc(item.song.artist)+'</small></td>'+
         jCols+
-        '<td class="c"><b>'+(avg==null?"–":item.sum)+'</b></td>'+
+        '<td class="c"><b>'+(avg==null?"–":sum)+'</b></td>'+
         '<td class="c">'+(avg==null?"–":'<span class="cell" style="'+pc(avg)+'">'+avg.toFixed(1)+'</span>')+'</td>'+
         '<td class="c"><b>'+placeStr+'</b></td>'+
       '</tr>';
@@ -1261,7 +1293,7 @@ var A={
     openConfirm("Delete Contest", "Really delete contest "+y.year+(y.suffix?" ("+y.suffix+")":"")+" including all songs and points?", function(){
       for(var sh in y.shows){
         var l = y.shows[sh];
-        for(var i=0; i<l.length; i++){delete S.ratings[l[i].id]; delete S.pred[l[i].id]; delete S.notes[l[i].id];}
+        for(var i=0; i<l.length; i++){delete S.ratings[l[i].id]; delete S.pred[l[i].id]; delete S.notes[l[i].id]; if(l[i].songId) delete S.ratings[l[i].songId];}
       }
       S.years=S.years.filter(function(x){return x!==y;});save();ui.yearId=null;ui.view="home";render();
     });
@@ -1269,9 +1301,14 @@ var A={
   },
   rate:function(t){
     var id=t.dataset.e,p=+t.dataset.p;
+    var e=findEntry(id);
     var targetJur = (me === "admin" && ui.pickJur) ? ui.pickJur : me;
-    S.ratings[id]=S.ratings[id]||{};
-    if(S.ratings[id][targetJur]===p)delete S.ratings[id][targetJur];else S.ratings[id][targetJur]=p;
+    var key = (e && e.songId) ? e.songId : id;
+    
+    S.ratings[key]=S.ratings[key]||{};
+    if(S.ratings[key][targetJur]===p) delete S.ratings[key][targetJur];
+    else S.ratings[key][targetJur]=p;
+    
     ui.pickE=null;ui.pickJur=null;save();
   },
   addSlot:function(t){
@@ -1341,6 +1378,7 @@ var A={
           for(var k=0; k<list.length; k++){if(list[k].songId===id){clearEntry(list[k].id); delete list[k].songId;}}
         }
       }
+      delete S.ratings[id];
       S.songs=S.songs.filter(function(x){return x.id!==id;});save();fillList();
     });
     return "keep";
@@ -1446,9 +1484,11 @@ var C={
   },
   note:function(t){
     var id=t.dataset.e,v=t.value.trim();
+    var e=findEntry(id);
     var targetJur = t.dataset.jur || me;
-    S.notes[id]=S.notes[id]||{};
-    if(v)S.notes[id][targetJur]=v;else delete S.notes[id][targetJur];
+    var key = (e && e.songId) ? e.songId : id;
+    S.notes[key]=S.notes[key]||{};
+    if(v)S.notes[key][targetJur]=v;else delete S.notes[key][targetJur];
     save();
   },
   place:function(t){var e=findEntry(t.dataset.e),v=parseInt(t.value);if(v>0)e.place=v;else delete e.place;save();},
