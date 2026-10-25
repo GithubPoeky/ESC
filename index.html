@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eurovision Song Contest Scoreboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e1650; --panel:#17226e; --panel2:#1f2c85; --line:#34439f;
+  --ink:#f7f8ff; --muted:#aab4ee; --pink:#ff2d95; --gold:#ffd166;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;font-family:var(--body);color:var(--ink);background:
+  radial-gradient(900px 420px at 85% -10%,rgba(255,45,149,.28),transparent 60%),
+  radial-gradient(700px 380px at 0% 0%,rgba(255,209,102,.12),transparent 60%),var(--bg);
+  min-height:100vh;line-height:1.45}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px 80px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid var(--line)}
+.brand{font-family:var(--display);font-weight:800;font-size:1.05rem;letter-spacing:.01em}
+.who{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.9rem}
+select,input{font:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;max-width:100%}
+select:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);padding:8px 14px}
+button.primary{background:var(--pink);border-color:var(--pink);color:#fff;font-weight:700}
+button.ghost{background:transparent}
+button.danger{color:#ffb3b3}
+button:disabled{opacity:.35;cursor:not-allowed}
+.hero{font-family:var(--display);font-weight:800;font-size:clamp(2.8rem,10vw,6.4rem);line-height:.95;margin:48px 0 36px;letter-spacing:-.02em}
+h2{font-family:var(--display);font-size:1.5rem;margin:24px 0 4px}
+h3{font-family:var(--display);margin:0 0 12px}
+.hint{color:var(--muted);margin:0 0 16px;font-size:.92rem}
+.yeartitle{font-family:var(--display);font-weight:800;font-size:clamp(2rem,6vw,3.4rem);margin:12px 0 16px;letter-spacing:-.01em}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.yearcard{cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.yearcard b{font-family:var(--display);font-size:2rem}
+.yearcard span{color:var(--muted);font-size:.9rem}
+.newyear{margin-top:28px}
+.newyear .f{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+.newyear label{display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:.85rem}
+.newyear input{width:96px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.tabs button{border-radius:999px;background:transparent}
+.tabs button.on{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:700}
+.row{display:grid;grid-template-columns:40px 1fr;gap:6px 12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px}
+.no{font-family:var(--display);font-weight:800;font-size:1.4rem;color:var(--gold);align-self:start;text-align:center}
+.main select{width:100%}
+.meta{display:flex;align-items:center;gap:8px;margin-top:6px}
+.flag{height:18px;width:auto;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.25);vertical-align:middle}
+.rate{grid-column:2;display:flex;flex-wrap:wrap;gap:4px}
+.chips{grid-column:2;display:flex;flex-wrap:wrap;gap:6px}
+.pt{width:38px;height:38px;padding:0;border:2px solid transparent;font-weight:800;opacity:.5}
+.pt:hover:not(:disabled){opacity:.9}
+.pt.on{opacity:1;border-color:#fff;box-shadow:0 0 0 2px var(--pink)}
+.chip{border-radius:999px;padding:2px 10px;font-size:.82rem}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:8px 6px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+th{color:var(--muted);font-weight:500;font-size:.85rem}
+.tw{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 10px}
+td.c,th.c{text-align:center}
+.cell{display:inline-block;min-width:34px;padding:3px 8px;border-radius:8px;font-weight:800;text-align:center}
+td input[type=number]{width:72px}
+.dup{border-color:#ff6b6b;color:#ffb3b3}
+.verdict{margin-top:14px;padding:16px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:1.05rem}
+.verdict b{font-family:var(--display);font-size:1.3rem}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+.seg button.on{background:var(--pink);border-color:var(--pink);font-weight:700}
+.q{display:inline-block;background:var(--gold);color:#222;border-radius:6px;padding:0 6px;font-size:.75rem;font-weight:800;margin-left:6px}
+.rank{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line)}
+.rank .p{font-family:var(--display);font-weight:800;font-size:1.3rem;width:36px;color:var(--gold)}
+.vs{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+dialog{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:22px;width:min(440px,92vw)}
+dialog::backdrop{background:rgba(5,8,40,.7)}
+dialog label{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;color:var(--muted);font-size:.88rem}
+dialog input,dialog select{width:100%}
+.empty{color:var(--muted);padding:20px 0}
+@media (min-width:760px){
+  .row{grid-template-columns:40px minmax(260px,1fr) auto}
+  .rate{grid-column:3;grid-row:1;flex-wrap:nowrap}
+  .chips{grid-column:2 / 4}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="app"></div>
+</div>
+<dialog id="dlg"></dialog>
+
+<script>
+const COUNTRIES=[["al","Albania"],["am","Armenia"],["au","Australia"],["at","Austria"],["az","Azerbaijan"],["by","Belarus"],["be","Belgium"],["ba","Bosnia and Herzegovina"],["bg","Bulgaria"],["hr","Croatia"],["cy","Cyprus"],["cz","Czechia"],["dk","Denmark"],["ee","Estonia"],["fi","Finland"],["fr","France"],["ge","Georgia"],["de","Germany"],["gr","Greece"],["hu","Hungary"],["is","Iceland"],["ie","Ireland"],["il","Israel"],["it","Italy"],["lv","Latvia"],["lt","Lithuania"],["lu","Luxembourg"],["mt","Malta"],["md","Moldova"],["mc","Monaco"],["me","Montenegro"],["ma","Morocco"],["nl","Netherlands"],["mk","North Macedonia"],["no","Norway"],["pl","Poland"],["pt","Portugal"],["ro","Romania"],["ru","Russia"],["sm","San Marino"],["rs","Serbia"],["sk","Slovakia"],["si","Slovenia"],["es","Spain"],["se","Sweden"],["ch","Switzerland"],["tr","Türkiye"],["ua","Ukraine"],["gb","United Kingdom"]];
+const CN=Object.fromEntries(COUNTRIES);
+const SHOWS={sf1:"Semi-final 1",sf2:"Semi-final 2",final:"Final"};
+const DEF_N={sf1:15,sf2:15,final:26};
+const KEY="esc-scoreboard-v1",MEKEY="esc-me";
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function fresh(){return{jury:[1,2,3,4].map(n=>({id:"j"+n,name:"Player "+n})),songs:[],years:[],ratings:{},pred:{}}}
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.jury)return d}catch(e){}return fresh()}
+let S=load();
+let me=localStorage.getItem(MEKEY)||"j1";
+const ui={year:null,tab:"sf1",sbShow:"final",resShow:"final",bA:null,bB:null,assign:null,editSong:null};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){alert("Could not save in this browser.")}}
+
+const songById=id=>S.songs.find(s=>s.id===id);
+const yearObj=y=>S.years.find(x=>String(x.year)===String(y));
+const songsOf=y=>S.songs.filter(s=>String(s.year)===String(y)).sort((a,b)=>CN[a.cc].localeCompare(CN[b.cc]));
+const jname=id=>(S.jury.find(j=>j.id===id)||{name:id}).name;
+function findEntry(id){for(const y of S.years)for(const sh in y.shows){const e=y.shows[sh].find(x=>x.id===id);if(e)return e}}
+
+function flag(cc){return `<img class="flag" src="https://flagcdn.com/w40/${cc}.png" srcset="https://flagcdn.com/w80/${cc}.png 2x" alt="" loading="lazy">`}
+
+/* points colours: 1 = red, middle = white, 10 = green */
+function pc(p){
+  const t=Math.max(0,Math.min(1,(p-1)/9));
+  const R=[214,40,57],W=[255,255,255],G=[24,150,80];
+  const mix=(a,b,k)=>a.map((v,i)=>Math.round(v+(b[i]-v)*k));
+  const [r,g,b]=t<.5?mix(R,W,t*2):mix(W,G,(t-.5)*2);
+  const lum=(r*299+g*587+b*114)/1000;
+  return `background:rgb(${r},${g},${b});color:${lum>150?"#1d1d1d":"#fff"}`;
+}
+const idx=id=>+String(id).split("-").pop();
+
+/* ---------- views ---------- */
+function render(){
+  const sy=window.scrollY;
+  $("#app").innerHTML=header()+(ui.year?yearView():home());
+  window.scrollTo(0,sy);
+}
+function header(){
+  return `<header><div class="brand">Eurovision Song Contest Scoreboard</div>
+  <div class="who">Rating as
+    <select data-chg="me">${S.jury.map(j=>`<option value="${j.id}" ${j.id===me?"selected":""}>${esc(j.name)}</option>`).join("")}</select>
+    <button class="ghost" data-act="settings" title="Names, export, import">Settings</button></div></header>`;
+}
+function home(){
+  const thisYear=new Date().getFullYear();
+  return `<h1 class="hero">Eurovision Song Contest</h1>
+  ${S.years.length?`<div class="grid">${S.years.map(y=>{
+    const n=songsOf(y.year).length;
+    return `<div class="card yearcard" data-act="openYear" data-y="${y.year}"><b>${y.year}</b><span>${n} song${n===1?"":"s"}</span></div>`}).join("")}</div>`
+   :`<p class="empty">No Eurovision year yet. Add the first one below.</p>`}
+  <div class="card newyear"><h3>New Eurovision year</h3><div class="f">
+    <label>Year<input id="ny_year" type="number" value="${thisYear}"></label>
+    <label>Semi-final 1 slots<input id="ny_sf1" type="number" min="1" value="${DEF_N.sf1}"></label>
+    <label>Semi-final 2 slots<input id="ny_sf2" type="number" min="1" value="${DEF_N.sf2}"></label>
+    <label>Final slots<input id="ny_final" type="number" min="1" value="${DEF_N.final}"></label>
+    <button class="primary" data-act="newYear">Add year</button></div></div>`;
+}
+const TABS=[["sf1","Semi-final 1"],["sf2","Semi-final 2"],["final","Final"],["res","Results"],["battle","Points battle"],["sb","Scoreboard"],["songs","Songs"]];
+function yearView(){
+  const body={sf1:()=>showView("sf1"),sf2:()=>showView("sf2"),final:()=>showView("final"),res:results,battle,sb:scoreboard,songs:songsTab}[ui.tab]();
+  return `<div style="padding-top:14px"><button class="ghost" data-act="home">← All years</button>
+    <button class="ghost danger" data-act="delYear" style="float:right">Delete year</button></div>
+    <h1 class="yeartitle">Eurovision ${ui.year}</h1>
+    <div class="tabs">${TABS.map(([k,l])=>`<button class="${ui.tab===k?"on":""}" data-act="tab" data-tab="${k}">${l}</button>`).join("")}</div>${body}`;
+}
+
+function showView(sh){
+  const y=yearObj(ui.year),list=y.shows[sh],songs=songsOf(ui.year);
+  let h=`<h2>${SHOWS[sh]}</h2><p class="hint">Choose the song for each start number, then give your points from 1 to 10. Tap a number again to remove it.</p>`;
+  h+=list.map((e,i)=>{
+    const s=songById(e.songId),r=S.ratings[e.id]||{},mine=r[me];
+    const opts=`<option value="">– choose song –</option>`+songs.map(x=>`<option value="${x.id}" ${x.id===e.songId?"selected":""}>${esc(CN[x.cc])} – ${esc(x.artist)} – ${esc(x.title)}</option>`).join("")+`<option value="__new">＋ New song…</option>`;
+    const btns=[...Array(10)].map((_,k)=>{const p=k+1;return `<button class="pt${mine===p?" on":""}" style="${pc(p)}" data-act="rate" data-e="${e.id}" data-p="${p}" ${s?"":"disabled"} aria-label="${p} points">${p}</button>`}).join("");
+    const others=S.jury.filter(j=>j.id!==me&&r[j.id]).map(j=>`<span class="chip" style="${pc(r[j.id])}">${esc(j.name)}: <b>${r[j.id]}</b></span>`).join("");
+    return `<div class="row"><div class="no">${i+1}</div>
+      <div class="main"><select data-chg="pick" data-e="${e.id}">${opts}</select>
+      ${s?`<div class="meta">${flag(s.cc)}<span><b>${esc(s.title)}</b> – ${esc(s.artist)}</span></div>`:""}</div>
+      <div class="rate">${btns}</div>${others?`<div class="chips">${others}</div>`:""}</div>`}).join("");
+  return h+`<div class="actions"><button class="ghost" data-act="addSlot" data-show="${sh}">＋ Start number</button>
+    <button class="ghost" data-act="delSlot" data-show="${sh}">− Remove last</button>
+    <button class="ghost" data-act="addSong">＋ New song</button></div>`;
+}
+
+function songsTab(){
+  const songs=songsOf(ui.year);
+  return `<h2>Songs ${ui.year}</h2><p class="hint">Enter every song once. It then shows up in the start-number lists of the semi-finals and the final.</p>
+  ${songs.length?`<div class="tw"><table><tbody>${songs.map(s=>`<tr><td>${flag(s.cc)} ${esc(CN[s.cc])}</td><td><b>${esc(s.title)}</b><br><span class="hint">${esc(s.artist)}</span></td>
+    <td style="text-align:right;white-space:nowrap"><button class="ghost" data-act="editSong" data-id="${s.id}">Edit</button> <button class="ghost danger" data-act="delSong" data-id="${s.id}">Delete</button></td></tr>`).join("")}</tbody></table></div>`:`<p class="empty">No songs yet.</p>`}
+  <div class="actions"><button class="primary" data-act="addSong">＋ New song</button></div>`;
+}
+
+function switcher(key){
+  return `<div class="seg">${Object.entries(SHOWS).map(([k,l])=>`<button class="${ui[key]===k?"on":""}" data-act="${key}" data-show="${k}">${l}</button>`).join("")}</div>`;
+}
+
+function results(){
+  const y=yearObj(ui.year),sh=ui.resShow,list=y.shows[sh];
+  const rows=list.filter(e=>songById(e.songId));
+  const ranked=rows.filter(e=>e.place).sort((a,b)=>a.place-b.place);
+  return `<h2>Results</h2><p class="hint">Enter the place each country reached.</p>${switcher("resShow")}
+  ${rows.length?`<div class="tw"><table><thead><tr><th>#</th><th>Country</th><th>Song</th><th>Place</th></tr></thead><tbody>
+  ${rows.map(e=>{const s=songById(e.songId);return `<tr><td>${idx(e.id)}</td><td>${flag(s.cc)} ${esc(CN[s.cc])}</td><td>${esc(s.title)}</td>
+    <td><input type="number" min="1" max="${list.length}" value="${e.place??""}" data-chg="place" data-e="${e.id}"></td></tr>`}).join("")}</tbody></table></div>`
+  :`<p class="empty">Pick songs for the start numbers of this show first.</p>`}
+  ${ranked.length?`<h2>${SHOWS[sh]} ranking</h2><div class="card" style="padding:4px 0">${ranked.map(e=>{const s=songById(e.songId);
+    return `<div class="rank"><div class="p">${e.place}</div>${flag(s.cc)}<div><b>${esc(CN[s.cc])}</b> <span class="hint">${esc(s.title)} – ${esc(s.artist)}</span>${sh!=="final"&&e.place<=10?`<span class="q">Qualified</span>`:""}</div></div>`}).join("")}</div>`:""}`;
+}
+
+function battle(){
+  const y=yearObj(ui.year),fin=y.shows.final.filter(e=>songById(e.songId));
+  ui.bA=ui.bA||me;
+  if(!ui.bB||ui.bB===ui.bA)ui.bB=(S.jury.find(j=>j.id!==ui.bA)||{}).id;
+  const A=ui.bA,B=ui.bB;
+  const sel=(k,v)=>`<select data-chg="${k}">${S.jury.map(j=>`<option value="${j.id}" ${j.id===v?"selected":""}>${esc(j.name)}</option>`).join("")}</select>`;
+  const dupSet=j=>{const c={};fin.forEach(e=>{const v=(S.pred[e.id]||{})[j];if(v)c[v]=(c[v]||0)+1});return c};
+  const dA=dupSet(A),dB=dupSet(B);
+  let sa=0,sb=0,n=0;
+  const rows=fin.map(e=>{
+    const s=songById(e.songId),p=S.pred[e.id]||{},a=p[A],b=p[B],act=e.place;
+    const da=a&&act?Math.abs(a-act):null,db=b&&act?Math.abs(b-act):null;
+    if(da!=null&&db!=null){sa+=da;sb+=db;n++}
+    const dcell=d=>d==null?"–":`<span class="cell" style="${pc(Math.max(1,10-d))}">${d}</span>`;
+    const inp=(j,v,dups)=>`<input type="number" min="1" max="${fin.length}" value="${v??""}" class="${v&&dups[v]>1?"dup":""}" data-chg="pred" data-e="${e.id}" data-j="${j}">`;
+    return `<tr><td>${flag(s.cc)} ${esc(CN[s.cc])}</td><td>${inp(A,a,dA)}</td><td>${inp(B,b,dB)}</td><td class="c">${act??"–"}</td><td class="c">${dcell(da)}</td><td class="c">${dcell(db)}</td></tr>`}).join("");
+  let verdict=`<span class="hint">Enter the actual final places in the Results tab to see who loses.</span>`;
+  if(n>0){
+    const done=n===fin.length?"":` <span class="hint">(${n} of ${fin.length} countries compared so far)</span>`;
+    verdict=sa===sb?`<b>It's a draw!</b> Both have ${sa} points.${done}`
+      :`<b>${esc(jname(sa>sb?A:B))} loses</b> with ${Math.max(sa,sb)} points against ${Math.min(sa,sb)} for ${esc(jname(sa>sb?B:A))}.${done}`;
+  }
+  return `<h2>Points battle</h2><p class="hint">Before the final, each of you writes down the predicted place of every country. Afterwards the difference to the real place counts as points. More points loses.</p>
+  <div class="vs">${sel("bA",A)} <b>vs</b> ${sel("bB",B)}</div>
+  ${fin.length?`<div class="tw" style="margin-top:12px"><table><thead><tr><th>Country</th><th>${esc(jname(A))}<br>predicts</th><th>${esc(jname(B))}<br>predicts</th><th class="c">Actual</th><th class="c">${esc(jname(A))}<br>points</th><th class="c">${esc(jname(B))}<br>points</th></tr></thead>
+  <tbody>${rows}</tbody><tfoot><tr><td colspan="4"><b>Total</b></td><td class="c"><b>${n?sa:"–"}</b></td><td class="c"><b>${n?sb:"–"}</b></td></tr></tfoot></table></div>
+  <div class="verdict">${verdict}</div>`
+  :`<p class="empty">Pick the songs for the final first, then enter your predictions here.</p>`}`;
+}
+
+function scoreboard(){
+  const y=yearObj(ui.year),sh=ui.sbShow;
+  const rows=y.shows[sh].filter(e=>songById(e.songId)).map(e=>{
+    const r=S.ratings[e.id]||{},vals=S.jury.map(j=>r[j.id]).filter(Boolean);
+    return{e,s:songById(e.songId),r,avg:vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null,sum:vals.reduce((a,b)=>a+b,0)};
+  }).sort((a,b)=>(b.avg??-1)-(a.avg??-1));
+  return `<h2>Scoreboard</h2><p class="hint">Average of all jury points, best first.</p>${switcher("sbShow")}
+  ${rows.length?`<div class="tw"><table><thead><tr><th>#</th><th>Country</th><th>Song</th>${S.jury.map(j=>`<th class="c">${esc(j.name)}</th>`).join("")}<th class="c">Total</th><th class="c">Avg</th><th class="c">Place</th></tr></thead><tbody>
+  ${rows.map((x,i)=>`<tr><td>${x.avg==null?"–":i+1}</td><td>${flag(x.s.cc)} ${esc(CN[x.s.cc])}</td><td>${esc(x.s.title)}</td>
+   ${S.jury.map(j=>`<td class="c">${x.r[j.id]?`<span class="cell" style="${pc(x.r[j.id])}">${x.r[j.id]}</span>`:"–"}</td>`).join("")}
+   <td class="c">${x.avg==null?"–":x.sum}</td>
+   <td class="c">${x.avg==null?"–":`<span class="cell" style="${pc(x.avg)}">${x.avg.toFixed(1)}</span>`}</td>
+   <td class="c">${x.e.place??"–"}</td></tr>`).join("")}</tbody></table></div>`
+  :`<p class="empty">Nothing to show yet.</p>`}`;
+}
+
+/* ---------- dialogs ---------- */
+const dlg=$("#dlg");
+dlg.addEventListener("close",()=>render());
+function openSong(id,assign){
+  const s=id?songById(id):null;
+  ui.editSong=id||null;ui.assign=assign||null;
+  const taken=new Set(songsOf(ui.year).map(x=>x.cc));
+  const opts=COUNTRIES.slice().sort((a,b)=>a[1].localeCompare(b[1])).map(([c,n])=>{
+    const own=s&&s.cc===c;
+    return `<option value="${c}" ${own?"selected":""} ${!own&&taken.has(c)?"disabled":""}>${n}${!own&&taken.has(c)?" (already added)":""}</option>`}).join("");
+  dlg.innerHTML=`<h3>${s?"Edit song":"New song"} · ${ui.year}</h3>
+   <label>Country<select id="f_cc" ${s?"disabled":""}>${opts}</select></label>
+   <label>Artist<input id="f_artist" value="${esc(s?.artist)}"></label>
+   <label>Song title<input id="f_title" value="${esc(s?.title)}"></label>
+   <div class="actions"><button class="ghost" data-act="closeDlg">Cancel</button><button class="primary" data-act="saveSong">Save</button></div>`;
+  dlg.showModal();
+}
+function openSettings(){
+  dlg.innerHTML=`<h3>Settings</h3>
+   ${S.jury.map(j=>`<label>${j.id.toUpperCase()} name<input data-jn="${j.id}" value="${esc(j.name)}"></label>`).join("")}
+   <p class="hint">Every browser keeps its own data. To combine everyone's points: each person exports their file and sends it around, everyone imports the files they receive. Your own points are never overwritten.</p>
+   <div class="actions"><button data-act="export">Export file</button>
+   <button data-act="importPick">Import file</button><input id="imp" type="file" accept="application/json" hidden></div>
+   <div class="actions"><button class="ghost" data-act="closeDlg">Close</button><button class="primary" data-act="saveNames">Save names</button></div>`;
+  dlg.showModal();
+  $("#imp").addEventListener("change",ev=>{
+    const f=ev.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=()=>{try{merge(JSON.parse(r.result));alert("Import done.");dlg.close()}catch(e){alert("This file could not be read.")}};
+    r.readAsText(f);
+  });
+}
+function merge(o){
+  (o.jury||[]).forEach(j=>{const l=S.jury.find(x=>x.id===j.id);if(l&&/^Player \d$/.test(l.name)&&j.name)l.name=j.name});
+  (o.songs||[]).forEach(s=>{if(!songById(s.id))S.songs.push(s)});
+  (o.years||[]).forEach(oy=>{
+    const y=yearObj(oy.year);
+    if(!y){S.years.push(oy);return}
+    for(const sh in oy.shows){
+      y.shows[sh]=y.shows[sh]||[];
+      oy.shows[sh].forEach(oe=>{
+        const e=y.shows[sh].find(x=>x.id===oe.id);
+        if(!e)y.shows[sh].push(oe);
+        else{if(!e.songId&&oe.songId)e.songId=oe.songId;if(e.place==null&&oe.place!=null)e.place=oe.place}
+      });
+      y.shows[sh].sort((a,b)=>idx(a.id)-idx(b.id));
+    }
+  });
+  for(const k of ["ratings","pred"])for(const id in (o[k]||{}))for(const j in o[k][id]){
+    S[k][id]=S[k][id]||{};
+    if(j!==me||S[k][id][j]==null)S[k][id][j]=o[k][id][j];
+  }
+  S.years.sort((a,b)=>b.year-a.year);save();
+}
+
+/* ---------- actions ---------- */
+const A={
+  home(){ui.year=null},
+  openYear(t){ui.year=t.dataset.y;ui.tab="sf1"},
+  tab(t){ui.tab=t.dataset.tab},
+  resShow(t){ui.resShow=t.dataset.show},
+  sbShow(t){ui.sbShow=t.dataset.show},
+  newYear(){
+    const y=parseInt($("#ny_year").value);
+    if(!y||y<1956){alert("Please enter a valid year.");return}
+    if(yearObj(y)){alert("This year already exists.");return}
+    const shows={};
+    for(const sh in SHOWS){const n=Math.max(1,parseInt($("#ny_"+sh).value)||DEF_N[sh]);shows[sh]=Array.from({length:n},(_,i)=>({id:`${y}-${sh}-${i+1}`}))}
+    S.years.push({year:y,shows});S.years.sort((a,b)=>b.year-a.year);save();
+    ui.year=y;ui.tab="songs";
+  },
+  delYear(){
+    if(!confirm(`Delete Eurovision ${ui.year} with all songs, points and results?`))return;
+    const y=yearObj(ui.year);
+    for(const sh in y.shows)y.shows[sh].forEach(e=>{delete S.ratings[e.id];delete S.pred[e.id]});
+    S.songs=S.songs.filter(s=>String(s.year)!==String(ui.year));
+    S.years=S.years.filter(x=>x!==y);save();ui.year=null;
+  },
+  rate(t){
+    const id=t.dataset.e,p=+t.dataset.p;
+    S.ratings[id]=S.ratings[id]||{};
+    if(S.ratings[id][me]===p)delete S.ratings[id][me];else S.ratings[id][me]=p;
+    save();
+  },
+  addSlot(t){
+    const l=yearObj(ui.year).shows[t.dataset.show];
+    l.push({id:`${ui.year}-${t.dataset.show}-${(l.length?idx(l[l.length-1].id):0)+1}`});save();
+  },
+  delSlot(t){
+    const l=yearObj(ui.year).shows[t.dataset.show];
+    if(l.length<=1)return;
+    const e=l[l.length-1];
+    if((e.songId||S.ratings[e.id])&&!confirm(`Remove start number ${l.length}?`))return;
+    l.pop();delete S.ratings[e.id];delete S.pred[e.id];save();
+  },
+  addSong(){openSong();return "keep"},
+  editSong(t){openSong(t.dataset.id);return "keep"},
+  delSong(t){
+    if(!confirm("Delete this song?"))return;
+    const id=t.dataset.id,y=yearObj(ui.year);
+    for(const sh in y.shows)y.shows[sh].forEach(e=>{if(e.songId===id){delete e.songId;delete e.place}});
+    S.songs=S.songs.filter(s=>s.id!==id);save();
+  },
+  saveSong(){
+    const artist=$("#f_artist").value.trim(),title=$("#f_title").value.trim(),cc=$("#f_cc").value;
+    if(!artist||!title){alert("Please enter artist and song title.");return "keep"}
+    if(ui.editSong){const s=songById(ui.editSong);s.artist=artist;s.title=title}
+    else{
+      const id=`${ui.year}-${cc}`;
+      S.songs.push({id,year:+ui.year,cc,artist,title});
+      if(ui.assign){const e=findEntry(ui.assign);if(e)e.songId=id}
+    }
+    save();dlg.close();return "keep";
+  },
+  closeDlg(){dlg.close();return "keep"},
+  settings(){openSettings();return "keep"},
+  saveNames(){
+    document.querySelectorAll("[data-jn]").forEach(i=>{const j=S.jury.find(x=>x.id===i.dataset.jn);if(i.value.trim())j.name=i.value.trim()});
+    save();dlg.close();return "keep";
+  },
+  export(){
+    const blob=new Blob([JSON.stringify(S,null,1)],{type:"application/json"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+    a.download=`eurovision-scoreboard-${jname(me).replace(/\W+/g,"_")}.json`;a.click();
+    return "keep";
+  },
+  importPick(){$("#imp").click();return "keep"}
+};
+document.addEventListener("click",ev=>{
+  const t=ev.target.closest("[data-act]");if(!t||!A[t.dataset.act])return;
+  const r=A[t.dataset.act](t);
+  if(r!=="keep")render();
+});
+const C={
+  me(t){me=t.value;localStorage.setItem(MEKEY,me)},
+  pick(t){
+    if(t.value==="__new"){openSong(null,t.dataset.e);return "keep"}
+    const e=findEntry(t.dataset.e);if(t.value)e.songId=t.value;else delete e.songId;save();
+  },
+  place(t){const e=findEntry(t.dataset.e),v=parseInt(t.value);if(v>0)e.place=v;else delete e.place;save()},
+  pred(t){
+    const id=t.dataset.e,j=t.dataset.j,v=parseInt(t.value);
+    S.pred[id]=S.pred[id]||{};
+    if(v>0)S.pred[id][j]=v;else delete S.pred[id][j];save();
+  },
+  bA(t){ui.bA=t.value},
+  bB(t){ui.bB=t.value}
+};
+document.addEventListener("change",ev=>{
+  const t=ev.target.closest("[data-chg]");if(!t)return;
+  if(C[t.dataset.chg](t)!=="keep")render();
+});
+render();
+</script>
+</body>
+</html>
