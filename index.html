@@ -76,8 +76,8 @@ h3{font-family:var(--display);margin:0 0 12px}
 .main select{width:100%}
 .meta{display:flex;align-items:center;gap:10px;min-height:36px;font-size:1.05rem}
 .meta b{font-size:1.15rem}
-.meta .flag{height:28px;border-radius:4px}
-.flag{height:18px;width:auto;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.25);vertical-align:middle}
+.meta .flag{width:32px;height:22px;object-fit:cover;border-radius:3px}
+.flag{width:24px;height:17px;object-fit:cover;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.25);vertical-align:middle}
 .rate{grid-column:2;display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .pt{width:36px;height:36px;padding:0;border:2px solid transparent;font-weight:800;opacity:.5}
 .pt:hover:not(:disabled){opacity:.9}
@@ -152,7 +152,7 @@ button.tile:hover{filter:brightness(1.08);transform:translateY(-2px) scale(1.06)
 .ov{display:grid;grid-template-columns:auto auto;gap:32px;justify-content:center;min-width:max-content}
 .ov-row,.ov-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .ov-pts{display:flex;align-items:center;gap:4px}
-.ov-pill .flag{height:20px}
+.ov-pill .flag{width:22px;height:15px;object-fit:cover}
 .ov-pt{width:42px;height:42px;display:grid;place-items:center;font:800 1.2rem var(--display);border-radius:8px;transition:transform .15s}
 .ov-pt:not(.none):hover{transform:scale(1.15);position:relative;z-index:1}
 .ov-pt.none{background:var(--panel2);color:var(--muted)}
@@ -270,8 +270,34 @@ function load(){
 var S=load();
 var me=localStorage.getItem(MEKEY)||"j1";
 var ui={big:null,q:"",view:"home",yearId:null,tab:"sf1",sbShow:"final",resShow:"final",bA:null,bB:null,assign:null,editSong:null,pickE:null,pickJur:null,libYear:"",libSort:"name",compareCc:null};
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){alert("Could not save in this browser.");}push();}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){showAlert("Error", "Could not save in this browser.");}push();}
 function clearEntry(id){var e=findEntry(id);if(e)delete e.place;delete S.ratings[id];delete S.pred[id];delete S.notes[id];}
+
+/* ---------- Custom Modal Helpers ---------- */
+var dlg=$("#dlg");
+dlg.addEventListener("close",function(){render();});
+
+var _pendingConfirmCallback = null;
+
+function showAlert(title, text) {
+  dlg.className = "";
+  dlg.innerHTML = '<h3>' + esc(title) + '</h3>' +
+    '<p class="hint">' + esc(text) + '</p>' +
+    '<div class="actions"><button class="primary" data-act="closeDlg">OK</button></div>';
+  if (!dlg.open) dlg.showModal();
+}
+
+function openConfirm(title, text, onYes) {
+  _pendingConfirmCallback = onYes;
+  dlg.className = "";
+  dlg.innerHTML = '<h3>' + esc(title) + '</h3>' +
+    '<p class="hint">' + esc(text) + '</p>' +
+    '<div class="actions">' +
+      '<button class="ghost" data-act="closeDlg">Cancel</button>' +
+      '<button class="primary" data-act="confirmYes">Confirm</button>' +
+    '</div>';
+  if (!dlg.open) dlg.showModal();
+}
 
 /* ---------- shared database (Firebase Realtime Database, REST) ---------- */
 var DB=(localStorage.getItem("esc-db")||"https://esc-connect-7bdfe-default-rtdb.europe-west1.firebasedatabase.app").replace(/\/+$/,"");
@@ -410,6 +436,7 @@ var songsOf=function(y){
   return arr;
 };
 var jname=function(id){
+  if(id === "admin") return "Admin";
   for(var i=0; i<S.jury.length; i++){if(S.jury[i].id===id) return S.jury[i].name;}
   return id;
 };
@@ -466,16 +493,11 @@ function render(){
   window.scrollTo(0,sy);
 }
 function header(){
-  var jOpts = "";
-  for(var i=0; i<S.jury.length; i++){
-    var j = S.jury[i];
-    jOpts += '<option value="'+j.id+'" '+(j.id===me?"selected":"")+'>'+esc(j.name)+'</option>';
-  }
-  jOpts += '<option value="admin" '+(me==="admin"?"selected":"")+'>👑 Admin</option>';
+  var currentName = (me === "admin") ? "👑 Admin" : esc(jname(me));
   
   return '<header><div class="brand">Eurovision Song Contest Scoreboard</div>'+
-  '<div class="who"><span id="net" class="net">'+netText()+'</span> Rating as '+
-    '<select data-chg="me">'+jOpts+'</select>'+
+  '<div class="who"><span id="net" class="net">'+netText()+'</span> Profile: '+
+    '<button class="ghost" data-act="openWelcomeModal" style="font-weight:700;color:var(--gold);border-color:var(--line)">'+currentName+'</button>'+
     '<button class="ghost" data-act="settings" title="Names, export, import">Settings</button></div></header>';
 }
 function home(){
@@ -500,7 +522,7 @@ function home(){
       }
     }
     var avgScore = songCount > 0 ? (totalPts / songCount) / 4 : 0;
-    var subText = avgScore.toFixed(1) + " Ø Pkt" + (y.city ? " · " + y.city : "");
+    var subText = avgScore.toFixed(1) + " Ø Pts" + (y.city ? " · " + y.city : "");
 
     yCards += '<div class="card yearcard" data-act="openYear" data-id="'+y.id+'"><b>'+esc(label)+'</b><span>'+esc(subText)+'</span></div>';
   }
@@ -605,7 +627,7 @@ function showView(sh){
       ptsBtns += '<button class="pt'+(mine===p?" on":"")+'" style="'+pc(p)+'" data-act="rate" data-e="'+e.id+'" data-p="'+p+'" aria-label="'+p+' points">'+p+'</button>';
     }
     
-    var picker = (ui.pickE===e.id)?'<div class="rate">'+(me==="admin"?'<div style="width:100%;font-size:0.85rem;color:var(--gold);margin-bottom:2px">Punkte vergeben für: <b>'+esc(jname(ui.pickJur||me))+'</b></div>':'')+ptsBtns+'<input class="note" placeholder="Note (optional)" value="'+esc(nt[activeJur]?nt[activeJur]:'')+'" data-chg="note" data-e="'+e.id+'" data-jur="'+activeJur+'"></div>':"";
+    var picker = (ui.pickE===e.id)?'<div class="rate">'+(me==="admin"?'<div style="width:100%;font-size:0.85rem;color:var(--gold);margin-bottom:2px">Rating points for: <b>'+esc(jname(ui.pickJur||me))+'</b></div>':'')+ptsBtns+'<input class="note" placeholder="Note (optional)" value="'+esc(nt[activeJur]?nt[activeJur]:'')+'" data-chg="note" data-e="'+e.id+'" data-jur="'+activeJur+'"></div>':"";
     
     var notesStr = "";
     for(var j=0; j<S.jury.length; j++){
@@ -947,9 +969,6 @@ function libraryView(){
 }
 
 /* ---------- dialogs ---------- */
-var dlg=$("#dlg");
-dlg.addEventListener("close",function(){render();});
-
 function openNewYearModal(){
   var thisYear=new Date().getFullYear();
   dlg.className="";
@@ -970,10 +989,12 @@ function openWelcomeModal(){
     var j = S.jury[i];
     btns += '<button class="primary preset-btn" data-act="selectWho" data-id="'+j.id+'" style="font-size:1.3rem;padding:18px">'+esc(j.name)+'</button>';
   }
+  btns += '<button class="preset-btn" data-act="selectWho" data-id="admin" style="font-size:1.3rem;padding:18px;border-color:var(--gold);color:var(--gold)">👑 Admin</button>';
   dlg.className="";
-  dlg.innerHTML='<h2 style="text-align:center;margin-bottom:8px">Welcome to Eurovision Scoreboard! 👋</h2>'+
-    '<p class="hint" style="text-align:center">Who are you? Choose your profile to start rating:</p>'+
-    '<div style="display:grid;grid-template-columns:1fr;gap:12px;margin:20px 0">'+btns+'</div>';
+  dlg.innerHTML='<h2 style="text-align:center;margin-bottom:8px">Select Profile 👋</h2>'+
+    '<p class="hint" style="text-align:center">Who are you? Choose your profile to rate:</p>'+
+    '<div style="display:grid;grid-template-columns:1fr;gap:12px;margin:20px 0">'+btns+'</div>'+
+    '<div class="actions"><button class="ghost" data-act="closeDlg">Cancel</button></div>';
   if(!dlg.open) dlg.showModal();
 }
 
@@ -1116,7 +1137,7 @@ function openSettings(){
   $("#imp").addEventListener("change",function(ev){
     var f=ev.target.files[0];if(!f)return;
     var r=new FileReader();
-    r.onload=function(){try{merge(JSON.parse(r.result));alert("Import successful.");dlg.close();}catch(e){alert("Error reading file.");}};
+    r.onload=function(){try{merge(JSON.parse(r.result));showAlert("Success", "Import successful.");dlg.close();}catch(e){showAlert("Error", "Error reading file.");}};
     r.readAsText(f);
   });
 }
@@ -1178,6 +1199,10 @@ var A={
     render();
     return "keep";
   },
+  openWelcomeModal:function(){
+    openWelcomeModal();
+    return "keep";
+  },
   home:function(){ui.yearId=null;ui.view="home";},
   openYear:function(t){ui.yearId=t.dataset.id;ui.view="year";ui.tab="sf1";},
   openCompare:function(){ui.view="compare";},
@@ -1185,16 +1210,18 @@ var A={
   addNewSongMain:function(){openSong(null,null);return "keep";},
   editSongMain:function(t){openSong(t.dataset.id,null);return "keep";},
   delSongMain:function(t){
-    if(!confirm("Delete song from library? This will also remove all points and placements."))return "keep";
     var id=t.dataset.id;
-    for(var i=0; i<S.years.length; i++){
-      var y=S.years[i];
-      for(var sh in y.shows){
-        var list=y.shows[sh];
-        for(var k=0; k<list.length; k++){if(list[k].songId===id){clearEntry(list[k].id); delete list[k].songId;}}
+    openConfirm("Delete Song", "Delete song from library? This will also remove all points and placements.", function(){
+      for(var i=0; i<S.years.length; i++){
+        var y=S.years[i];
+        for(var sh in y.shows){
+          var list=y.shows[sh];
+          for(var k=0; k<list.length; k++){if(list[k].songId===id){clearEntry(list[k].id); delete list[k].songId;}}
+        }
       }
-    }
-    S.songs=S.songs.filter(function(x){return x.id!==id;});save();render();return "keep";
+      S.songs=S.songs.filter(function(x){return x.id!==id;});save();render();
+    });
+    return "keep";
   },
   openNewYearDlg:function(){openNewYearModal();return "keep";},
   ovMode:function(t){ui.ov=t.dataset.m;},
@@ -1213,9 +1240,9 @@ var A={
   saveNewYear:function(){
     var yNum=parseInt($("#ny_year").value);
     var suffix=($("#ny_suffix").value||"").trim();
-    if(!yNum||yNum<1956){alert("Please enter a valid year.");return "keep";}
+    if(!yNum||yNum<1956){showAlert("Notice", "Please enter a valid year.");return "keep";}
     var id = yNum + (suffix ? "_" + suffix.toLowerCase().replace(/[^a-z0-9]/g,"_") : "_main");
-    if(yearObj(id)){alert("This contest already exists for this year.");return "keep";}
+    if(yearObj(id)){showAlert("Notice", "This contest already exists for this year.");return "keep";}
     
     var shows={};
     for(var sh in SHOWS){
@@ -1231,12 +1258,14 @@ var A={
   },
   delYear:function(){
     var y=yearObj(ui.yearId);
-    if(!confirm("Really delete contest "+y.year+(y.suffix?" ("+y.suffix+")":"")+" including all songs and points?"))return;
-    for(var sh in y.shows){
-      var l = y.shows[sh];
-      for(var i=0; i<l.length; i++){delete S.ratings[l[i].id]; delete S.pred[l[i].id]; delete S.notes[l[i].id];}
-    }
-    S.years=S.years.filter(function(x){return x!==y;});save();ui.yearId=null;ui.view="home";
+    openConfirm("Delete Contest", "Really delete contest "+y.year+(y.suffix?" ("+y.suffix+")":"")+" including all songs and points?", function(){
+      for(var sh in y.shows){
+        var l = y.shows[sh];
+        for(var i=0; i<l.length; i++){delete S.ratings[l[i].id]; delete S.pred[l[i].id]; delete S.notes[l[i].id];}
+      }
+      S.years=S.years.filter(function(x){return x!==y;});save();ui.yearId=null;ui.view="home";render();
+    });
+    return "keep";
   },
   rate:function(t){
     var id=t.dataset.e,p=+t.dataset.p;
@@ -1253,8 +1282,13 @@ var A={
     var y=yearObj(ui.yearId),l=y.shows[t.dataset.show];
     if(l.length<=1)return;
     var e=l[l.length-1];
-    if((e.songId||S.ratings[e.id])&&!confirm("Remove running order slot "+l.length+"?"))return;
-    l.pop();delete S.ratings[e.id];delete S.pred[e.id];save();
+    if(e.songId||S.ratings[e.id]){
+      openConfirm("Remove Slot", "Remove running order slot "+l.length+"?", function(){
+        l.pop();delete S.ratings[e.id];delete S.pred[e.id];save();render();
+      });
+    }else{
+      l.pop();delete S.ratings[e.id];delete S.pred[e.id];save();
+    }
   },
   editNo:function(t){
     openEditNo(t.dataset.e);
@@ -1287,27 +1321,34 @@ var A={
   choose:function(t){
     var e=findEntry(ui.assign),id=t.dataset.id;
     if(e.songId&&e.songId!==id){
-      if((S.ratings[e.id]||S.pred[e.id]||e.place)&&!confirm("This slot already has points or placements. Continue?"))return "keep";
-      clearEntry(e.id);
+      if(S.ratings[e.id]||S.pred[e.id]||e.place){
+        openConfirm("Replace Song", "This slot already has points or placements. Continue?", function(){
+          clearEntry(e.id);
+          e.songId=id;save();dlg.close();render();
+        });
+        return "keep";
+      }
     }
     e.songId=id;save();dlg.close();return "keep";
   },
   delSong:function(t){
-    if(!confirm("Delete song from library? This will also remove all points and placements."))return "keep";
     var id=t.dataset.id;
-    for(var i=0; i<S.years.length; i++){
-      var y=S.years[i];
-      for(var sh in y.shows){
-        var list=y.shows[sh];
-        for(var k=0; k<list.length; k++){if(list[k].songId===id){clearEntry(list[k].id); delete list[k].songId;}}
+    openConfirm("Delete Song", "Delete song from library? This will also remove all points and placements.", function(){
+      for(var i=0; i<S.years.length; i++){
+        var y=S.years[i];
+        for(var sh in y.shows){
+          var list=y.shows[sh];
+          for(var k=0; k<list.length; k++){if(list[k].songId===id){clearEntry(list[k].id); delete list[k].songId;}}
+        }
       }
-    }
-    S.songs=S.songs.filter(function(x){return x.id!==id;});save();fillList();return "keep";
+      S.songs=S.songs.filter(function(x){return x.id!==id;});save();fillList();
+    });
+    return "keep";
   },
   saveSong:function(){
     var artist=$("#f_artist").value.trim(),title=$("#f_title").value.trim(),cc=$("#f_cc").value;
     var songYear=parseInt($("#f_song_year").value)||new Date().getFullYear();
-    if(!artist||!title){alert("Please enter artist and song title.");return "keep";}
+    if(!artist||!title){showAlert("Notice", "Please enter artist and song title.");return "keep";}
     if(ui.editSong){var x=songById(ui.editSong);x.artist=artist;x.title=title;x.cc=cc;x.year=songYear;}
     else{
       var id="s"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
@@ -1335,6 +1376,15 @@ var A={
   },
   saveDb:function(){localStorage.setItem("esc-db",$("#dburl").value.trim().replace(/\/+$/,""));location.reload();return "keep";},
   closeDlg:function(){dlg.close();return "keep";},
+  confirmYes:function(){
+    dlg.close();
+    if(_pendingConfirmCallback){
+      var cb = _pendingConfirmCallback;
+      _pendingConfirmCallback = null;
+      cb();
+    }
+    return "keep";
+  },
   settings:function(){openSettings();return "keep";},
   saveNames:function(){
     var inputs = document.querySelectorAll("[data-jn]");
@@ -1390,11 +1440,6 @@ document.addEventListener("click",function(ev){
 });
 
 var C={
-  me:function(t){
-    me = t.value;
-    localStorage.setItem(MEKEY, me);
-    render();
-  },
   pick:function(t){
     if(t.value==="__new"){openSong(null,t.dataset.e);return "key0";}
     var e=findEntry(t.dataset.e);if(t.value)e.songId=t.value;else delete e.songId;save();
