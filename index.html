@@ -147,21 +147,41 @@ h3{font-family:var(--display);margin:0 0 12px}
   flex-wrap:wrap;
 }
 .tiles{display:flex;gap:4px}
+
+/* Geteilte Kacheln (Split-Tiles Design) */
 .tile{
-  width:44px;
-  height:44px;
+  width:46px;
+  height:50px;
   border-radius:10px;
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content:center;
+  justify-content:space-between;
   border:2px solid transparent;
   padding:0;
-  line-height:1.1;
+  line-height:1;
   font-family:inherit;
+  overflow:hidden;
 }
-.tile b{font-family:var(--number-font); font-size:1.4rem; letter-spacing:0.05em;}
-.tile small{font-size:0.65rem;font-weight:700;opacity:.9}
+.tile small{
+  font-size:0.6rem;
+  font-weight:700;
+  width:100%;
+  text-align:center;
+  padding:3px 0;
+  background: rgba(0,0,0,0.22);
+  border-bottom: 1px solid rgba(0,0,0,0.15);
+}
+.tile.empty small{
+  background: rgba(255,255,255,0.06);
+  border-bottom-color: var(--line);
+}
+.tile b{
+  font-family:var(--number-font); 
+  font-size:1.35rem; 
+  letter-spacing:0.05em;
+  margin-bottom:3px;
+}
 .tile.empty{background:var(--panel2);color:var(--muted)}
 .tile.me{border-color:#fff}
 
@@ -695,7 +715,7 @@ function showView(sh){
     var mainStatsHtml = "";
     if (sh !== "final" && ui.subTab === "tips") {
       if (isAutoFinal) {
-        mainStatsHtml = '<div class="tiles"><div class="tile" style="background:#7b2cbf;color:#fff;width:auto;padding:0 12px;font-family:var(--display);font-size:0.8rem;font-weight:800;">AUTO-FINALIST</div></div>';
+        mainStatsHtml = '<div class="tiles"><div class="tile" style="background:#7b2cbf;color:#fff;width:auto;padding:0 12px;font-family:var(--display);font-size:0.8rem;font-weight:800;display:grid;place-items:center;">AUTO-FINALIST</div></div>';
       } else {
         var tipsHtml = "";
         for(var j=0; j<S.jury.length; j++){
@@ -714,7 +734,7 @@ function showView(sh){
           var clickAttr = isMe ? 'data-act="toggleQual" data-e="'+e.id+'" data-jur="'+jur.id+'"' : '';
           var curStyle = isMe ? 'cursor:pointer;' : 'cursor:default;';
           
-          tipsHtml += '<button class="tile '+(isMe?"me":"empty")+'" style="background:'+bg+';color:'+col+';border:'+border+';'+curStyle+'" '+clickAttr+' title="'+esc(jur.name)+'"><b>'+txt+'</b><small style="color:inherit;opacity:0.8">'+esc(lab[j])+'</small></button>';
+          tipsHtml += '<button class="tile '+(isMe?"me":"empty")+'" style="background:'+bg+';color:'+col+';border:'+border+';'+curStyle+'" '+clickAttr+' title="'+esc(jur.name)+'"><small style="background:transparent;border:none;padding:1px 0">'+esc(lab[j])+'</small><b>'+txt+'</b></button>';
         }
         mainStatsHtml = '<div class="tiles">'+tipsHtml+'</div>';
       }
@@ -729,7 +749,7 @@ function showView(sh){
       for(var j=0; j<S.jury.length; j++){
         var jur = S.jury[j], v = r[jur.id], isMe = (jur.id === me) || (me === "admin");
         var cls = "tile" + (isMe?" me":"") + (v!==undefined&&v!==null?"":" empty");
-        var inner = "<b>"+(v!==undefined&&v!==null?v:"–")+"</b><small>"+esc(lab[j])+"</small>";
+        var inner = "<small>"+esc(lab[j])+"</small><b>"+(v!==undefined&&v!==null?v:"–")+"</b>";
         
         if(isMe && s){ tiles += '<button class="'+cls+'" style="'+(v?pc(v):"")+'" data-act="openPick" data-e="'+e.id+'" data-jur="'+jur.id+'" title="'+esc(jur.name)+'">'+inner+'</button>'; }
         else { tiles += '<div class="'+cls+'" style="'+(v?pc(v):"")+'" title="'+esc(jur.name)+'">'+inner+'</div>'; }
