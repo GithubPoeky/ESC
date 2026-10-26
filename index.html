@@ -6,105 +6,223 @@
 <title>Eurovision Song Contest Scoreboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;800&family=Plus+Jakarta+Sans:wght@400;600;700&family=Protest+Strike&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#150a30; --panel:#231247; --panel2:#2f1a5e; --line:#47298a;
-  --ink:#f8f5ff; --muted:#b9a8e8; --pink:#ff2d95; --gold:#ffd166;
-  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
-  --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --bg:#06020f; --panel:#110624; --panel2:#1a0b35; --line:#32195f;
+  --ink:#f8f5ff; --muted:#9d88dc; --pink:#ff2d95; --gold:#ffd166;
+  --display:"Outfit","Segoe UI",system-ui,sans-serif;
+  --body:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --number-font:"Protest Strike", sans-serif;
 }
 *{box-sizing:border-box}
 html{background:var(--bg)}
 body{margin:0;font-family:var(--body);color:var(--ink);background:
-  radial-gradient(900px 420px at 85% -10%,rgba(255,45,149,.22),transparent 60%),
-  radial-gradient(700px 380px at 0% 0%,rgba(140,82,255,.22),transparent 60%),var(--bg);
-  min-height:100vh;line-height:1.45}
-.wrap{max-width:1300px;margin:0 auto;padding:0 16px 80px}
+  radial-gradient(900px 420px at 50% -10%,rgba(255,45,149,.15),transparent 60%),
+  radial-gradient(700px 380px at 10% 20%,rgba(110,50,220,.2),transparent 60%),var(--bg);
+  min-height:100vh;line-height:1.42; overflow-x:hidden;}
+
+#app { transition: opacity 0.3s ease; }
+#app.enter { animation: popIn 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+@keyframes popIn {
+  0% { opacity: 0; transform: translateY(10px) scale(0.99); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.wrap{max-width:1600px;margin:0 auto;padding:0 16px 80px}
 header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid var(--line)}
 .brand{font-family:var(--display);font-weight:800;font-size:1.05rem;letter-spacing:.01em}
 .who{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.9rem}
-select,input{font:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;max-width:100%}
+select,input{font:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;max-width:100%; transition: border-color 0.2s ease;}
 select:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
 input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-input[type=number] {
-  -moz-appearance: textfield;
-}
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }
 
-button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);padding:8px 14px}
+button{
+  font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);padding:6px 12px;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s ease,filter .2s ease,background-color .2s ease,opacity .2s ease,border-color .2s ease;
+}
+button:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 16px rgba(255,45,149,.25)}
+button:active:not(:disabled){transform:scale(.92);box-shadow:none}
+
 button.primary{background:#9e134c;border-color:#9e134c;color:#fff;font-weight:700}
 button.ghost{background:transparent}
 button.danger{color:#ffb3b3}
-button:disabled{opacity:.35;cursor:not-allowed}
-.hero{font-family:var(--display);font-weight:800;font-size:clamp(2.8rem,10vw,6.4rem);line-height:.95;margin:48px 0 24px;letter-spacing:-.02em}
+button:disabled{opacity:.35;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+
+.hero{
+  font-family:var(--display);font-weight:800;font-size:clamp(2.8rem,8vw,5.6rem);line-height:1.05;margin:48px 0 24px;letter-spacing:-.02em;
+  text-align:center;
+  background:linear-gradient(135deg, #ff2d95 0%, #ffd166 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
 h2{font-family:var(--display);font-size:1.5rem;margin:24px 0 4px}
 h3{font-family:var(--display);margin:0 0 12px}
-.hint{color:var(--muted);margin:0 0 16px;font-size:.92rem}
+.hint{color:var(--muted);margin:0 0 14px;font-size:.9rem}
 .yeartitle{font-family:var(--display);font-weight:800;font-size:clamp(2rem,6vw,3.4rem);margin:12px 0 16px;letter-spacing:-.01em}
 
-/* Redesigned Home Grid & FAB */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:20px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
-.yearcard{cursor:pointer;display:flex;flex-direction:column;gap:6px;padding:24px;min-height:140px;justify-content:center}
+
+.yearcard{cursor:pointer;display:flex;flex-direction:column;gap:6px;padding:24px;min-height:140px;justify-content:center; transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease, border-color 0.25s ease;}
+.yearcard:hover{transform:translateY(-6px); box-shadow:0 12px 24px rgba(0,0,0,0.4); border-color:var(--gold);}
+.yearcard:active{transform:scale(0.96);}
 .yearcard b{font-family:var(--display);font-size:2.2rem}
 .yearcard span{color:var(--muted);font-size:1rem}
 
 .fab{position:fixed;bottom:32px;right:32px;width:64px;height:64px;border-radius:50%;background:var(--pink);color:#fff;font-size:2.4rem;display:grid;place-items:center;border:none;box-shadow:0 10px 28px rgba(255,45,149,0.5);z-index:100;cursor:pointer;padding:0;margin:0}
 .fab:hover{transform:scale(1.1) rotate(90deg);box-shadow:0 14px 32px rgba(255,45,149,0.7)}
 
-.main-actions{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:32px}
-.main-actions button{font-family:var(--display);font-weight:700;font-size:1.15rem;padding:14px 24px;border-radius:12px;flex:1;min-width:220px}
+.main-actions{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:32px;justify-content:center}
+.main-actions button{font-family:var(--display);font-weight:700;font-size:1.15rem;padding:14px 24px;border-radius:12px;flex:1;max-width:300px;min-width:220px}
 
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px;border-bottom:1px solid var(--line);padding-bottom:10px}
 .tabs button{border-radius:999px;background:transparent}
 .tabs button.on{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:700}
-
-/* Special Styling for Final Tab */
 .tabs button.final-tab{border-color:var(--gold);color:var(--gold);font-weight:700}
 .tabs button.final-tab.on{background:var(--gold);color:var(--bg);border-color:var(--gold)}
 
-/* Song Row Layout */
-.row{display:grid;grid-template-columns:52px 1fr;gap:6px 10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px;align-items:center}
-.list{display:block;column-count:1;gap:8px}
-.no{font-family:var(--display);font-weight:700;font-size:.85rem;color:var(--muted);background:var(--panel2);border-radius:6px;height:36px;display:flex;align-items:center;justify-content:center;align-self:center;padding:0 4px;cursor:pointer;border:1px solid transparent}
+.list{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px}
+@media(max-width:1300px){.list{grid-template-columns:1fr}}
+
+@keyframes simpleFadeUp { 
+  from { opacity: 0; transform: translateY(8px); } 
+  to { opacity: 1; transform: translateY(0); } 
+}
+.row{
+  display:grid;
+  grid-template-columns:44px 1fr auto;
+  gap:12px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px 12px;
+  align-items:center;
+  animation: simpleFadeUp 0.3s ease-out backwards;
+}
+
+@media(max-width:700px){
+  .row{grid-template-columns:1fr;gap:8px}
+  .pl{justify-self:start!important}
+}
+
+.no{
+  font-family:var(--display);
+  font-weight:800;
+  font-size:0.95rem;
+  color:var(--muted);
+  background:var(--panel2);
+  border-radius:8px;
+  width:44px;
+  height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  border:1px solid transparent;
+  flex-shrink:0;
+  transition:color 0.2s, border-color 0.2s;
+}
 .no:hover{border-color:var(--gold);color:var(--gold)}
-.main select{width:100%}
-.meta{display:flex;align-items:center;gap:12px;min-height:36px;font-size:1.05rem}
-.meta b{font-size:1.15rem}
-.meta .flag{width:26px;height:18px;object-fit:cover;border-radius:3px;transform:scale(1.35);display:inline-block;margin:0 3px;vertical-align:middle}
-.flag{width:20px;height:14px;object-fit:cover;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.25);vertical-align:middle;transform:scale(1.3);display:inline-block;margin:0 2px}
-.rate{grid-column:2;display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
-.pt{width:36px;height:36px;padding:0;border:2px solid transparent;font-weight:800;opacity:.5}
+
+.row-content{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-width:0;
+}
+
+.meta{display:flex;align-items:center;gap:8px;font-size:0.95rem;flex-wrap:wrap;min-width:0}
+.meta b{font-size:1.05rem}
+.flag{width:22px;height:15px;object-fit:cover;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.25);vertical-align:middle;transform:scale(1.2);display:inline-block;margin:0 2px}
+
+.stats{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.tiles{display:flex;gap:4px}
+.tile{
+  width:44px;
+  height:44px;
+  border-radius:10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  border:2px solid transparent;
+  padding:0;
+  line-height:1.1;
+  font-family:inherit;
+}
+.tile b{font-family:var(--number-font); font-size:1.4rem; letter-spacing:0.05em;}
+.tile small{font-size:0.65rem;font-weight:700;opacity:.9}
+.tile.empty{background:var(--panel2);color:var(--muted)}
+.tile.me{border-color:#fff}
+
+.avg{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:44px}
+.avg b{font-family:var(--display);font-size:1.15rem}
+.avg small{font-size:0.6rem;color:var(--muted);letter-spacing:.04em}
+
+.pl{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  justify-self:end;
+}
+.pl input{width:56px;height:44px;text-align:center;font-family:var(--display);font-size:1.25rem;font-weight:800;color:var(--gold);background:var(--bg);border:2px solid var(--gold);border-radius:10px;padding:0}
+.pl small{font-size:0.6rem;color:var(--gold);font-weight:700;letter-spacing:.05em}
+
+.rate{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+  padding-top:6px;
+  border-top:1px solid var(--line);
+  width:100%;
+  grid-column:1/-1;
+}
+.pt{width:34px;height:34px;padding:0;border:2px solid transparent;font-family:var(--number-font);font-size:1.2rem;opacity:.5}
 .pt:hover:not(:disabled){opacity:.9}
 .pt.on{opacity:1;border-color:#fff;box-shadow:0 0 0 2px var(--pink)}
+
+.notes{
+  color:var(--muted);
+  font-size:0.8rem;
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px 12px;
+  grid-column:1/-1;
+}
+
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 table{width:100%;border-collapse:collapse}
 th,td{padding:8px 6px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
 th{color:var(--muted);font-weight:500;font-size:.85rem}
 .tw{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 10px}
 td.c,th.c{text-align:center}
-.cell{display:inline-block;min-width:34px;padding:3px 8px;border-radius:8px;font-weight:800;text-align:center}
+.cell{display:inline-block;min-width:34px;padding:3px 8px;border-radius:8px;font-family:var(--number-font);font-size:1.1rem;text-align:center}
 td input[type=number]{width:72px}
 .dup{border-color:#ff6b6b;color:#ffb3b3}
 .verdict{margin-top:14px;padding:16px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:1.05rem}
 .verdict b{font-family:var(--display);font-size:1.3rem}
 .seg{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
 .seg button.on{background:var(--pink);border-color:var(--pink);font-weight:700}
-.q{display:inline-block;background:#1f9d55;color:#fff;border-radius:6px;padding:0 6px;font-size:.75rem;font-weight:800;margin-left:6px}
-.autofinal{display:inline-block;background:#7b2cbf;color:#fff;border-radius:6px;padding:0 6px;font-size:.75rem;font-weight:800;margin-left:6px}
+.q{display:inline-block;background:#1f9d55;color:#fff;border-radius:4px;padding:0 4px;font-size:0.65rem;font-weight:800;margin-left:4px;white-space:nowrap;flex-shrink:0}
+.autofinal{display:inline-block;background:#7b2cbf;color:#fff;border-radius:4px;padding:0 4px;font-size:0.65rem;font-weight:800;margin-left:4px;white-space:nowrap;flex-shrink:0}
 .rank{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line)}
 .rank .p{font-family:var(--display);font-weight:800;font-size:1.3rem;width:36px;color:var(--gold)}
 .vs{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 
-/* Modal styling & custom pickers */
 dialog{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:22px;width:min(440px,92vw)}
 dialog.wide{width:min(680px,92vw)}
-dialog::backdrop{background:rgba(5,8,40,.75);backdrop-filter:blur(4px);animation:fadeIn .25s ease}
+dialog::backdrop{background:rgba(5,2,15,.85);backdrop-filter:blur(4px);animation:fadeIn .25s ease}
 dialog label{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;color:var(--muted);font-size:.88rem}
 dialog input,dialog select{width:100%}
 .preset-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:8px;margin:12px 0 16px}
@@ -112,113 +230,38 @@ dialog input,dialog select{width:100%}
 .preset-btn:hover{border-color:var(--pink);background:rgba(255,45,149,.15)}
 
 .empty{color:var(--muted);padding:20px 0}
-.stats{grid-column:2;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.tiles{display:flex;gap:6px}
-.tile{width:50px;height:50px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid transparent;padding:0;line-height:1.1;font-family:inherit}
-.tile b{font-size:1.35rem}
-.tile small{font-size:0.75rem;font-weight:700;opacity:.9}
-.tile.empty{background:var(--panel2);color:var(--muted)}
-.tile.me{border-color:#fff}
-button.tile{cursor:pointer}
-button.tile:hover{filter:brightness(1.08);transform:translateY(-2px) scale(1.06)}
-.avg{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:44px}
-.avg b{font-family:var(--display);font-size:1.15rem}
-.avg small{font-size:.65rem;color:var(--muted);letter-spacing:.04em}
-
-/* Prominent Placement Style */
-.pl{display:flex;flex-direction:column;align-items:center;gap:2px;margin-left:auto}
-.pl input{width:68px;height:42px;text-align:center;font-family:var(--display);font-size:1.3rem;font-weight:800;color:var(--gold);background:var(--bg);border:2px solid var(--gold);border-radius:10px;padding:0}
-.pl small{font-size:.65rem;color:var(--gold);font-weight:700;letter-spacing:.05em}
-
-.row.out{filter:grayscale(1);opacity:.45}
-.row.out:hover{opacity:.95}
-.row.dq{filter:grayscale(1);opacity:.35;text-decoration:line-through}
-.row.winner{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
-.row.autofinal-row{border-color:#9d4edd;box-shadow:0 0 0 1px rgba(157,78,221,0.5)}
-.row.epic-10{border:2px solid var(--gold);animation:epicGlow 2s infinite ease-in-out}
-
-.notes{grid-column:2 / -1;color:var(--muted);font-size:.82rem;display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:4px}
-.note{flex:1 1 220px}
-.sm-group{display:flex;gap:4px;margin-left:auto;opacity:0;pointer-events:none}
-.row:hover .sm-group,.sm-group:focus-within{opacity:1;pointer-events:auto}
-.sm{padding:3px 8px;font-size:.75rem}
-@media (hover:none){.sm-group{opacity:1;pointer-events:auto}}
+.sm-group{display:flex;gap:4px;margin-left:auto;flex-shrink:0}
+.sm{padding:2px 6px;font-size:0.75rem}
 .prow{display:flex;gap:6px;align-items:center;border-bottom:1px solid var(--line)}
-.pbtn{flex:1;display:flex;gap:10px;align-items:center;text-align:left;background:transparent;border:0;padding:10px 4px}
+.pbtn{flex:1;display:flex;gap:10px;align-items:center;text-align:left;background:transparent;border:0;padding:8px 4px}
 .pbtn small{color:var(--muted)}
 #plist{max-height:55vh;overflow:auto;margin:10px 0}
 .net{font-size:.8rem}
 
-/* Redesigned Compact Overview */
-.ovwrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
-.ov{display:grid;grid-template-columns:auto auto;gap:32px;justify-content:center;min-width:max-content}
-.ov-row,.ov-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.ov-pts{display:flex;align-items:center;gap:4px}
-.ov-pill .flag{width:22px;height:15px;object-fit:cover}
-.ov-pt{width:42px;height:42px;display:grid;place-items:center;font:800 1.2rem var(--display);border-radius:8px;transition:transform .15s}
-.ov-pt:not(.none):hover{transform:scale(1.15);position:relative;z-index:1}
-.ov-pt.none{background:var(--panel2);color:var(--muted)}
-.ov-name{width:42px;text-align:center;font:700 .9rem var(--display);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ov-no{width:24px;text-align:center;color:var(--muted);font-size:.85rem;font-weight:600}
-.ov-pill{width:220px;height:42px;border-radius:8px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 10px;font:700 1rem var(--display)}
-.ov-row.gray{filter:grayscale(1);opacity:.4}
-.ov-pill.gold{border-color:var(--gold);box-shadow:0 0 10px rgba(255,209,102,.3)}
-.ov-pill.out{background:var(--bg);color:var(--muted);opacity:.5}
-.ov-pill.title{background:var(--line);color:var(--ink);justify-content:center;font-size:1.1rem}
+/* Overview Layout: Lückenlos & mit Song-Details gefüllt */
+.ov-grid-side{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:24px;margin-top:16px}
+@media(max-width:1200px){.ov-grid-side{grid-template-columns:1fr}}
+.ov-column{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.ov-col-title{font-family:var(--display);font-weight:800;font-size:1.1rem;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center;margin-bottom:16px;color:var(--ink)}
 
-@media (min-width:900px){
-  .list{
-    display: block;
-    column-count: 2;
-    column-gap: 12px;
-  }
-  .list .row{
-    margin-bottom: 8px;
-    break-inside: avoid;
-  }
-}
+.ov-headers-row{display:flex;justify-content:space-between;align-items:center;padding:0 8px 6px;color:var(--muted);font-size:0.8rem;font-weight:700}
+.ov-row-item{display:flex;align-items:center;gap:4px;margin-bottom:8px;justify-content:space-between}
+.ov-pts{display:flex;gap:4px}
+.ov-pt{width:34px;height:34px;display:grid;place-items:center;font-family:var(--number-font);font-size:1.1rem;border-radius:8px;background:var(--panel2);border:1px solid var(--line)}
+.ov-pt.none{color:var(--muted);opacity:0.4}
+.ov-no{width:26px;text-align:center;font-weight:700;color:var(--muted);font-size:0.85rem;display:none;}
+.ov-pill{flex:1;height:38px;border-radius:8px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);display:flex;align-items:center;justify-content:space-between;padding:0 10px;font:700 0.85rem var(--display);overflow:hidden;}
+.ov-pill .song-info{display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;}
+.ov-pill .song-info span{overflow:hidden;text-overflow:ellipsis;font-size:0.8rem;font-weight:400;color:var(--muted);}
+.ov-pill .song-info b{font-size:0.85rem;color:var(--ink);font-weight:600;}
+.ov-pill.out{opacity:0.4;background:var(--bg)}
+.ov-pill .flag{width:22px;height:15px;object-fit:cover;border-radius:2px;flex-shrink:0;}
+.ov-place{width:36px;text-align:center;font-weight:800;color:var(--gold);font-size:0.9rem}
 
-/* Enhancer & Animations */
-button{transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s ease,filter .2s ease,background-color .2s ease,opacity .2s ease}
-button:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 16px rgba(255,45,149,.25)}
-button:active:not(:disabled){transform:scale(.92);box-shadow:none}
-button.primary:hover:not(:disabled){box-shadow:0 0 0 3px rgba(255,45,149,.35),0 6px 16px rgba(255,45,149,.45)}
-.pt:hover:not(:disabled){transform:scale(1.18) rotate(3deg)}
-.pt.on{animation:pop .35s cubic-bezier(.34,1.56,.64,1)}
-@keyframes pop{0%{transform:scale(.7)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
-@keyframes epicGlow{
-  0%{box-shadow:0 0 5px var(--gold),0 0 10px rgba(255,45,149,0.5);border-color:var(--gold)}
-  50%{box-shadow:0 0 25px var(--gold),0 0 45px var(--pink),inset 0 0 12px var(--gold);border-color:#fff}
-  100%{box-shadow:0 0 5px var(--gold),0 0 10px rgba(255,45,149,0.5);border-color:var(--gold)}
-}
+.row.winner{border-color:var(--gold);box-shadow:0 0 15px rgba(255,209,102,.3)}
+.row.autofinal-row{border-color:#9d4edd}
 
-.row{transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
-.row:hover{transform:translateY(-3px);border-color:var(--pink);box-shadow:0 10px 24px rgba(0,0,0,.35)}
-.meta .flag{transition:transform .3s ease}
-.row:hover .meta .flag{transform:scale(1.4) rotate(-6deg)}
-.avg b{display:inline-block;transition:transform .2s}
-.row:hover .avg b{transform:scale(1.18)}
-
-.yearcard{transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
-.yearcard:hover{transform:translateY(-5px) scale(1.03);border-color:var(--pink);box-shadow:0 14px 32px rgba(255,45,149,.3)}
-.hero{background:linear-gradient(90deg,#fff 0%,#ffd166 30%,#ff2d95 60%,#fff 100%);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;animation:shine 8s linear infinite}
-.row .primary{animation:pulse 2.2s ease-in-out infinite}
-.row.winner{animation:glow 2.4s ease-in-out infinite}
-
-.enter .row,.enter .ov-row,.enter .yearcard,.enter .tw,.enter .verdict{animation:rise .45s cubic-bezier(0.16,1,0.3,1) both}
-.enter .row:nth-child(2n),.enter .ov-row:nth-child(2n){animation-delay:.05s}
-.enter .row:nth-child(3n),.enter .ov-row:nth-child(3n){animation-delay:.1s}
-.enter .row:nth-child(4n),.enter .ov-row:nth-child(4n){animation-delay:.15s}
-
-dialog[open]{animation:riseModal .3s cubic-bezier(0.16,1,0.3,1) both}
-@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-@keyframes riseModal{from{opacity:0;transform:scale(0.92) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes shine{to{background-position:-300% 0}}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,45,149,.55)}50%{box-shadow:0 0 0 10px rgba(255,45,149,0)}}
-@keyframes glow{0%,100%{box-shadow:0 0 0 1px var(--gold),0 0 10px rgba(255,209,102,.3)}50%{box-shadow:0 0 0 1px var(--gold),0 0 24px rgba(255,209,102,.75)}}
-
-@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
@@ -271,18 +314,9 @@ function load(){
 }
 var S=load();
 var me=localStorage.getItem(MEKEY)||"j1";
-var ui={big:null,q:"",view:"home",yearId:null,tab:"sf1",sbShow:"final",resShow:"final",bA:null,bB:null,assign:null,editSong:null,pickE:null,pickJur:null,libYear:"",libSort:"name",compareCc:null};
+var ui={big:null,q:"",view:"home",yearId:null,tab:"sf1",subTab:"points",ovSubTab:"semis",sbShow:"final",editMode:false,bA:null,bB:null,assign:null,editSong:null,pickE:null,pickJur:null,libYear:"",libSort:"name",compareCc:null,enter:false};
+
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){showAlert("Error", "Could not save in this browser.");}push();}
-function clearEntry(id){
-  var e=findEntry(id);
-  if(e){
-    delete e.place;
-    if(e.songId) delete S.ratings[e.songId];
-    delete S.ratings[id];
-    delete S.notes[id];
-    delete S.qualPred[id];
-  }
-}
 
 function getRatings(e){
   if(!e) return {};
@@ -304,10 +338,8 @@ function getQualPred(e){
   return {};
 }
 
-/* ---------- Custom Modal Helpers ---------- */
 var dlg=$("#dlg");
 dlg.addEventListener("close",function(){render();});
-
 var _pendingConfirmCallback = null;
 
 function showAlert(title, text) {
@@ -330,7 +362,6 @@ function openConfirm(title, text, onYes) {
   if (!dlg.open) dlg.showModal();
 }
 
-/* ---------- shared database (Firebase Realtime Database, REST) ---------- */
 var DB=(localStorage.getItem("esc-db")||"https://esc-connect-7bdfe-default-rtdb.europe-west1.firebasedatabase.app").replace(/\/+$/,"");
 var lastFlat={},busy=0,net=DB?"connecting":"local";
 var netText=function(){return {local:"Local only",connecting:"Connecting…",online:"● Shared",error:"Offline, retrying"}[net];};
@@ -338,14 +369,8 @@ var badge=function(){var n=$("#net");if(n)n.textContent=netText();};
 
 function toTree(){
   var t={jury:{},songs:{},years:{},ratings:S.ratings,notes:S.notes,pred:S.pred,qualPred:S.qualPred};
-  for(var i=0; i<S.jury.length; i++){
-    var j = S.jury[i];
-    t.jury[j.id] = {name:j.name};
-  }
-  for(var i=0; i<S.songs.length; i++){
-    var x = S.songs[i];
-    t.songs[x.id] = {cc:x.cc, artist:x.artist, title:x.title, year:x.year};
-  }
+  for(var i=0; i<S.jury.length; i++){ t.jury[S.jury[i].id] = {name:S.jury[i].name}; }
+  for(var i=0; i<S.songs.length; i++){ var x = S.songs[i]; t.songs[x.id] = {cc:x.cc, artist:x.artist, title:x.title, year:x.year}; }
   for(var i=0; i<S.years.length; i++){
     var y = S.years[i];
     var o={year:y.year, suffix:y.suffix, city:y.city, shows:{}};
@@ -353,8 +378,7 @@ function toTree(){
       o.shows[sh]={};
       var shList = y.shows[sh];
       for(var k=0; k<shList.length; k++){
-        var e = shList[k];
-        o.shows[sh][e.id] = {n:e.customNo || idx(e.id), songId:e.songId, place:e.place, dq:e.dq, autoFinal: e.autoFinal};
+        var e = shList[k]; o.shows[sh][e.id] = {n:e.customNo || idx(e.id), songId:e.songId, place:e.place, dq:e.dq, autoFinal: e.autoFinal};
       }
     }
     t.years[y.id]=o;
@@ -374,35 +398,16 @@ function flat(o,p,out){
 
 function fromTree(t){
   var r=fresh(),ju=t.jury||{};
-  for(var i=0; i<r.jury.length; i++){
-    var j = r.jury[i];
-    if(ju[j.id] && ju[j.id].name) j.name = ju[j.id].name;
-  }
-  
-  r.songs=[];
-  var tSongs = t.songs || {};
-  for(var id in tSongs){
-    if(tSongs.hasOwnProperty(id)){
-      var x = tSongs[id];
-      r.songs.push(Object.assign({id:id}, x));
-    }
-  }
-
-  r.years=[];
-  var tYears = t.years || {};
+  for(var i=0; i<r.jury.length; i++){ if(ju[r.jury[i].id] && ju[r.jury[i].id].name) r.jury[i].name = ju[r.jury[i].id].name; }
+  r.songs=[]; var tSongs = t.songs || {};
+  for(var id in tSongs){ if(tSongs.hasOwnProperty(id)) r.songs.push(Object.assign({id:id}, tSongs[id])); }
+  r.years=[]; var tYears = t.years || {};
   for(var id in tYears){
     if(tYears.hasOwnProperty(id)){
-      var o = tYears[id];
-      var shows={};
+      var o = tYears[id]; var shows={};
       for(var sh in SHOWS){
-        var shObj = (o.shows || {})[sh] || {};
-        var arr = [];
-        for(var id2 in shObj){
-          if(shObj.hasOwnProperty(id2)){
-            var e = shObj[id2];
-            arr.push({id:id2, songId:e.songId, place:e.place, customNo:e.n, dq:e.dq, autoFinal: e.autoFinal});
-          }
-        }
+        var shObj = (o.shows || {})[sh] || {}; var arr = [];
+        for(var id2 in shObj){ if(shObj.hasOwnProperty(id2)){ var e = shObj[id2]; arr.push({id:id2, songId:e.songId, place:e.place, customNo:e.n, dq:e.dq, autoFinal: e.autoFinal}); } }
         arr.sort(function(a,b){
           var na = a.customNo || idx(a.id), nb = b.customNo || idx(b.id);
           if(!isNaN(na) && !isNaN(nb)) return na - nb;
@@ -419,11 +424,8 @@ function fromTree(t){
 }
 
 function same(a,b){
-  var k=Object.keys(a);
-  if(k.length !== Object.keys(b).length) return false;
-  for(var i=0; i<k.length; i++){
-    if(a[k[i]] !== b[k[i]]) return false;
-  }
+  var k=Object.keys(a); if(k.length !== Object.keys(b).length) return false;
+  for(var i=0; i<k.length; i++){ if(a[k[i]] !== b[k[i]]) return false; }
   return true;
 }
 
@@ -452,32 +454,13 @@ function pull(first){
   }).catch(function(){net="error";badge();});
 }
 
-var songById=function(id){
-  for(var i=0; i<S.songs.length; i++){if(S.songs[i].id===id) return S.songs[i];}
-  return null;
-};
-var yearObj=function(id){
-  for(var i=0; i<S.years.length; i++){if(S.years[i].id===id) return S.years[i];}
-  return null;
-};
-var songsOf=function(y){
-  var arr = [];
-  for(var i=0; i<S.songs.length; i++){if(String(S.songs[i].year)===String(y)) arr.push(S.songs[i]);}
-  arr.sort(function(a,b){return CN[a.cc].localeCompare(CN[b.cc]);});
-  return arr;
-};
-var jname=function(id){
-  if(id === "admin") return "Admin";
-  for(var i=0; i<S.jury.length; i++){if(S.jury[i].id===id) return S.jury[i].name;}
-  return id;
-};
+var songById=function(id){ for(var i=0; i<S.songs.length; i++) if(S.songs[i].id===id) return S.songs[i]; return null; };
+var yearObj=function(id){ for(var i=0; i<S.years.length; i++) if(S.years[i].id===id) return S.years[i]; return null; };
+var jname=function(id){ if(id === "admin") return "Admin"; for(var i=0; i<S.jury.length; i++) if(S.jury[i].id===id) return S.jury[i].name; return id; };
 function findEntry(id){
   for(var i=0;i<S.years.length;i++){
     var y=S.years[i];
-    for(var sh in y.shows){
-      var list = y.shows[sh];
-      for(var j=0; j<list.length; j++){if(list[j].id===id) return list[j];}
-    }
+    for(var sh in y.shows){ var list = y.shows[sh]; for(var j=0; j<list.length; j++){if(list[j].id===id) return list[j];} }
   }
 }
 
@@ -488,9 +471,7 @@ function flagFb(i){
   var sp=document.createElement("span");
   var chars = cc.toUpperCase().split("");
   var text = "";
-  for(var k=0; k<chars.length; k++){
-    text += String.fromCodePoint(127397 + chars[k].charCodeAt(0));
-  }
+  for(var k=0; k<chars.length; k++){ text += String.fromCodePoint(127397 + chars[k].charCodeAt(0)); }
   sp.textContent = text + " ";
   i.replaceWith(sp);
 }
@@ -503,17 +484,20 @@ var pc=function(p){
   var r=rgb[0],g=rgb[1],b=rgb[2];
   var lum=(r*299+g*587+b*114)/1000;
   var style = "background:rgb("+r+","+g+","+b+");color:"+(lum>150?"#1d1d1d":"#fff");
-  if(Number(p) === 10){
-    style += ";border:2.5px solid var(--gold);box-shadow:0 0 10px rgba(255,209,102,0.8)";
-  }
+  if(Number(p) === 10){ style += ";border:2.5px solid var(--gold);box-shadow:0 0 10px rgba(255,209,102,0.8)"; }
   return style;
 };
 var idx=function(id){return +String(id).split("-").pop();};
 
-/* ---------- views ---------- */
 function render(){
   var sy=window.scrollY;
-  $("#app").className=ui.enter?"enter":"";ui.enter=false;
+  if(ui.enter) {
+    var app = $("#app");
+    app.classList.remove("enter"); 
+    void app.offsetWidth; 
+    app.classList.add("enter");
+  }
+  ui.enter=false;
   
   var mainHtml = home();
   if(ui.view === "compare") mainHtml = compareView();
@@ -523,38 +507,34 @@ function render(){
   $("#app").innerHTML = header() + mainHtml;
   window.scrollTo(0,sy);
 }
+
 function header(){
   var currentName = (me === "admin") ? "👑 Admin" : esc(jname(me));
-  
   return '<header><div class="brand">Eurovision Song Contest Scoreboard</div>'+
   '<div class="who"><span id="net" class="net">'+netText()+'</span> Profile: '+
     '<button class="ghost" data-act="openWelcomeModal" style="font-weight:700;color:var(--gold);border-color:var(--line)">'+currentName+'</button>'+
     '<button class="ghost" data-act="settings" title="Names, export, import">Settings</button></div></header>';
 }
+
 function home(){
   var sortedYears = S.years.slice().sort(function(a,b){return b.year - a.year || b.id.localeCompare(a.id);});
   var yCards = "";
   for(var i=0; i<sortedYears.length; i++){
     var y = sortedYears[i];
     var label = y.year + (y.suffix ? " (" + y.suffix + ")" : "");
-    
-    var totalPts = 0;
-    var songCount = 0;
+    var totalPts = 0, songCount = 0;
     for(var sh in y.shows){
       var list = y.shows[sh];
       for(var k=0; k<list.length; k++){
         if(list[k].songId){
           songCount++;
           var r = getRatings(list[k]);
-          for(var j=0; j<S.jury.length; j++){
-            if(r[S.jury[j].id]) totalPts += r[S.jury[j].id];
-          }
+          for(var j=0; j<S.jury.length; j++){ if(r[S.jury[j].id]) totalPts += r[S.jury[j].id]; }
         }
       }
     }
     var avgScore = songCount > 0 ? (totalPts / songCount) / 4 : 0;
     var subText = avgScore.toFixed(1) + " Ø Pts" + (y.city ? " · " + y.city : "");
-
     yCards += '<div class="card yearcard" data-act="openYear" data-id="'+y.id+'"><b>'+esc(label)+'</b><span>'+esc(subText)+'</span></div>';
   }
   return '<h1 class="hero">Eurovision Song Contest</h1>'+
@@ -562,18 +542,26 @@ function home(){
     '<button data-act="openLibraryView" class="primary">Song Library</button>'+
     '<button data-act="openCompare" class="primary">Country Comparison</button>'+
   '</div>'+
-  (sortedYears.length?'<div class="grid">'+yCards+'</div>':'<p class="empty">No Eurovision contest added yet. Use the ＋ button in the bottom right corner to add your first one.</p>');
+  (sortedYears.length?'<div class="grid">'+yCards+'</div>':'<p class="empty">No Eurovision contest added yet. Use the ＋ button in the bottom right corner.</p>');
 }
 
-var TABS=[["sf1","Semi-final 1"],["sf2","Semi-final 2"],["final","Final"],["ov","Overview"],["battle","Points battle"],["sb","Scoreboard"]];
+var TABS=[
+  ["sf1","Semi-final 1"],
+  ["sf2","Semi-final 2"],
+  ["overview","Overview"],
+  ["final","Final"],
+  ["battle","Points battle"],
+  ["sb","Scoreboard"]
+];
+
 function yearView(){
   var y=yearObj(ui.yearId);
   if(!y) { ui.yearId=null; ui.view="home"; return home(); }
   var body = "";
   if(ui.tab==="sf1") body=showView("sf1");
   else if(ui.tab==="sf2") body=showView("sf2");
+  else if(ui.tab==="overview") body=overviewTab();
   else if(ui.tab==="final") body=showView("final");
-  else if(ui.tab==="ov") body=overview();
   else if(ui.tab==="battle") body=battle();
   else if(ui.tab==="sb") body=scoreboard();
 
@@ -598,272 +586,221 @@ function initials(){
   }
   var res = [];
   for(var i=0; i<first.length; i++){
-    var c = first[i];
-    var count = 0;
+    var c = first[i], count = 0;
     for(var k=0; k<first.length; k++){ if(first[k]===c) count++; }
     res.push(count > 1 ? c + (i+1) : c);
   }
   return res;
 }
 
-function showView(sh){
-  var y=yearObj(ui.yearId),list=y.shows[sh],lab=initials();
-  var cnt={};
-  for(var i=0; i<list.length; i++){
-    var x = list[i];
-    if(x.place) cnt[x.place] = (cnt[x.place]||0) + 1;
-  }
-
-  // Calculate total points per jury member for this specific show
-  var juryTotals = {};
-  for(var j=0; j<S.jury.length; j++){ juryTotals[S.jury[j].id] = 0; }
-  for(var i=0; i<list.length; i++){
-    var e = list[i];
-    if(e.songId){
-      var r = getRatings(e);
-      for(var j=0; j<S.jury.length; j++){
-        var jId = S.jury[j].id;
-        if(r[jId]) juryTotals[jId] += r[jId];
-      }
-    }
-  }
-
-  var maxPts = -1, minPts = Infinity;
-  var hasValues = false;
-  for(var j=0; j<S.jury.length; j++){
-    var pts = juryTotals[S.jury[j].id];
-    if(pts > 0) hasValues = true;
-    if(pts > maxPts) maxPts = pts;
-    if(pts < minPts) minPts = pts;
-  }
+function overviewTab(){
+  var y = yearObj(ui.yearId), lab = initials();
   
-  var allSame = true;
-  var firstVal = -1;
-  for(var j=0; j<S.jury.length; j++){
-    var pts = juryTotals[S.jury[j].id];
-    if(firstVal === -1) firstVal = pts;
-    else if(pts !== firstVal) allSame = false;
-  }
+  var subTabsHtml = '<div class="tabs" style="border:none;margin:16px 0">' +
+    '<button class="'+(ui.ovSubTab==='semis'?'on':'')+'" data-act="ovSubTab" data-val="semis" style="background:'+(ui.ovSubTab==='semis'?'var(--pink)':'var(--panel2)')+';color:'+(ui.ovSubTab==='semis'?'#fff':'var(--ink)')+'">Semi-finals</button>' +
+    '<button class="'+(ui.ovSubTab==='final'?'on':'')+'" data-act="ovSubTab" data-val="final" style="background:'+(ui.ovSubTab==='final'?'var(--pink)':'var(--panel2)')+';color:'+(ui.ovSubTab==='final'?'#fff':'var(--ink)')+'">Final</button>' +
+  '</div>';
 
-  var totalsHtml = '<div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:16px 0 20px">';
-  for(var j=0; j<S.jury.length; j++){
-    var jur = S.jury[j];
-    var pts = juryTotals[jur.id];
-    var bubbleStyle = "background:var(--panel2);border:1px solid var(--line);";
-    if(hasValues && !allSame){
-      if(pts === maxPts) bubbleStyle = "background:rgba(24,150,80,0.25);border:1px solid #189650;box-shadow:0 0 12px rgba(24,150,80,0.35);";
-      else if(pts === minPts) bubbleStyle = "background:rgba(214,40,57,0.25);border:1px solid #d62839;box-shadow:0 0 12px rgba(214,40,57,0.35);";
-    }
-    totalsHtml += '<div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;'+bubbleStyle+'">' +
-      '<span style="font-family:var(--display);font-weight:700;color:var(--muted)">'+esc(jur.name)+'</span>' +
-      '<span style="font-family:var(--display);font-weight:800;font-size:1.1rem">'+pts+' <small style="font-size:0.75rem;font-weight:600">pts</small></span>' +
-    '</div>';
-  }
-  totalsHtml += '</div>';
-
-  var h='<h2>'+SHOWS[sh]+'</h2><p class="hint">Pick a song for each running order slot. Use the arrows to reorder. Tap your tile to give 1–10 points.</p>'+totalsHtml;
-  
-  var rowsHtml = "";
-  for(var i=0; i<list.length; i++){
-    var e = list[i];
-    var s = songById(e.songId);
-    var r = getRatings(e);
-    var activeJur = (me === "admin" && ui.pickJur) ? ui.pickJur : me;
-    var mine = r[activeJur];
-    var nt = getNotes(e);
-    var qp = getQualPred(e);
-    
-    var vals = [];
-    for(var j=0; j<S.jury.length; j++){
-      if(r[S.jury[j].id]) vals.push(r[S.jury[j].id]);
-    }
-    var sum = 0;
-    for(var v=0; v<vals.length; v++){ sum += vals[v]; }
-    var avg = vals.length ? sum / vals.length : null;
-
-    var allTen = S.jury.length > 0;
-    for(var j=0; j<S.jury.length; j++){
-      if(r[S.jury[j].id] !== 10) { allTen = false; break; }
-    }
-
-    var tiles = "";
-    for(var j=0; j<S.jury.length; j++){
-      var jur = S.jury[j];
-      var v = r[jur.id];
-      var isMe = (jur.id === me);
-      var canClick = isMe || (me === "admin");
-      var cls = "tile" + (isMe?" me":"") + (v!==undefined&&v!==null?"":" empty");
-      var inner = "<b>"+(v!==undefined&&v!==null?v:"–")+"</b><small>"+esc(lab[j])+"</small>";
-      
-      if(canClick && s){
-        tiles += '<button class="'+cls+'" style="'+(v?pc(v):"")+'" data-act="openPick" data-e="'+e.id+'" data-jur="'+jur.id+'" title="'+esc(jur.name)+'">'+inner+'</button>';
-      } else {
-        tiles += '<div class="'+cls+'" style="'+(v?pc(v):"")+'" title="'+esc(jur.name)+'">'+inner+'</div>';
-      }
-    }
-
-    var ptsBtns = "";
-    for(var p=1; p<=10; p++){
-      ptsBtns += '<button class="pt'+(mine===p?" on":"")+'" style="'+pc(p)+'" data-act="rate" data-e="'+e.id+'" data-p="'+p+'" aria-label="'+p+' points">'+p+'</button>';
-    }
-    
-    var picker = (ui.pickE===e.id)?'<div class="rate">'+(me==="admin"?'<div style="width:100%;font-size:0.85rem;color:var(--gold);margin-bottom:2px">Rating points for: <b>'+esc(jname(ui.pickJur||me))+'</b></div>':'')+ptsBtns+'<input class="note" placeholder="Note (optional)" value="'+esc(nt[activeJur]?nt[activeJur]:'')+'" data-chg="note" data-e="'+e.id+'" data-jur="'+activeJur+'"></div>':"";
-    
-    var notesStr = "";
-    for(var j=0; j<S.jury.length; j++){
-      var jur = S.jury[j];
-      if(nt[jur.id]){
-        notesStr += '<span><b>'+esc(jur.name)+':</b> '+esc(nt[jur.id])+'</span>';
-      }
-    }
-
-    var isAutoFinal = (e.autoFinal !== undefined) ? e.autoFinal : (s && ['de', 'fr', 'it', 'es', 'gb'].indexOf(s.cc) !== -1);
-
-    // Qualification Tip for Semis: Kompaktes Dropdown-Menü pro Jury-Mitglied (L : [Q/NQ] - T : [Q/NQ])
-    var qualTipHtml = "";
-    if(sh !== "final" && !isAutoFinal){
-      var actualQ = (e.place !== undefined && e.place !== null) ? (e.place <= 10) : null;
-      var qSelects = "";
-      
-      for(var j=0; j<S.jury.length; j++){
-        var jur = S.jury[j];
-        var jQual = qp[jur.id]; // true, false or undefined
-        var selVal = jQual === true ? "true" : (jQual === false ? "false" : "");
-        
-        var selectStyle = "background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:2px 6px;font-size:0.75rem;font-weight:700;";
-        if(actualQ !== null && jQual !== undefined){
-          selectStyle = (jQual === actualQ) ? "background:rgba(24,150,80,0.25);border:1px solid #189650;color:#fff;" : "background:rgba(214,40,57,0.25);border:1px solid #d62839;color:#fff;";
-        }
-
-        qSelects += '<div style="display:inline-flex;align-items:center;gap:4px;font-size:0.78rem;">' +
-          '<span style="color:var(--muted);font-weight:700;">'+esc(lab[j])+':</span>' +
-          '<select style="'+selectStyle+'" data-chg="qual" data-e="'+e.id+'" data-jur="'+jur.id+'">' +
-            '<option value="" '+(selVal===""?"selected":"")+'>–</option>' +
-            '<option value="true" '+(selVal==="true"?"selected":"")+'>Q</option>' +
-            '<option value="false" '+(selVal==="false"?"selected":"")+'>NQ</option>' +
-          '</select>' +
-        '</div>';
-      }
-      qualTipHtml = '<div style="grid-column:2;display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:6px;font-size:0.82rem;"><span style="color:var(--muted);font-weight:600;">Tipp:</span>'+qSelects+'</div>';
-    }
-
-    var q = (sh!=="final" && e.place && e.place<=10)?'<span class="q">Qualified</span>':"";
-    var af = isAutoFinal ? '<span class="autofinal">Auto-Finalist</span>' : "";
-    var placeVal = (e.place !== undefined && e.place !== null) ? e.place : "";
-    var displayNo = e.customNo || idx(e.id);
-    
-    // Auto-Finalisten bekommen nun eine eigene dezente Stilklasse (.autofinal-row) statt dem gelben Gewinner-Glow
-    var rowClass = (e.place===1?" winner":"")+(sh!=="final"&&e.place>10?" out":"")+(e.dq?" dq":"")+(allTen?" epic-10":"")+(isAutoFinal && e.place !== 1 ? " autofinal-row":"");
-
-    var mainContent = s ? '<div class="meta">'+flag(s.cc)+'<span><b>'+esc(s.title)+'</b> – '+esc(s.artist)+'</span>'+q+af+
-      '<div class="sm-group"><button class="ghost sm" data-act="moveUp" data-show="'+sh+'" data-idx="'+i+'" title="Nach oben">▲</button><button class="ghost sm" data-act="moveDown" data-show="'+sh+'" data-idx="'+i+'" title="Nach unten">▼</button><button class="ghost sm" data-act="pick" data-e="'+e.id+'">Change</button><button class="ghost sm danger" data-act="toggleDq" data-e="'+e.id+'">'+(e.dq?"Undq":"DQ")+'</button></div></div>'
-      : '<div style="display:flex;align-items:center;gap:8px"><button class="primary" data-act="pick" data-e="'+e.id+'">＋ Song</button><div class="sm-group"><button class="ghost sm" data-act="moveUp" data-show="'+sh+'" data-idx="'+i+'">▲</button><button class="ghost sm" data-act="moveDown" data-show="'+sh+'" data-idx="'+i+'">▼</button></div></div>';
-
-    rowsHtml += '<div class="row'+rowClass+'">'+
-      '<div class="no" data-act="editNo" data-e="'+e.id+'" title="Change running order or status">'+esc(displayNo)+'</div>'+
-      '<div class="main">'+mainContent+'</div>'+
-      '<div class="stats"><div class="tiles">'+tiles+'</div>'+
-        '<div class="avg"><b>'+(avg==null?"–":avg.toFixed(1))+'</b><small>AVG</small></div>'+
-        '<div class="pl"><input type="number" min="1" max="'+list.length+'" placeholder="–" value="'+placeVal+'" class="'+(e.place&&cnt[e.place]>1?"dup":"")+'" data-chg="place" data-e="'+e.id+'" '+(s?"":"disabled")+' aria-label="Place"><small>PLACE</small></div></div>'+
-      picker+qualTipHtml+(notesStr?'<div class="notes">'+notesStr+'</div>':"")+'</div>';
-  }
-
-  h += '<div class="list">'+rowsHtml+'</div>';
-
-  // Qualification Leaderboard / Stats for Semis
-  if(sh !== "final"){
-    var hasAnyPlace = false;
-    for(var i=0; i<list.length; i++){ if(list[i].place != null) { hasAnyPlace = true; break; } }
-    
-    if(hasAnyPlace){
-      var scores = {};
-      for(var j=0; j<S.jury.length; j++){ scores[S.jury[j].id] = 0; }
-      var totalEvaluated = 0;
-
-      for(var i=0; i<list.length; i++){
-        var e = list[i];
-        if(e.place != null && e.songId){
-          totalEvaluated++;
-          var actualQ = e.place <= 10;
-          var qpMap = getQualPred(e);
-          for(var j=0; j<S.jury.length; j++){
-            var jId = S.jury[j].id;
-            if(qpMap[jId] !== undefined && qpMap[jId] === actualQ){
-              scores[jId] = (scores[jId] || 0) + 1;
-            }
-          }
-        }
-      }
-
-      var sortedScores = S.jury.slice().sort(function(a,b){ return (scores[b.id]||0) - (scores[a.id]||0); });
-      var statRows = "";
-      for(var j=0; j<sortedScores.length; j++){
-        var jur = sortedScores[j];
-        statRows += '<div class="rank"><span class="p">#'+(j+1)+'</span><b style="flex:1">'+esc(jur.name)+'</b><span class="cell" style="background:var(--panel2)">'+(scores[jur.id]||0)+' von '+totalEvaluated+' richtig</span></div>';
-      }
-      h += '<h2>🏆 Qualifikations-Tipp-Statistik</h2><p class="hint">Wer hat am häufigsten korrekt getippt, ob ein Land ins Finale kommt?</p><div class="card" style="padding:4px 0">'+statRows+'</div>';
-    }
-  }
-
-  return h+'<div class="actions"><button class="ghost" data-act="addSlot" data-show="'+sh+'">＋ Running Order</button>'+
-    '<button class="ghost" data-act="delSlot" data-show="'+sh+'">− Remove Last</button>'+
-    '<button class="ghost" data-act="openLibraryView">Song Library</button></div>';
-}
-
-function switcher(key){
-  var res = "";
-  for(var sh in SHOWS){
-    res += '<button class="'+(ui[key]===sh?"on":"")+'" data-act="'+key+'" data-show="'+sh+'">'+SHOWS[sh]+'</button>';
-  }
-  return '<div class="seg">'+res+'</div>';
-}
-
-function overview(){
-  var y=yearObj(ui.yearId),mode=ui.ov||"semis";
-  var halves;
-  if(mode==="semis") halves=[["Semi-final 1",y.shows.sf1,true],["Semi-final 2",y.shows.sf2,true]];
-  else {
-    var f=y.shows.final, h=Math.ceil(f.length/2);
-    halves=[["1st Half",f.slice(0,h),false],["2nd Half",f.slice(h),false]];
-  }
-  
-  var lab=initials();
-  var names="";
-  for(var i=0; i<S.jury.length; i++){
-    names += '<span class="ov-name" title="'+esc(S.jury[i].name)+'">'+esc(lab[i])+'</span>';
-  }
-
-  var renderHalf = function(item, right){
-    var title=item[0], list=item[1], semi=item[2];
-    var head = '<div class="ov-head">'+(right?'<span class="ov-pill title">'+title+'</span><span class="ov-no"></span><div class="ov-pts">'+names+'</div>':'<div class="ov-pts">'+names+'</div><span class="ov-no"></span><span class="ov-pill title">'+title+'</span>')+'</div>';
-    
-    var rows = "";
+  if(ui.ovSubTab === 'final'){
+    var list = y.shows.final;
+    var rowsOv = "";
     for(var i=0; i<list.length; i++){
-      var e = list[i];
-      var s = songById(e.songId);
-      var r = getRatings(e);
-      
+      var e = list[i], s = songById(e.songId), r = getRatings(e);
       var pts = '<div class="ov-pts">';
       for(var j=0; j<S.jury.length; j++){
         var v = r[S.jury[j].id];
         pts += '<span class="ov-pt'+(v!==undefined&&v!==null?"":" none")+'" style="'+(v?pc(v):"")+'">'+(v!==undefined&&v!==null?v:"")+'</span>';
       }
       pts += '</div>';
-
-      var out = (semi && e.place && e.place>10) || e.dq;
-      var pl = e.place ? '<b>'+e.place+'.</b>' : "";
-      var pill = s ? '<span class="ov-pill'+(out?" out":"")+(e.dq?" dq":"")+'">'+(right?pl:"")+'<span style="display:flex;align-items:center;gap:8px">'+flag(s.cc)+esc(CN[s.cc])+'</span>'+(right?"":pl)+'</span>' : '<span class="ov-pill out"></span>';
-      var displayNo = e.customNo || idx(e.id);
-      var no = '<span class="ov-no">'+esc(displayNo)+'</span>';
-
-      rows += '<div class="ov-row">'+(right?pill+no+pts:pts+no+pill)+'</div>';
+      var out = e.dq;
+      var pl = e.place ? '<span class="ov-place">'+e.place+'.</span>' : '<span class="ov-place">–</span>';
+      var pill = s ? '<span class="ov-pill'+(out?" out":"")+(e.dq?" dq":"")+'"><div class="song-info">'+flag(s.cc)+'<span><b>'+esc(s.title)+'</b> – '+esc(s.artist)+'</span></div></span>' : '<span class="ov-pill out"><div class="song-info"><span>–</span></div></span>';
+      rowsOv += '<div class="ov-row-item">'+pts+pill+pl+'</div>';
     }
-    return '<div>'+head+rows+'</div>';
+    return '<h2>Overview</h2><p class="hint">Everyone\'s points side by side. Disqualified or non-qualifying countries are greyed out.</p>' +
+      subTabsHtml + '<div class="card" style="margin-top:16px"><h3 style="text-align:center;margin-bottom:16px">Final</h3><div style="display:flex;flex-direction:column;gap:8px">'+rowsOv+'</div></div>';
+  }
+
+  var renderSideCol = function(shKey, title, isMirror){
+    var list = y.shows[shKey];
+    var rows = "";
+    for(var i=0; i<list.length; i++){
+      var e = list[i], s = songById(e.songId), r = getRatings(e);
+      var pts = '<div class="ov-pts">';
+      for(var j=0; j<S.jury.length; j++){
+        var v = r[S.jury[j].id];
+        pts += '<span class="ov-pt'+(v!==undefined&&v!==null?"":" none")+'" style="'+(v?pc(v):"")+'">'+(v!==undefined&&v!==null?v:"")+'</span>';
+      }
+      pts += '</div>';
+      var out = (e.place && e.place>10) || e.dq;
+      var pl = e.place ? '<span class="ov-place">'+e.place+'.</span>' : '<span class="ov-place">–</span>';
+      var pill = s ? '<span class="ov-pill'+(out?" out":"")+(e.dq?" dq":"")+'"><div class="song-info">'+flag(s.cc)+'<span><b>'+esc(s.title)+'</b> – '+esc(s.artist)+'</span></div></span>' : '<span class="ov-pill out"><div class="song-info"><span>–</span></div></span>';
+      
+      if(isMirror){
+        rows += '<div class="ov-row-item">'+pl+pill+pts+'</div>';
+      } else {
+        rows += '<div class="ov-row-item">'+pts+pill+pl+'</div>';
+      }
+    }
+
+    return '<div class="ov-column">' +
+      '<div class="ov-col-title">'+title+'</div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px">'+rows+'</div>' +
+    '</div>';
   };
 
-  return '<h2>Overview</h2><p class="hint">Everyone\'s points side by side. Disqualified or non-qualifying countries are greyed out.</p>'+
-   '<div class="seg"><button class="'+(mode==="semis"?"on":"")+'" data-act="ovMode" data-m="semis">Semi-finals</button><button class="'+(mode==="final"?"on":"")+'" data-act="ovMode" data-m="final">Final</button></div>'+
-   '<div class="ovwrap"><div class="ov">'+renderHalf(halves[0], false)+renderHalf(halves[1], true)+'</div></div>';
+  return '<h2>Overview</h2><p class="hint">Everyone\'s points side by side. Disqualified or non-qualifying countries are greyed out.</p>' +
+    subTabsHtml +
+    '<div class="ov-grid-side">' +
+      renderSideCol("sf1", "Semi-final 1", false) +
+      renderSideCol("sf2", "Semi-final 2", true) +
+    '</div>';
+}
+
+function showView(sh){
+  var y=yearObj(ui.yearId),list=y.shows[sh],lab=initials();
+  var cnt={};
+  for(var i=0; i<list.length; i++){ if(list[i].place) cnt[list[i].place] = (cnt[list[i].place]||0) + 1; }
+
+  var topControls = "";
+  if(sh !== "final"){
+    topControls = '<div class="tabs" style="border:none;margin:0;padding:3px;background:var(--panel2);border-radius:10px;display:inline-flex;gap:4px">' +
+      '<button class="'+(ui.subTab!=='tips'?'on':'')+'" style="border:none;margin:0" data-act="subTab" data-val="points">Punkte</button>' +
+      '<button class="'+(ui.subTab==='tips'?'on':'')+'" style="border:none;margin:0" data-act="subTab" data-val="tips">Q/NQ Tipps</button>' +
+    '</div>';
+  }
+
+  var topBtnBar = '<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px;flex-wrap:wrap;gap:12px">'+
+    '<div><h2 style="margin:0">'+SHOWS[sh]+'</h2><p class="hint" style="margin:2px 0 0">Klicke auf Kacheln für Punkte, trage Tipps und Plätze rechts ein.</p></div>'+
+    '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'+
+      topControls+
+      '<button class="ghost '+(ui.editMode?'primary':'')+'" data-act="toggleEditMode">✏️ Edit</button>'+
+    '</div>'+
+  '</div>';
+
+  var half = Math.ceil(list.length / 2);
+  var leftList = [], rightList = [];
+  for(var i=0; i<list.length; i++){
+    if(i < half) leftList.push({item: list[i], index: i});
+    else rightList.push({item: list[i], index: i});
+  }
+
+  var renderCard = function(obj){
+    var e = obj.item, i = obj.index, s = songById(e.songId), r = getRatings(e);
+    var activeJur = (me === "admin" && ui.pickJur) ? ui.pickJur : me;
+    var mine = r[activeJur], nt = getNotes(e), qp = getQualPred(e);
+    var isAutoFinal = (e.autoFinal !== undefined) ? e.autoFinal : (s && ['de', 'fr', 'it', 'es', 'gb'].indexOf(s.cc) !== -1);
+    var actualQ = (e.place !== undefined && e.place !== null) ? (e.place <= 10) : null;
+    
+    var mainStatsHtml = "";
+    if (sh !== "final" && ui.subTab === "tips") {
+      if (isAutoFinal) {
+        mainStatsHtml = '<div class="tiles"><div class="tile" style="background:#7b2cbf;color:#fff;width:auto;padding:0 12px;font-family:var(--display);font-size:0.8rem;font-weight:800;">AUTO-FINALIST</div></div>';
+      } else {
+        var tipsHtml = "";
+        for(var j=0; j<S.jury.length; j++){
+          var jur = S.jury[j], jQual = qp[jur.id], isMe = (jur.id === me) || (me === "admin");
+          var txt = jQual === true ? "Q" : (jQual === false ? "NQ" : "–");
+          var bg = "var(--panel2)", col = "var(--muted)", border = "2px solid transparent";
+          
+          if (jQual === true) { col = "#4ade80"; border = "2px solid #189650"; bg = "rgba(24,150,80,0.1)"; }
+          else if (jQual === false) { col = "#ffb3b3"; border = "2px solid #d62839"; bg = "rgba(214,40,57,0.1)"; }
+          
+          if (actualQ !== null && jQual !== undefined) {
+            if (actualQ === jQual) { bg = "#189650"; col = "#fff"; border = "2px solid #4ade80"; } 
+            else { bg = "#d62839"; col = "#fff"; border = "2px solid #ffb3b3"; } 
+          }
+          
+          var clickAttr = isMe ? 'data-act="toggleQual" data-e="'+e.id+'" data-jur="'+jur.id+'"' : '';
+          var curStyle = isMe ? 'cursor:pointer;' : 'cursor:default;';
+          
+          tipsHtml += '<button class="tile '+(isMe?"me":"empty")+'" style="background:'+bg+';color:'+col+';border:'+border+';'+curStyle+'" '+clickAttr+' title="'+esc(jur.name)+'"><b>'+txt+'</b><small style="color:inherit;opacity:0.8">'+esc(lab[j])+'</small></button>';
+        }
+        mainStatsHtml = '<div class="tiles">'+tipsHtml+'</div>';
+      }
+    } 
+    else {
+      var vals = [];
+      for(var j=0; j<S.jury.length; j++){ if(r[S.jury[j].id]) vals.push(r[S.jury[j].id]); }
+      var sum = 0; for(var v=0; v<vals.length; v++){ sum += vals[v]; }
+      var avg = vals.length ? sum / vals.length : null;
+
+      var tiles = "";
+      for(var j=0; j<S.jury.length; j++){
+        var jur = S.jury[j], v = r[jur.id], isMe = (jur.id === me) || (me === "admin");
+        var cls = "tile" + (isMe?" me":"") + (v!==undefined&&v!==null?"":" empty");
+        var inner = "<b>"+(v!==undefined&&v!==null?v:"–")+"</b><small>"+esc(lab[j])+"</small>";
+        
+        if(isMe && s){ tiles += '<button class="'+cls+'" style="'+(v?pc(v):"")+'" data-act="openPick" data-e="'+e.id+'" data-jur="'+jur.id+'" title="'+esc(jur.name)+'">'+inner+'</button>'; }
+        else { tiles += '<div class="'+cls+'" style="'+(v?pc(v):"")+'" title="'+esc(jur.name)+'">'+inner+'</div>'; }
+      }
+      mainStatsHtml = '<div class="tiles">'+tiles+'</div><div class="avg"><b>'+(avg==null?"–":avg.toFixed(1))+'</b><small>AVG</small></div>';
+    }
+
+    var ptsBtns = "";
+    for(var p=1; p<=10; p++){
+      ptsBtns += '<button class="pt'+(mine===p?" on":"")+'" style="'+pc(p)+'" data-act="rate" data-e="'+e.id+'" data-p="'+p+'" aria-label="'+p+' points">'+p+'</button>';
+    }
+    var picker = (ui.pickE===e.id && (sh === 'final' || ui.subTab === 'points'))?'<div class="rate">'+(me==="admin"?'<div style="width:100%;font-size:0.8rem;color:var(--gold);margin-bottom:2px">Rating for: <b>'+esc(jname(ui.pickJur||me))+'</b></div>':'')+ptsBtns+'<input class="note" placeholder="Note (optional)" value="'+esc(nt[activeJur]?nt[activeJur]:'')+'" data-chg="note" data-e="'+e.id+'" data-jur="'+activeJur+'"></div>':"";
+    
+    var notesStr = "";
+    for(var j=0; j<S.jury.length; j++){
+      if(nt[S.jury[j].id]){ notesStr += '<span><b>'+esc(S.jury[j].name)+':</b> '+esc(nt[S.jury[j].id])+'</span>'; }
+    }
+
+    var qTag = (sh!=="final" && actualQ)?'<span class="q">Q</span>':"";
+    var afTag = isAutoFinal ? '<span class="autofinal">AF</span>' : "";
+    var placeVal = (e.place !== undefined && e.place !== null) ? e.place : "";
+    var displayNo = e.customNo || idx(e.id);
+    var rowClass = (e.place===1?" winner":"")+(sh!=="final"&&e.place>10?" out":"")+(e.dq?" dq":"")+(isAutoFinal && e.place !== 1 ? " autofinal-row":"");
+
+    var smGroupHtml = "";
+    if(ui.editMode){
+      smGroupHtml = '<div class="sm-group">' +
+        '<button class="ghost sm" data-act="moveUp" data-show="'+sh+'" data-idx="'+i+'">▲</button>' +
+        '<button class="ghost sm" data-act="moveDown" data-show="'+sh+'" data-idx="'+i+'">▼</button>' +
+        '<button class="ghost sm" data-act="pick" data-e="'+e.id+'">Change</button>' +
+        '<button class="ghost sm danger" data-act="toggleDq" data-e="'+e.id+'">'+(e.dq?"Undq":"DQ")+'</button>' +
+      '</div>';
+    }
+
+    var mainContent = s ? '<div class="meta">'+flag(s.cc)+'<span><b>'+esc(s.title)+'</b> – '+esc(s.artist)+'</span>'+qTag+afTag+smGroupHtml+'</div>'
+      : '<div style="display:flex;align-items:center;gap:8px"><button class="primary sm" data-act="pick" data-e="'+e.id+'">＋ Song</button>'+smGroupHtml+'</div>';
+
+    return '<div class="row '+rowClass+'">'+
+      '<div class="no" data-act="editNo" data-e="'+e.id+'" title="Change order/status">'+esc(displayNo)+'</div>'+
+      '<div class="row-content">'+
+        mainContent+
+        picker+
+        (notesStr?'<div class="notes">'+notesStr+'</div>':'')+
+      '</div>'+
+      '<div style="display:flex;align-items:center;gap:12px">'+
+        '<div class="stats">'+mainStatsHtml+'</div>'+
+        '<div class="pl"><input type="number" min="1" max="'+list.length+'" placeholder="–" value="'+placeVal+'" class="'+(e.place&&cnt[e.place]>1?"dup":"")+'" data-chg="place" data-e="'+e.id+'" '+(s?"":"disabled")+' aria-label="Place"><small>PLACE</small></div>'+
+      '</div>'+
+    '</div>';
+  };
+
+  var leftColHtml = "";
+  for(var i=0; i<leftList.length; i++){ leftColHtml += renderCard(leftList[i]); }
+  var rightColHtml = "";
+  for(var i=0; i<rightList.length; i++){ rightColHtml += renderCard(rightList[i]); }
+
+  var editActions = ui.editMode ? '<div class="actions"><button class="ghost" data-act="addSlot" data-show="'+sh+'">＋ Running Order</button><button class="ghost" data-act="delSlot" data-show="'+sh+'">− Remove Last</button></div>' : '';
+
+  return topBtnBar + 
+    '<div class="list" style="margin-top:10px">' +
+      '<div style="display:flex;flex-direction:column;gap:12px">'+leftColHtml+'</div>' +
+      '<div style="display:flex;flex-direction:column;gap:12px">'+rightColHtml+'</div>' +
+    '</div>'+
+    editActions +
+    '<div class="actions" style="margin-top:16px"><button class="ghost" data-act="openLibraryView">Song Library</button></div>';
+}
+
+function switcher(key){
+  var res = "";
+  for(var sh in SHOWS){ res += '<button class="'+(ui[key]===sh?"on":"")+'" data-act="'+key+'" data-show="'+sh+'">'+SHOWS[sh]+'</button>'; }
+  return '<div class="seg">'+res+'</div>';
 }
 
 function battle(){
@@ -909,17 +846,17 @@ function battle(){
     rows+='<tr><td>'+flag(s.cc)+' '+esc(CN[s.cc])+'</td><td>'+inp(A,a,dA)+'</td><td>'+inp(B,b,dB)+'</td><td class="c">'+placeActStr+'</td><td class="c">'+dcell(da)+'</td><td class="c">'+dcell(db)+'</td></tr>';
   }
 
-  var verdict='<span class="hint">Enter the actual final places to see the results.</span>';
+  var verdict='<span class="hint">Enter actual final places to see results.</span>';
   if(n>0){
     var done=n===fin.length?"":' <span class="hint">('+n+' of '+fin.length+' compared)</span>';
     if(sa===sb) verdict='<b>It\'s a draw!</b> Both have '+sa+' points.'+done;
-    else if(sa<sb) verdict='<b>👑 '+esc(jname(A))+' wins</b> with '+sa+' points. '+esc(jname(B))+' loses with '+sb+'.'+done;
-    else verdict='<b>👑 '+esc(jname(B))+' wins</b> with '+sb+' points. '+esc(jname(A))+' loses with '+sa+'.'+done;
+    else if(sa<sb) verdict='<b>👑 '+esc(jname(A))+' wins</b> with '+sa+' points.'+done;
+    else verdict='<b>👑 '+esc(jname(B))+' wins</b> with '+sb+' points.'+done;
   }
-  return '<h2>Points battle</h2><p class="hint">Predict final placements beforehand. Whoever is furthest off from the real result loses.</p>'+
+  return '<h2>Points battle</h2><p class="hint">Predict final placements beforehand.</p>'+
   '<div class="vs">'+sel("bA",A)+' <b>vs</b> '+sel("bB",B)+'</div>'+
-  (fin.length?'<div class="tw" style="margin-top:12px"><table><thead><tr><th>Country</th><th>'+esc(jname(A))+'<br>predicts</th><th>'+esc(jname(B))+'<br>predicts</th><th class="c">Actual</th><th class="c">'+esc(jname(A))+'<br>Points</th><th class="c">'+esc(jname(B))+'<br>Points</th></tr></thead>'+
-  '<tbody>'+rows+'</tbody><tfoot><tr><td colspan="4"><b>Total</b></td><td class="c"><b>'+(n?sa:"–")+(n&&sa<sb?" 👑":"")+'</b></td><td class="c"><b>'+(n?sb:"–")+(n&&sb<sa?" 👑":"")+'</b></td></tr></tfoot></table></div>'+
+  (fin.length?'<div class="tw" style="margin-top:12px"><table><thead><tr><th>Country</th><th>'+esc(jname(A))+'</th><th>'+esc(jname(B))+'</th><th class="c">Actual</th><th class="c">'+esc(jname(A))+' Pts</th><th class="c">'+esc(jname(B))+' Pts</th></tr></thead>'+
+  '<tbody>'+rows+'</tbody></table></div>'+
   '<div class="verdict">'+verdict+'</div>'
   :'<p class="empty">Please select songs for the final first.</p>');
 }
@@ -938,327 +875,155 @@ function scoreboard(){
       rows.push({e:e, s:songById(e.songId), r:r, avg:vals.length?sum/vals.length:null, sum:sum});
     }
   }
-
-  rows.sort(function(a,b){
-    var avgA = (a.avg !== null && a.avg !== undefined) ? a.avg : -1;
-    var avgB = (b.avg !== null && b.avg !== undefined) ? b.avg : -1;
-    return avgB - avgA;
-  });
-
-  var tops = "";
-  for(var j=0; j<S.jury.length; j++){
-    var jur = S.jury[j];
-    var best = 0;
-    for(var k=0; k<rows.length; k++){ var pt = rows[k].r[jur.id]||0; if(pt>best) best=pt; }
-    if(best){
-      var w = [];
-      for(var k=0; k<rows.length; k++){ if((rows[k].r[jur.id]||0)===best) w.push(rows[k]); }
-      var wStr = "";
-      for(var wIdx=0; wIdx<w.length; wIdx++){ wStr += (wIdx>0?", ":"") + flag(w[wIdx].s.cc) + " " + esc(CN[w[wIdx].s.cc]); }
-      tops += '<div class="rank"><b style="min-width:90px">'+esc(jur.name)+'</b><span style="flex:1">'+wStr+'</span><span class="cell" style="'+pc(best)+'">'+best+'</span></div>';
-    }
-  }
-
+  rows.sort(function(a,b){ return ((b.avg!==null?b.avg:-1)-(a.avg!==null?a.avg:-1)); });
   var juryHeaders = "";
   for(var j=0; j<S.jury.length; j++){ juryHeaders += '<th class="c">'+esc(S.jury[j].name)+'</th>'; }
-
   var tbody = "";
   for(var i=0; i<rows.length; i++){
     var x = rows[i];
-    var placeShowStr = (x.e.place !== undefined && x.e.place !== null) ? x.e.place : "–";
     var jCols = "";
     for(var j=0; j<S.jury.length; j++){
       var p = x.r[S.jury[j].id];
       jCols += '<td class="c">'+(p?'<span class="cell" style="'+pc(p)+'">'+p+'</span>':"–")+'</td>';
     }
-    tbody += '<tr><td>'+(x.avg==null?"–":i+1)+'</td><td>'+flag(x.s.cc)+' '+esc(CN[x.s.cc])+'</td><td>'+esc(x.s.title)+'</td>'+jCols+'<td class="c">'+(x.avg==null?"–":x.sum)+'</td><td class="c">'+(x.avg==null?"–":'<span class="cell" style="'+pc(x.avg)+'">'+x.avg.toFixed(1)+'</span>')+'</td><td class="c">'+placeShowStr+'</td></tr>';
+    tbody += '<tr><td>'+(x.avg==null?"–":i+1)+'</td><td>'+flag(x.s.cc)+' '+esc(CN[x.s.cc])+'</td><td>'+esc(x.s.title)+'</td>'+jCols+'<td class="c">'+(x.avg==null?"–":x.sum)+'</td><td class="c">'+(x.avg==null?"–":'<span class="cell" style="'+pc(x.avg)+'">'+x.avg.toFixed(1)+'</span>')+'</td></tr>';
   }
-
-  return '<h2>Scoreboard</h2><p class="hint">Average of all jury points, highest first.</p>'+switcher("sbShow")+
-  (rows.length?'<div class="tw"><table><thead><tr><th>#</th><th>Country</th><th>Song</th>'+juryHeaders+'<th class="c">Total</th><th class="c">Ø</th><th class="c">Place</th></tr></thead><tbody>'+tbody+'</tbody></table></div>'
-  :'<p class="empty">Nothing to show yet.</p>')+
-  (tops?'<h2>Favourites</h2><div class="card" style="padding:4px 0">'+tops+'</div>':"");
+  return '<h2>Scoreboard</h2><p class="hint">Average points, highest first.</p>'+switcher("sbShow")+
+  (rows.length?'<div class="tw"><table><thead><tr><th>#</th><th>Country</th><th>Song</th>'+juryHeaders+'<th class="c">Total</th><th class="c">Ø</th></tr></thead><tbody>'+tbody+'</tbody></table></div>':'<p class="empty">Nothing to show yet.</p>');
 }
 
 function compareView(){
   ui.compareCc = ui.compareCc || COUNTRIES[0][0];
   var ccOpts = "";
-  for(var i=0; i<COUNTRIES.length; i++){
-    ccOpts += '<option value="'+COUNTRIES[i][0]+'" '+(COUNTRIES[i][0]===ui.compareCc?"selected":"")+'>'+COUNTRIES[i][1]+'</option>';
-  }
-
+  for(var i=0; i<COUNTRIES.length; i++){ ccOpts += '<option value="'+COUNTRIES[i][0]+'" '+(COUNTRIES[i][0]===ui.compareCc?"selected":"")+'>'+COUNTRIES[i][1]+'</option>'; }
   var entries = [];
   for(var i=0; i<S.years.length; i++){
     var y = S.years[i];
-    var yearEntries = [];
     for(var sh in y.shows){
       var list = y.shows[sh];
       for(var k=0; k<list.length; k++){
-        var entry = list[k];
-        var song = songById(entry.songId);
-        if(song && song.cc === ui.compareCc){
-          yearEntries.push({yearObj: y, showKey: sh, showName: SHOWS[sh], entry: entry, song: song});
-        }
-      }
-    }
-    
-    if(yearEntries.length > 0){
-      var finalEntry = yearEntries.find(function(item){ return item.showKey === 'final'; });
-      if(finalEntry){
-        entries.push(finalEntry);
-      } else {
-        entries.push(yearEntries[0]);
+        var entry = list[k], song = songById(entry.songId);
+        if(song && song.cc === ui.compareCc){ entries.push({yearObj: y, showName: SHOWS[sh], entry: entry, song: song}); }
       }
     }
   }
-
   entries.sort(function(a,b){ return b.yearObj.year - a.yearObj.year; });
-
-  var html = '<div style="padding-top:14px"><button class="ghost" data-act="home">← Back to Main Menu</button></div>'+
-  '<h2>Country Comparison</h2><p class="hint">Compare results, points, and placements for a country across all saved years and shows.</p>'+
-  '<div style="margin-bottom:16px"><label>Select Country: <select data-chg="compareCc" style="width:240px;margin-left:8px">'+ccOpts+'</select></label></div>';
-
-  if(entries.length === 0){
-    html += '<p class="empty">No entries found for this country in the saved contests.</p>';
-  } else {
-    var rowsHtml = "";
-    for(var i=0; i<entries.length; i++){
-      var item = entries[i];
-      var r = getRatings(item.entry);
-      var vals = [];
-      for(var j=0; j<S.jury.length; j++){ if(r[S.jury[j].id]) vals.push(r[S.jury[j].id]); }
-      var sum = 0; for(var v=0; v<vals.length; v++){ sum+=vals[v]; }
-      var avg = vals.length ? sum/vals.length : null;
-
-      var jCols = "";
-      for(var j=0; j<S.jury.length; j++){
-        var p = r[S.jury[j].id];
-        jCols += '<td class="c">'+(p?'<span class="cell" style="'+pc(p)+'">'+p+'</span>':"–")+'</td>';
-      }
-
-      var labelYear = item.yearObj.year + (item.yearObj.suffix ? " ("+item.yearObj.suffix+")" : "");
-      var placeStr = (item.entry.place !== undefined && item.entry.place !== null) ? item.entry.place + "." : "–";
-
-      rowsHtml += '<tr>'+
-        '<td><b>'+labelYear+'</b><br><small>'+item.showName+'</small></td>'+
-        '<td>'+flag(item.song.cc)+' <b>'+esc(item.song.title)+'</b><br><small>'+esc(item.song.artist)+'</small></td>'+
-        jCols+
-        '<td class="c"><b>'+(avg==null?"–":sum)+'</b></td>'+
-        '<td class="c">'+(avg==null?"–":'<span class="cell" style="'+pc(avg)+'">'+avg.toFixed(1)+'</span>')+'</td>'+
-        '<td class="c"><b>'+placeStr+'</b></td>'+
-      '</tr>';
+  var rowsHtml = "";
+  for(var i=0; i<entries.length; i++){
+    var item = entries[i], r = getRatings(item.entry);
+    var vals = []; for(var j=0; j<S.jury.length; j++){ if(r[S.jury[j].id]) vals.push(r[S.jury[j].id]); }
+    var sum = 0; for(var v=0; v<vals.length; v++){ sum+=vals[v]; }
+    var avg = vals.length ? sum/vals.length : null;
+    var jCols = "";
+    for(var j=0; j<S.jury.length; j++){
+      var p = r[S.jury[j].id];
+      jCols += '<td class="c">'+(p?'<span class="cell" style="'+pc(p)+'">'+p+'</span>':"–")+'</td>';
     }
-
-    var juryHeaders = "";
-    for(var j=0; j<S.jury.length; j++){ juryHeaders += '<th class="c">'+esc(S.jury[j].name)+'</th>'; }
-
-    html += '<div class="tw"><table><thead><tr><th>Year / Show</th><th>Song</th>'+juryHeaders+'<th class="c">Total</th><th class="c">Ø</th><th class="c">Place</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>';
+    rowsHtml += '<tr><td><b>'+item.yearObj.year+'</b><br><small>'+item.showName+'</small></td><td>'+flag(item.song.cc)+' <b>'+esc(item.song.title)+'</b></td>'+jCols+'<td class="c"><b>'+(avg==null?"–":sum)+'</b></td><td class="c">'+(avg==null?"–":'<span class="cell" style="'+pc(avg)+'">'+avg.toFixed(1)+'</span>')+'</td></tr>';
   }
-
-  return html;
+  var juryHeaders = ""; for(var j=0; j<S.jury.length; j++){ juryHeaders += '<th class="c">'+esc(S.jury[j].name)+'</th>'; }
+  return '<div style="padding-top:14px"><button class="ghost" data-act="home">← Back</button></div>'+
+  '<h2>Country Comparison</h2>'+
+  '<div style="margin-bottom:16px"><label>Select Country: <select data-chg="compareCc" style="width:240px;margin-left:8px">'+ccOpts+'</select></label></div>'+
+  (rowsHtml ? '<div class="tw"><table><thead><tr><th>Year / Show</th><th>Song</th>'+juryHeaders+'<th class="c">Total</th><th class="c">Ø</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>' : '<p class="empty">No entries found.</p>');
 }
 
 function libraryView(){
-  ui.q = ui.q || "";
-  ui.libYear = ui.libYear !== undefined ? ui.libYear : "";
-  ui.libSort = ui.libSort || "name";
-
+  ui.q = ui.q || ""; ui.libYear = ui.libYear !== undefined ? ui.libYear : ""; ui.libSort = ui.libSort || "name";
   var availableYears = [];
-  for(var i=0; i<S.songs.length; i++){
-    if(S.songs[i].year && availableYears.indexOf(S.songs[i].year)===-1) availableYears.push(S.songs[i].year);
-  }
-  for(var i=0; i<S.years.length; i++){
-    if(S.years[i].year && availableYears.indexOf(S.years[i].year)===-1) availableYears.push(S.years[i].year);
-  }
+  for(var i=0; i<S.songs.length; i++){ if(S.songs[i].year && availableYears.indexOf(S.songs[i].year)===-1) availableYears.push(S.songs[i].year); }
   availableYears.sort(function(a,b){return b-a;});
-
   var yearOpts = '<option value="">All Years</option>';
-  for(var i=0; i<availableYears.length; i++){ 
-    yearOpts+='<option value="'+availableYears[i]+'" '+(String(ui.libYear)===String(availableYears[i])?"selected":"")+'>'+availableYears[i]+'</option>'; 
-  }
-
-  var sortOpts = 
-    '<option value="name" '+(ui.libSort==="name"?"selected":"")+'>Sort: Name/Country</option>'+
-    '<option value="artist" '+(ui.libSort==="artist"?"selected":"")+'>Sort: Artist</option>'+
-    '<option value="year" '+(ui.libSort==="year"?"selected":"")+'>Sort: Year</option>';
-
-  var q = ui.q.toLowerCase();
-  var list = [];
+  for(var i=0; i<availableYears.length; i++){ yearOpts+='<option value="'+availableYears[i]+'" '+(String(ui.libYear)===String(availableYears[i])?"selected":"")+'>'+availableYears[i]+'</option>'; }
+  var q = ui.q.toLowerCase(), list = [];
   for(var i=0; i<S.songs.length; i++){
     var x = S.songs[i];
-    var matchesQ = (CN[x.cc]+" "+x.artist+" "+x.title).toLowerCase().indexOf(q) !== -1;
-    if(!matchesQ) continue;
+    if((CN[x.cc]+" "+x.artist+" "+x.title).toLowerCase().indexOf(q)===-1) continue;
     if(ui.libYear && String(x.year)!==String(ui.libYear)) continue;
     list.push(x);
   }
-
-  list.sort(function(a,b){
-    if(ui.libSort==="year"){
-      return (b.year||0) - (a.year||0) || CN[a.cc].localeCompare(CN[b.cc]);
-    } else if(ui.libSort==="artist"){
-      return a.artist.localeCompare(b.artist);
-    } else {
-      return CN[a.cc].localeCompare(CN[b.cc]);
-    }
-  });
-
+  list.sort(function(a,b){ return CN[a.cc].localeCompare(CN[b.cc]); });
   var pHtml = "";
   for(var i=0; i<list.length; i++){
     var x = list[i];
-    var subInfo = esc(CN[x.cc]) + (x.year ? " · " + x.year : "");
     pHtml += '<div class="prow" style="padding:10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)">'+
-      '<div style="display:flex;align-items:center;gap:12px;flex:1">'+flag(x.cc)+'<span><b>'+esc(x.title)+'</b> – '+esc(x.artist)+'<br><small style="color:var(--muted)">'+subInfo+'</small></span></div>'+
-      '<div style="display:flex;gap:8px">'+
-        '<button class="ghost sm" data-act="editSongMain" data-id="'+x.id+'">Edit</button>'+
-        '<button class="ghost sm danger" data-act="delSongMain" data-id="'+x.id+'">Delete</button>'+
-      '</div>'+
+      '<div style="display:flex;align-items:center;gap:12px;flex:1">'+flag(x.cc)+'<span><b>'+esc(x.title)+'</b> – '+esc(x.artist)+'<br><small style="color:var(--muted)">'+esc(CN[x.cc])+(x.year?" · "+x.year:"")+'</small></span></div>'+
+      '<div style="display:flex;gap:8px"><button class="ghost sm" data-act="editSongMain" data-id="'+x.id+'">Edit</button><button class="ghost sm danger" data-act="delSongMain" data-id="'+x.id+'">Delete</button></div>'+
     '</div>';
   }
-
-  return '<div style="padding-top:14px"><button class="ghost" data-act="home">← Back to Main Menu</button></div>'+
+  return '<div style="padding-top:14px"><button class="ghost" data-act="home">← Back</button></div>'+
   '<h2>Song Library</h2>'+
-  '<p class="hint">Manage all songs in your library, search, filter, edit or delete them.</p>'+
   '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:16px 0">'+
-    '<input id="lib_search_input" placeholder="Search by title, artist, or country" value="'+esc(ui.q)+'" style="flex:1;min-width:180px">'+
+    '<input id="lib_search_input" placeholder="Search..." value="'+esc(ui.q)+'" style="flex:1;min-width:180px">'+
     '<select id="lib_year_select" style="width:130px">'+yearOpts+'</select>'+
-    '<select id="lib_sort_select" style="width:170px">'+sortOpts+'</select>'+
     '<button class="primary" data-act="addNewSongMain">＋ New Song</button>'+
   '</div>'+
   '<div class="card" style="padding:0 16px">'+(pHtml ? pHtml : '<p class="empty">No matching songs found.</p>')+'</div>';
 }
 
-/* ---------- dialogs ---------- */
 function openNewYearModal(){
   var thisYear=new Date().getFullYear();
   dlg.className="";
   dlg.innerHTML='<h3>Add New Contest</h3>'+
     '<label>Year<input id="ny_year" type="number" value="'+thisYear+'"></label>'+
-    '<label>Suffix / Label (optional)<input id="ny_suffix" placeholder="e.g. Junior, Asia"></label>'+
+    '<label>Suffix (optional)<input id="ny_suffix" placeholder="e.g. Junior"></label>'+
     '<label>Host City<input id="ny_city"></label>'+
-    '<label>Semi 1 Slots<input id="ny_sf1" type="number" min="1" value="'+DEF_N.sf1+'"></label>'+
-    '<label>Semi 2 Slots<input id="ny_sf2" type="number" min="1" value="'+DEF_N.sf2+'"></label>'+
-    '<label>Final Slots<input id="ny_final" type="number" min="1" value="'+DEF_N.final+'"></label>'+
-    '<div class="actions"><button class="ghost" data-act="closeDlg">Cancel</button><button class="primary" data-act="saveNewYear">Create Contest</button></div>';
+    '<div class="actions"><button class="ghost" data-act="closeDlg">Cancel</button><button class="primary" data-act="saveNewYear">Create</button></div>';
   if(!dlg.open) dlg.showModal();
 }
 
 function openWelcomeModal(){
   var btns = "";
-  for(var i=0; i<S.jury.length; i++){
-    var j = S.jury[i];
-    btns += '<button class="primary preset-btn" data-act="selectWho" data-id="'+j.id+'" style="font-size:1.3rem;padding:18px">'+esc(j.name)+'</button>';
-  }
-  btns += '<button class="preset-btn" data-act="selectWho" data-id="admin" style="font-size:1.3rem;padding:18px;border-color:var(--gold);color:var(--gold)">👑 Admin</button>';
+  for(var i=0; i<S.jury.length; i++){ btns += '<button class="primary preset-btn" data-act="selectWho" data-id="'+S.jury[i].id+'">'+esc(S.jury[i].name)+'</button>'; }
+  btns += '<button class="preset-btn" data-act="selectWho" data-id="admin" style="border-color:var(--gold);color:var(--gold)">👑 Admin</button>';
   dlg.className="";
-  dlg.innerHTML='<h2 style="text-align:center;margin-bottom:8px">Select Profile 👋</h2>'+
-    '<p class="hint" style="text-align:center">Who are you? Choose your profile to rate:</p>'+
-    '<div style="display:grid;grid-template-columns:1fr;gap:12px;margin:20px 0">'+btns+'</div>'+
-    '<div class="actions"><button class="ghost" data-act="closeDlg">Cancel</button></div>';
+  dlg.innerHTML='<h2>Select Profile 👋</h2><p class="hint">Who are you?</p><div style="display:grid;grid-template-columns:1fr;gap:10px;margin:16px 0">'+btns+'</div>';
   if(!dlg.open) dlg.showModal();
 }
 
-function checkFirstJoin(){
-  if(!localStorage.getItem("esc-joined")){
-    openWelcomeModal();
-  }
-}
+function checkFirstJoin(){ if(!localStorage.getItem("esc-joined")) openWelcomeModal(); }
 
 function openSong(id,assign){
-  var s=id?songById(id):null;
-  ui.editSong=id||null; ui.assign=assign||null;
+  var s=id?songById(id):null; ui.editSong=id||null; ui.assign=assign||null;
   var currentYearObj = ui.yearId ? yearObj(ui.yearId) : null;
   var defaultSongYear = (s && s.year) ? s.year : (currentYearObj && currentYearObj.year ? currentYearObj.year : new Date().getFullYear());
-
   var sortedCountries = COUNTRIES.slice().sort(function(a,b){return a[1].localeCompare(b[1]);});
-  var opts="";
-  for(var i=0; i<sortedCountries.length; i++){
-    var c=sortedCountries[i][0], n=sortedCountries[i][1];
-    opts += '<option value="'+c+'" '+((s && s.cc===c)?"selected":"")+'>'+n+'</option>';
-  }
+  var opts=""; for(var i=0; i<sortedCountries.length; i++){ opts += '<option value="'+sortedCountries[i][0]+'" '+((s && s.cc===sortedCountries[i][0])?"selected":"")+'>'+sortedCountries[i][1]+'</option>'; }
   dlg.className="";
   dlg.innerHTML='<h3>'+(s?"Edit Song":"New Song")+'</h3>'+
    '<label>Country<select id="f_cc">'+opts+'</select></label>'+
    '<label>Artist<input id="f_artist" value="'+esc(s?s.artist:"")+'"></label>'+
    '<label>Song Title<input id="f_title" value="'+esc(s?s.title:"")+'"></label>'+
-   '<label>Song Year<input id="f_song_year" type="number" value="'+defaultSongYear+'"></label>'+
+   '<label>Year<input id="f_song_year" type="number" value="'+defaultSongYear+'"></label>'+
    '<div class="actions"><button class="ghost" data-act="closeDlg">Cancel</button><button class="primary" data-act="saveSong">Save</button></div>';
   if(!dlg.open)dlg.showModal();
 }
-function openPicker(entryId){ui.assign=entryId;pickerHtml();}
+
+function openPicker(entryId){ ui.assign=entryId; pickerHtml(); }
 function pickerHtml(){
-  ui.q=""; ui.libYear=""; ui.libSort="name";
+  ui.q=""; ui.libYear="";
   dlg.className="wide";
-  
-  var availableYears = [];
-  for(var i=0; i<S.songs.length; i++){
-    if(S.songs[i].year && availableYears.indexOf(S.songs[i].year)===-1) availableYears.push(S.songs[i].year);
-  }
-  for(var i=0; i<S.years.length; i++){
-    if(S.years[i].year && availableYears.indexOf(S.years[i].year)===-1) availableYears.push(S.years[i].year);
-  }
-  availableYears.sort(function(a,b){return b-a;});
-
-  var yearOpts = "";
-  for(var i=0; i<availableYears.length; i++){ yearOpts+='<option value="'+availableYears[i]+'">'+availableYears[i]+'</option>'; }
-
-  dlg.innerHTML='<h3>Song Library</h3>'+
-   '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">'+
-     '<input id="q" placeholder="Search by title, artist, or country" style="flex:1;min-width:180px">'+
-     '<select id="lib_year" style="width:130px"><option value="">All Years</option>'+yearOpts+'</select>'+
-     '<select id="lib_sort" style="width:150px">'+
-       '<option value="name">Sort: Name/Country</option>'+
-       '<option value="artist">Sort: Artist</option>'+
-       '<option value="year">Sort: Year</option>'+
-     '</select>'+
-   '</div>'+
-   '<div id="plist"></div>'+
+  dlg.innerHTML='<h3>Song Library</h3><input id="q" placeholder="Search..." style="width:100%;margin-bottom:10px"><div id="plist"></div>'+
    '<div class="actions"><button class="ghost" data-act="closeDlg">Close</button><button class="primary" data-act="addSong">＋ New Song</button></div>';
-  
-  fillList();
-  if(!dlg.open)dlg.showModal();
-
+  fillList(); if(!dlg.open)dlg.showModal();
   $("#q").addEventListener("input",function(e){ui.q=e.target.value;fillList();});
-  $("#lib_year").addEventListener("change",function(e){ui.libYear=e.target.value;fillList();});
-  $("#lib_sort").addEventListener("change",function(e){ui.libSort=e.target.value;fillList();});
 }
 function fillList(){
   var q=ui.q.toLowerCase(), lib=!ui.assign, used=new Set();
   var yo=ui.yearId&&yearObj(ui.yearId);
-  if(yo){
-    for(var sh in yo.shows){
-      var list = yo.shows[sh];
-      for(var i=0; i<list.length; i++){if(list[i].songId) used.add(list[i].songId);}
-    }
-  }
-
+  if(yo){ for(var sh in yo.shows){ var list = yo.shows[sh]; for(var i=0; i<list.length; i++){if(list[i].songId) used.add(list[i].songId);} } }
   var list = [];
   for(var i=0; i<S.songs.length; i++){
     var x = S.songs[i];
-    var matchesQ = (CN[x.cc]+" "+x.artist+" "+x.title).toLowerCase().indexOf(q) !== -1;
-    if(!matchesQ) continue;
-    if(ui.libYear && String(x.year)!==String(ui.libYear)) continue;
+    if((CN[x.cc]+" "+x.artist+" "+x.title).toLowerCase().indexOf(q)===-1) continue;
     list.push(x);
   }
-
-  list.sort(function(a,b){
-    if(lib && ui.libSort==="year"){
-      return (b.year||0) - (a.year||0) || CN[a.cc].localeCompare(CN[b.cc]);
-    } else if(lib && ui.libSort==="artist"){
-      return a.artist.localeCompare(b.artist);
-    } else {
-      var usedA = used.has(a.id) ? 1 : 0;
-      var usedB = used.has(b.id) ? 1 : 0;
-      return (usedB - usedA) || CN[a.cc].localeCompare(CN[b.cc]);
-    }
-  });
-
   var pHtml = "";
   for(var i=0; i<list.length; i++){
     var x = list[i];
-    var subInfo = esc(CN[x.cc]) + (x.year ? " · " + x.year : "") + (used.has(x.id) ? " · used this year" : "");
-    pHtml += '<div class="prow"><button class="pbtn" data-act="'+(lib?"editSong":"choose")+'" data-id="'+x.id+'">'+flag(x.cc)+'<span><b>'+esc(x.title)+'</b> – '+esc(x.artist)+'<br><small>'+subInfo+'</small></span></button>'+(lib?'<button class="ghost danger" data-act="delSong" data-id="'+x.id+'">Delete</button>':"")+'</div>';
+    pHtml += '<div class="prow"><button class="pbtn" data-act="'+(lib?"editSong":"choose")+'" data-id="'+x.id+'">'+flag(x.cc)+'<span><b>'+esc(x.title)+'</b> – '+esc(x.artist)+'</span></button>'+(lib?'<button class="ghost danger" data-act="delSong" data-id="'+x.id+'">Delete</button>':"")+'</div>';
   }
-  $("#plist").innerHTML = pHtml ? pHtml : '<p class="empty">'+(S.songs.length?"No matching songs found.":"No songs in the library yet.")+'</p>';
+  $("#plist").innerHTML = pHtml ? pHtml : '<p class="empty">No songs found.</p>';
 }
 
 function openEditNo(entryId){
@@ -1266,414 +1031,201 @@ function openEditNo(entryId){
   var cur = e.customNo || idx(e.id);
   var s = songById(e.songId);
   var isAutoFinal = (e.autoFinal !== undefined) ? e.autoFinal : (s && ['de', 'fr', 'it', 'es', 'gb'].indexOf(s.cc) !== -1);
-
   dlg.className="";
   dlg.innerHTML='<h3>Running Order & Status</h3>'+
-   '<p class="hint">Select an option, enter a custom number, or toggle Auto-Finalist:</p>'+
-   '<div class="preset-grid" style="grid-template-columns:repeat(3, 1fr)">'+
-     '<button class="preset-btn" data-setno="'+idx(e.id)+'">Standard</button>'+
-     '<button class="preset-btn" data-setno="Host">Host</button>'+
-     '<button class="preset-btn" data-setno="➔">➔</button>'+
-   '</div>'+
-   '<label>Custom Value / Number<input id="custom_no_input" value="'+esc(cur)+'"></label>'+
-   '<label style="flex-direction:row;align-items:center;gap:8px;margin-top:12px;cursor:pointer;">'+
-     '<input type="checkbox" id="custom_autofinal_input" '+(isAutoFinal?'checked':'')+'> Auto-Finalist (Direkt im Finale) '+
-   '</label>'+
+   '<label>Custom Number<input id="custom_no_input" value="'+esc(cur)+'"></label>'+
+   '<label style="flex-direction:row;align-items:center;gap:8px;margin-top:10px"><input type="checkbox" id="custom_autofinal_input" '+(isAutoFinal?'checked':'')+'> Auto-Finalist</label>'+
    '<div class="actions"><button class="ghost" data-act="closeDlg">Cancel</button><button class="primary" data-act="saveCustomNo" data-e="'+entryId+'">Save</button></div>';
   if(!dlg.open) dlg.showModal();
 }
 
 function openSettings(){
-  var jLabels = "";
-  for(var i=0; i<S.jury.length; i++){
-    var j = S.jury[i];
-    jLabels += '<label>'+j.id.toUpperCase()+' Name<input data-jn="'+j.id+'" value="'+esc(j.name)+'"></label>';
-  }
+  var jLabels = ""; for(var i=0; i<S.jury.length; i++){ jLabels += '<label>'+S.jury[i].id.toUpperCase()+' Name<input data-jn="'+S.jury[i].id+'" value="'+esc(S.jury[i].name)+'"></label>'; }
   dlg.className="";
-  dlg.innerHTML='<h3>Settings</h3>'+
-   jLabels+
-   '<label>Shared Database URL (Firebase Realtime Database)<input id="dburl" value="'+esc(DB)+'" placeholder="https://…firebasedatabase.app"></label>'+
-   '<div class="actions" style="margin:-4px 0 12px"><button data-act="saveDb">Connect</button></div>'+
-   '<p class="hint">With a database, everyone sees the same data. Without one, each browser saves locally.</p>'+
-   '<div class="actions"><button data-act="export">Export File</button>'+
-   '<label style="background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 14px;cursor:pointer;display:inline-block;text-align:center;flex:1;">Import File <input id="imp" type="file" accept="application/json" style="display:none"></label></div>'+
-   '<div class="actions"><button class="ghost" data-act="closeDlg">Close</button><button class="primary" data-act="saveNames">Save Names</button></div>';
+  dlg.innerHTML='<h3>Settings</h3>'+jLabels+'<label>Database URL<input id="dburl" value="'+esc(DB)+'"></label>'+
+   '<div class="actions"><button data-act="export">Export</button><label style="background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px;cursor:pointer;flex:1;text-align:center">Import<input id="imp" type="file" style="display:none"></label></div>'+
+   '<div class="actions"><button class="ghost" data-act="closeDlg">Close</button><button class="primary" data-act="saveNames">Save</button></div>';
   if(!dlg.open)dlg.showModal();
   $("#imp").addEventListener("change",function(ev){
-    var f=ev.target.files[0];if(!f)return;
+    var f=ev.target.files[0]; if(!f)return;
     var r=new FileReader();
-    r.onload=function(){try{merge(JSON.parse(r.result));showAlert("Success", "Import successful.");dlg.close();}catch(e){showAlert("Error", "Error reading file.");}};
+    r.onload=function(){try{S=JSON.parse(r.result);save();dlg.close();render();}catch(e){showAlert("Error","Invalid file");}};
     r.readAsText(f);
   });
 }
 
-function merge(o){
-  if(o.jury){
-    for(var i=0; i<o.jury.length; i++){
-      var j=o.jury[i];
-      var l = S.jury.find(function(x){return x.id===j.id;});
-      if(l && /^Player \d$/.test(l.name) && j.name) l.name = j.name;
-    }
-  }
-  if(o.songs){
-    for(var i=0; i<o.songs.length; i++){if(!songById(o.songs[i].id)) S.songs.push(o.songs[i]);}
-  }
-  if(o.years){
-    for(var i=0; i<o.years.length; i++){
-      var oy = o.years[i];
-      var id = oy.id || (oy.year + (oy.suffix ? "_" + oy.suffix : ""));
-      var y = yearObj(id);
-      if(!y){ S.years.push(Object.assign({}, oy, {id: id})); continue; }
-      for(var sh in oy.shows){
-        y.shows[sh] = y.shows[sh] || [];
-        var oyShows = oy.shows[sh];
-        for(var k=0; k<oyShows.length; k++){
-          var oe = oyShows[k];
-          var e = y.shows[sh].find(function(x){return x.id===oe.id;});
-          if(!e) y.shows[sh].push(oe);
-          else {
-            if(!e.songId && oe.songId) e.songId = oe.songId;
-            if(e.place==null && oe.place!=null) e.place = oe.place;
-          }
-        }
-      }
-    }
-  }
-  var keys=["ratings","pred","notes","qualPred"];
-  for(var ki=0; ki<keys.length; ki++){
-    var k=keys[ki];
-    var obj=o[k]||{};
-    for(var id in obj){
-      var innerObj=obj[id];
-      for(var j in innerObj){
-        S[k][id]=S[k][id]||{};
-        if(j!==me||S[k][id][j]==null)S[k][id][j]=innerObj[j];
-      }
-    }
-  }
-  S.years.sort(function(a,b){return b.year-a.year||b.id.localeCompare(a.id);});save();
-}
-
-/* ---------- actions ---------- */
 var A={
-  selectWho:function(t){
-    me = t.dataset.id;
-    localStorage.setItem(MEKEY, me);
-    localStorage.setItem("esc-joined", "true");
-    dlg.close();
-    render();
-    return "keep";
+  selectWho:function(t){ me = t.dataset.id; localStorage.setItem(MEKEY, me); localStorage.setItem("esc-joined", "true"); dlg.close(); ui.enter=true; render(); return "keep"; },
+  openWelcomeModal:function(){ openWelcomeModal(); return "keep"; },
+  toggleEditMode:function(){ ui.editMode = !ui.editMode; },
+  subTab:function(t){ ui.subTab = t.dataset.val; ui.enter=true; }, 
+  ovSubTab:function(t){ ui.ovSubTab = t.dataset.val; ui.enter=true; },
+  
+  toggleQual:function(t){
+    var eId = t.dataset.e, jurId = t.dataset.jur;
+    S.qualPred[eId] = S.qualPred[eId] || {};
+    var cur = S.qualPred[eId][jurId];
+    if (cur === undefined) S.qualPred[eId][jurId] = true; 
+    else if (cur === true) S.qualPred[eId][jurId] = false; 
+    else delete S.qualPred[eId][jurId]; 
+    save(); return "render";
   },
-  openWelcomeModal:function(){
-    openWelcomeModal();
-    return "keep";
-  },
-  home:function(){ui.yearId=null;ui.view="home";},
-  openYear:function(t){ui.yearId=t.dataset.id;ui.view="year";ui.tab="sf1";},
-  openCompare:function(){ui.view="compare";},
-  openLibraryView:function(){ui.view="library";ui.q="";ui.libYear="";ui.libSort="name";},
+  
+  home:function(){ui.yearId=null;ui.view="home";ui.enter=true;},
+  openYear:function(t){ui.yearId=t.dataset.id;ui.view="year";ui.tab="sf1";ui.subTab="points";ui.ovSubTab="semis";ui.editMode=false;ui.enter=true;},
+  openCompare:function(){ui.view="compare";ui.enter=true;},
+  openLibraryView:function(){ui.view="library";ui.enter=true;},
   addNewSongMain:function(){openSong(null,null);return "keep";},
   editSongMain:function(t){openSong(t.dataset.id,null);return "keep";},
   delSongMain:function(t){
     var id=t.dataset.id;
-    openConfirm("Delete Song", "Delete song from library? This will also remove all points and placements.", function(){
-      for(var i=0; i<S.years.length; i++){
-        var y=S.years[i];
-        for(var sh in y.shows){
-          var list=y.shows[sh];
-          for(var k=0; k<list.length; k++){if(list[k].songId===id){clearEntry(list[k].id); delete list[k].songId;}}
-        }
-      }
+    openConfirm("Delete Song","Delete from library?",function(){
       S.songs=S.songs.filter(function(x){return x.id!==id;});save();render();
     });
     return "keep";
   },
   openNewYearDlg:function(){openNewYearModal();return "keep";},
-  ovMode:function(t){ui.ov=t.dataset.m;},
-  tab:function(t){ui.tab=t.dataset.tab;ui.pickE=null;ui.pickJur=null;},
+  tab:function(t){ui.tab=t.dataset.tab;ui.subTab="points";ui.ovSubTab="semis";ui.pickE=null;ui.pickJur=null;ui.editMode=false;ui.enter=true;},
   openPick:function(t){
-    var eId = t.dataset.e;
-    var jurId = t.dataset.jur || me;
-    if(ui.pickE === eId && ui.pickJur === jurId){
-      ui.pickE = null; ui.pickJur = null;
-    } else {
-      ui.pickE = eId; ui.pickJur = jurId;
-    }
+    var eId = t.dataset.e, jurId = t.dataset.jur || me;
+    if(ui.pickE === eId && ui.pickJur === jurId){ ui.pickE = null; ui.pickJur = null; }
+    else { ui.pickE = eId; ui.pickJur = jurId; }
   },
-  resShow:function(t){ui.resShow=t.dataset.show;},
   sbShow:function(t){ui.sbShow=t.dataset.show;},
   saveNewYear:function(){
-    var yNum=parseInt($("#ny_year").value);
-    var suffix=($("#ny_suffix").value||"").trim();
-    if(!yNum||yNum<1956){showAlert("Notice", "Please enter a valid year.");return "keep";}
-    var id = yNum + (suffix ? "_" + suffix.toLowerCase().replace(/[^a-z0-9]/g,"_") : "_main");
-    if(yearObj(id)){showAlert("Notice", "This contest already exists for this year.");return "keep";}
-    
+    var yNum=parseInt($("#ny_year").value), suffix=($("#ny_suffix").value||"").trim();
+    if(!yNum) return "keep";
+    var id = yNum + (suffix ? "_" + suffix.toLowerCase() : "_main");
+    if(yearObj(id)) return "keep";
     var shows={};
     for(var sh in SHOWS){
-      var n=Math.max(1,parseInt($("#ny_"+sh).value)||DEF_N[sh]);
       shows[sh]=[];
-      for(var i=1; i<=n; i++){ shows[sh].push({id:id+"-"+sh+"-"+i}); }
+      for(var i=1; i<=DEF_N[sh]; i++){ shows[sh].push({id:id+"-"+sh+"-"+i}); }
     }
     S.years.push({id:id,year:yNum,suffix:suffix,city:$("#ny_city").value.trim()||undefined,shows:shows});
-    S.years.sort(function(a,b){return b.year-a.year||b.id.localeCompare(a.id);});
-    save();
-    dlg.close();
-    ui.yearId=id;ui.view="year";ui.tab="sf1";
+    S.years.sort(function(a,b){return b.year-a.year;});
+    save(); dlg.close(); ui.yearId=id; ui.view="year"; ui.tab="sf1"; ui.subTab="points"; ui.ovSubTab="semis"; ui.enter=true;
   },
   delYear:function(){
     var y=yearObj(ui.yearId);
-    openConfirm("Delete Contest", "Really delete contest "+y.year+(y.suffix?" ("+y.suffix+")":"")+" including all songs and points?", function(){
-      for(var sh in y.shows){
-        var l = y.shows[sh];
-        for(var i=0; i<l.length; i++){delete S.ratings[l[i].id]; delete S.pred[l[i].id]; delete S.notes[l[i].id]; delete S.qualPred[l[i].id]; if(l[i].songId) delete S.ratings[l[i].songId];}
-      }
-      S.years=S.years.filter(function(x){return x!==y;});save();ui.yearId=null;ui.view="home";render();
+    openConfirm("Delete Contest","Really delete contest?",function(){
+      S.years=S.years.filter(function(x){return x!==y;});save();ui.yearId=null;ui.view="home";ui.enter=true;render();
     });
     return "keep";
   },
   rate:function(t){
-    var id=t.dataset.e,p=+t.dataset.p;
-    var e=findEntry(id);
-    var targetJur = (me === "admin" && ui.pickJur) ? ui.pickJur : me;
+    var id=t.dataset.e, p=+t.dataset.p;
+    var e=findEntry(id), targetJur = (me === "admin" && ui.pickJur) ? ui.pickJur : me;
     var key = (e && e.songId) ? e.songId : id;
-    
     S.ratings[key]=S.ratings[key]||{};
     if(S.ratings[key][targetJur]===p) delete S.ratings[key][targetJur];
     else S.ratings[key][targetJur]=p;
-    
-    ui.pickE=null;ui.pickJur=null;save();
+    ui.pickE=null; ui.pickJur=null; save();
   },
   moveUp:function(t){
-    var y=yearObj(ui.yearId), sh=t.dataset.show, idx_pos=+t.dataset.idx;
-    var list=y.shows[sh];
-    if(idx_pos > 0){
-      var tmp = list[idx_pos];
-      list[idx_pos] = list[idx_pos-1];
-      list[idx_pos-1] = tmp;
-      save();
-    }
+    var y=yearObj(ui.yearId), l=y.shows[t.dataset.show], idx_pos=+t.dataset.idx;
+    if(idx_pos>0){ var tmp=l[idx_pos]; l[idx_pos]=l[idx_pos-1]; l[idx_pos-1]=tmp; save(); }
   },
   moveDown:function(t){
-    var y=yearObj(ui.yearId), sh=t.dataset.show, idx_pos=+t.dataset.idx;
-    var list=y.shows[sh];
-    if(idx_pos < list.length - 1){
-      var tmp = list[idx_pos];
-      list[idx_pos] = list[idx_pos+1];
-      list[idx_pos+1] = tmp;
-      save();
-    }
+    var y=yearObj(ui.yearId), l=y.shows[t.dataset.show], idx_pos=+t.dataset.idx;
+    if(idx_pos<l.length-1){ var tmp=l[idx_pos]; l[idx_pos]=l[idx_pos+1]; l[idx_pos+1]=tmp; save(); }
   },
   addSlot:function(t){
-    var y=yearObj(ui.yearId),l=y.shows[t.dataset.show];
-    l.push({id:y.id+"-"+t.dataset.show+"-"+(l.length+1)});save();
+    var y=yearObj(ui.yearId), l=y.shows[t.dataset.show];
+    l.push({id:y.id+"-"+t.dataset.show+"-"+(l.length+1)}); save();
   },
   delSlot:function(t){
-    var y=yearObj(ui.yearId),l=y.shows[t.dataset.show];
-    if(l.length<=1)return;
-    var e=l[l.length-1];
-    if(e.songId||S.ratings[e.id]){
-      openConfirm("Remove Slot", "Remove running order slot "+l.length+"?", function(){
-        l.pop();delete S.ratings[e.id];delete S.pred[e.id];delete S.qualPred[e.id];save();render();
-      });
-    }else{
-      l.pop();delete S.ratings[e.id];delete S.pred[e.id];delete S.qualPred[e.id];save();
-    }
+    var y=yearObj(ui.yearId), l=y.shows[t.dataset.show];
+    if(l.length<=1)return; l.pop(); save();
   },
-  editNo:function(t){
-    openEditNo(t.dataset.e);
-    return "keep";
-  },
-  setno:function(t){
-    var inp = $("#custom_no_input");
-    if(inp) inp.value = t.dataset.setno;
-    return "keep";
-  },
+  editNo:function(t){ openEditNo(t.dataset.e); return "keep"; },
   saveCustomNo:function(t){
-    var e = findEntry(t.dataset.e);
-    var inp = $("#custom_no_input");
-    var afChk = $("#custom_autofinal_input");
+    var e=findEntry(t.dataset.e), inp=$("#custom_no_input"), afChk=$("#custom_autofinal_input");
     if(e){
-      if(inp){
-        var v = inp.value.trim();
-        if(!v || v === String(idx(e.id))) delete e.customNo;
-        else e.customNo = v;
-      }
-      if(afChk){
-        var s = songById(e.songId);
-        var defAf = s && ['de', 'fr', 'it', 'es', 'gb'].indexOf(s.cc) !== -1;
-        if(afChk.checked !== defAf) {
-          e.autoFinal = afChk.checked;
-        } else {
-          delete e.autoFinal;
-        }
-      }
+      if(inp){ var v=inp.value.trim(); if(!v||v===String(idx(e.id))) delete e.customNo; else e.customNo=v; }
+      if(afChk){ e.autoFinal=afChk.checked; }
       save();
     }
     dlg.close();
   },
-  toggleDq:function(t){
-    var e=findEntry(t.dataset.e);
-    e.dq = !e.dq;
-    save();
-  },
+  toggleDq:function(t){ var e=findEntry(t.dataset.e); e.dq=!e.dq; save(); },
   addSong:function(){openSong(null,ui.assign);return "keep";},
   editSong:function(t){openSong(t.dataset.id,null);return "keep";},
   pick:function(t){openPicker(t.dataset.e);return "keep";},
   choose:function(t){
-    var e=findEntry(ui.assign),id=t.dataset.id;
-    if(e.songId&&e.songId!==id){
-      if(S.ratings[e.id]||S.pred[e.id]||e.place){
-        openConfirm("Replace Song", "This slot already has points or placements. Continue?", function(){
-          clearEntry(e.id);
-          e.songId=id;save();dlg.close();render();
-        });
-        return "keep";
-      }
-    }
-    e.songId=id;save();dlg.close();return "keep";
+    var e=findEntry(ui.assign), id=t.dataset.id;
+    e.songId=id; save(); dlg.close(); return "keep";
   },
   delSong:function(t){
     var id=t.dataset.id;
-    openConfirm("Delete Song", "Delete song from library? This will also remove all points and placements.", function(){
-      for(var i=0; i<S.years.length; i++){
-        var y=S.years[i];
-        for(var sh in y.shows){
-          var list=y.shows[sh];
-          for(var k=0; k<list.length; k++){if(list[k].songId===id){clearEntry(list[k].id); delete list[k].songId;}}
-        }
-      }
-      delete S.ratings[id];
-      S.songs=S.songs.filter(function(x){return x.id!==id;});save();fillList();
+    openConfirm("Delete Song","Delete from library?",function(){
+      S.songs=S.songs.filter(function(x){return x.id!==id;}); save(); fillList();
     });
     return "keep";
   },
   saveSong:function(){
-    var artist=$("#f_artist").value.trim(),title=$("#f_title").value.trim(),cc=$("#f_cc").value;
+    var artist=$("#f_artist").value.trim(), title=$("#f_title").value.trim(), cc=$("#f_cc").value;
     var songYear=parseInt($("#f_song_year").value)||new Date().getFullYear();
-    if(!artist||!title){showAlert("Notice", "Please enter artist and song title.");return "keep";}
-    if(ui.editSong){var x=songById(ui.editSong);x.artist=artist;x.title=title;x.cc=cc;x.year=songYear;}
-    else{
-      var id="s"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+    if(!artist||!title) return "keep";
+    if(ui.editSong){ var x=songById(ui.editSong); x.artist=artist; x.title=title; x.cc=cc; x.year=songYear; }
+    else {
+      var id="s"+Date.now().toString(36);
       S.songs.push({id:id,cc:cc,artist:artist,title:title,year:songYear});
-      if(ui.assign){var e=findEntry(ui.assign);if(e)e.songId=id;}
+      if(ui.assign){ var e=findEntry(ui.assign); if(e) e.songId=id; }
     }
-    save();
-    if(ui.assign){dlg.close();}else { render(); }
-    return "keep";
+    save(); if(ui.assign) dlg.close(); else render(); return "keep";
   },
   editCity:function(){
     var y=yearObj(ui.yearId);
     dlg.className="";
-    dlg.innerHTML='<h3>Host City</h3>'+
-     '<label>City<input id="city_input" value="'+esc(y.city||"")+'"></label>'+
-     '<div class="actions"><button class="ghost" data-act="closeDlg">Cancel</button><button class="primary" data-act="saveCity">Save</button></div>';
-    if(!dlg.open) dlg.showModal();
-    return "keep";
+    dlg.innerHTML='<h3>Host City</h3><label>City<input id="city_input" value="'+esc(y.city||"")+'"></label><div class="actions"><button class="ghost" data-act="closeDlg">Cancel</button><button class="primary" data-act="saveCity">Save</button></div>';
+    if(!dlg.open) dlg.showModal(); return "keep";
   },
-  saveCity:function(){
-    var y=yearObj(ui.yearId);
-    var inp = $("#city_input");
-    if(y && inp){ y.city = inp.value.trim() || undefined; save(); }
-    dlg.close();
-  },
-  saveDb:function(){localStorage.setItem("esc-db",$("#dburl").value.trim().replace(/\/+$/,""));location.reload();return "keep";},
+  saveCity:function(){ var y=yearObj(ui.yearId), inp=$("#city_input"); if(y&&inp){ y.city=inp.value.trim()||undefined; save(); } dlg.close(); },
   closeDlg:function(){dlg.close();return "keep";},
-  confirmYes:function(){
-    dlg.close();
-    if(_pendingConfirmCallback){
-      var cb = _pendingConfirmCallback;
-      _pendingConfirmCallback = null;
-      cb();
-    }
-    return "keep";
-  },
+  confirmYes:function(){ dlg.close(); if(_pendingConfirmCallback){ var cb=_pendingConfirmCallback; _pendingConfirmCallback=null; cb(); } return "keep"; },
   settings:function(){openSettings();return "keep";},
   saveNames:function(){
     var inputs = document.querySelectorAll("[data-jn]");
     for(var i=0; i<inputs.length; i++){
-      var inp = inputs[i];
-      var jId = inp.dataset.jn;
-      if(inp.value.trim()){
-        for(var k=0; k<S.jury.length; k++){if(S.jury[k].id===jId) S.jury[k].name = inp.value.trim();}
-      }
+      var jId = inputs[i].dataset.jn, val = inputs[i].value.trim();
+      if(val){ for(var k=0; k<S.jury.length; k++){ if(S.jury[k].id===jId) S.jury[k].name=val; } }
     }
-    save();dlg.close();return "keep";
+    save(); dlg.close(); return "keep";
   },
   export:function(){
     var blob=new Blob([JSON.stringify(S,null,1)],{type:"application/json"});
-    var a=document.createElement("a");a.href=URL.createObjectURL(blob);
-    a.download="eurovision-scoreboard-"+jname(me).replace(/\W+/g,"_")+".json";a.click();
-    return "keep";
-  },
-  importPick:function(){$("#imp").click();return "keep"}
+    var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="esc.json"; a.click(); return "keep";
+  }
 };
 
 document.addEventListener("input",function(ev){
-  if(ev.target.id === "lib_search_input"){
-    ui.q = ev.target.value;
-    render();
-    var input = $("#lib_search_input");
-    if(input){ input.focus(); input.selectionStart = input.selectionEnd = input.value.length; }
-  }
+  if(ev.target.id === "lib_search_input"){ ui.q = ev.target.value; render(); var inp=$("#lib_search_input"); if(inp){ inp.focus(); inp.selectionStart=inp.selectionEnd=inp.value.length; } }
 });
 
 document.addEventListener("change",function(ev){
-  if(ev.target.id === "lib_year_select"){
-    ui.libYear = ev.target.value;
-    render();
-  }
-  if(ev.target.id === "lib_sort_select"){
-    ui.libSort = ev.target.value;
-    render();
-  }
-  var t=ev.target.closest("[data-chg]");if(!t)return;
-  if(C[t.dataset.chg](t)!=="keep")render();
+  if(ev.target.id === "lib_year_select"){ ui.libYear = ev.target.value; render(); }
+  var t=ev.target.closest("[data-chg]"); if(!t) return;
+  if(C[t.dataset.chg](t)!=="keep") render();
 });
 
 document.addEventListener("click",function(ev){
-  var preset = ev.target.closest("[data-setno]");
-  if(preset){ A.setno(preset); return; }
-
-  if(ev.target.closest("input,select,textarea,label"))return;
-  var t=ev.target.closest("[data-act]");if(!t||!A[t.dataset.act])return;
-  if(["openYear","tab","home","ovMode","sbShow","openCompare","openLibraryView"].indexOf(t.dataset.act)!==-1)ui.enter=true;
+  var t=ev.target.closest("[data-act]"); 
+  if(!t||!A[t.dataset.act]) return;
   var r=A[t.dataset.act](t);
-  if(r!=="keep")render();
+  if(r!=="keep") render();
 });
 
 var C={
-  pick:function(t){
-    if(t.value==="__new"){openSong(null,t.dataset.e);return "key0";}
-    var e=findEntry(t.dataset.e);if(t.value)e.songId=t.value;else delete e.songId;save();
-  },
   note:function(t){
-    var id=t.dataset.e,v=t.value.trim();
-    var e=findEntry(id);
-    var targetJur = t.dataset.jur || me;
+    var id=t.dataset.e, v=t.value.trim(), e=findEntry(id), targetJur=t.dataset.jur||me;
     var key = (e && e.songId) ? e.songId : id;
     S.notes[key]=S.notes[key]||{};
-    if(v)S.notes[key][targetJur]=v;else delete S.notes[key][targetJur];
+    if(v) S.notes[key][targetJur]=v; else delete S.notes[key][targetJur];
     save();
   },
-  place:function(t){var e=findEntry(t.dataset.e),v=parseInt(t.value);if(v>0)e.place=v;else delete e.place;save();},
-  pred:function(t){
-    var id=t.dataset.e,j=t.dataset.j,v=parseInt(t.value);
-    S.pred[id]=S.pred[id]||{};
-    if(v>0)S.pred[id][j]=v;else delete S.pred[id][j];save();
-  },
-  qual:function(t){
-    var eId = t.dataset.e;
-    var jurId = t.dataset.jur;
-    var val = t.value;
-    S.qualPred[eId] = S.qualPred[eId] || {};
-    if(val === ""){
-      delete S.qualPred[eId][jurId];
-    } else {
-      S.qualPred[eId][jurId] = (val === "true");
-    }
-    save();
-  },
+  place:function(t){ var e=findEntry(t.dataset.e), v=parseInt(t.value); if(v>0) e.place=v; else delete e.place; save(); },
+  pred:function(t){ var id=t.dataset.e, j=t.dataset.j, v=parseInt(t.value); S.pred[id]=S.pred[id]||{}; if(v>0) S.pred[id][j]=v; else delete S.pred[id][j]; save(); },
   bA:function(t){ui.bA=t.value;},
   bB:function(t){ui.bB=t.value;},
   compareCc:function(t){ui.compareCc=t.value;render();}
