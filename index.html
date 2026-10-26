@@ -40,6 +40,44 @@ input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 input[type=number] { -moz-appearance: textfield; }
 
+/* Custom Checkbox Design */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-grid;
+  place-content: center;
+  transition: all 0.2s ease;
+  vertical-align: middle;
+  margin: 0;
+}
+input[type="checkbox"]:hover {
+  border-color: var(--pink);
+}
+input[type="checkbox"]:checked {
+  background: var(--pink);
+  border-color: var(--pink);
+  box-shadow: 0 0 12px rgba(255,45,149,0.4);
+}
+input[type="checkbox"]::before {
+  content: "";
+  width: 10px;
+  height: 6px;
+  border-left: 2px solid white;
+  border-bottom: 2px solid white;
+  transform: rotate(-45deg) scale(0);
+  transition: transform 0.15s ease-in-out;
+  margin-top: -2px;
+}
+input[type="checkbox"]:checked::before {
+  transform: rotate(-45deg) scale(1);
+}
+
 button{
   font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);padding:6px 12px;
   transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s ease,filter .2s ease,background-color .2s ease,opacity .2s ease,border-color .2s ease;
@@ -148,7 +186,6 @@ h3{font-family:var(--display);margin:0 0 12px}
 }
 .tiles{display:flex;gap:4px}
 
-/* Geteilte Kacheln (Split-Tiles Design) */
 .tile{
   width:46px;
   height:50px;
@@ -258,18 +295,15 @@ dialog input,dialog select{width:100%}
 #plist{max-height:55vh;overflow:auto;margin:10px 0}
 .net{font-size:.8rem}
 
-/* Overview Layout: Lückenlos & mit Song-Details gefüllt */
 .ov-grid-side{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:24px;margin-top:16px}
 @media(max-width:1200px){.ov-grid-side{grid-template-columns:1fr}}
 .ov-column{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
 .ov-col-title{font-family:var(--display);font-weight:800;font-size:1.1rem;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center;margin-bottom:16px;color:var(--ink)}
 
-.ov-headers-row{display:flex;justify-content:space-between;align-items:center;padding:0 8px 6px;color:var(--muted);font-size:0.8rem;font-weight:700}
 .ov-row-item{display:flex;align-items:center;gap:4px;margin-bottom:8px;justify-content:space-between}
 .ov-pts{display:flex;gap:4px}
 .ov-pt{width:34px;height:34px;display:grid;place-items:center;font-family:var(--number-font);font-size:1.1rem;border-radius:8px;background:var(--panel2);border:1px solid var(--line)}
 .ov-pt.none{color:var(--muted);opacity:0.4}
-.ov-no{width:26px;text-align:center;font-weight:700;color:var(--muted);font-size:0.85rem;display:none;}
 .ov-pill{flex:1;height:38px;border-radius:8px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);display:flex;align-items:center;justify-content:space-between;padding:0 10px;font:700 0.85rem var(--display);overflow:hidden;}
 .ov-pill .song-info{display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;}
 .ov-pill .song-info span{overflow:hidden;text-overflow:ellipsis;font-size:0.8rem;font-weight:400;color:var(--muted);}
@@ -393,12 +427,12 @@ function toTree(){
   for(var i=0; i<S.songs.length; i++){ var x = S.songs[i]; t.songs[x.id] = {cc:x.cc, artist:x.artist, title:x.title, year:x.year}; }
   for(var i=0; i<S.years.length; i++){
     var y = S.years[i];
-    var o={year:y.year, suffix:y.suffix, city:y.city, shows:{}};
+    var o={year:y.year, suffix:y.suffix, city:y.city, splitAfter: y.splitAfter, shows:{}};
     for(var sh in y.shows){
       o.shows[sh]={};
       var shList = y.shows[sh];
       for(var k=0; k<shList.length; k++){
-        var e = shList[k]; o.shows[sh][e.id] = {n:e.customNo || idx(e.id), songId:e.songId, place:e.place, dq:e.dq, autoFinal: e.autoFinal};
+        var e = shList[k]; o.shows[sh][e.id] = {n:e.customNo, songId:e.songId, place:e.place, dq:e.dq, autoFinal: e.autoFinal};
       }
     }
     t.years[y.id]=o;
@@ -429,13 +463,14 @@ function fromTree(t){
         var shObj = (o.shows || {})[sh] || {}; var arr = [];
         for(var id2 in shObj){ if(shObj.hasOwnProperty(id2)){ var e = shObj[id2]; arr.push({id:id2, songId:e.songId, place:e.place, customNo:e.n, dq:e.dq, autoFinal: e.autoFinal}); } }
         arr.sort(function(a,b){
-          var na = a.customNo || idx(a.id), nb = b.customNo || idx(b.id);
+          var na = a.customNo !== undefined ? parseFloat(a.customNo) : idx(a.id);
+          var nb = b.customNo !== undefined ? parseFloat(b.customNo) : idx(b.id);
           if(!isNaN(na) && !isNaN(nb)) return na - nb;
           return String(na).localeCompare(String(nb));
         });
         shows[sh] = arr;
       }
-      r.years.push({id:id, year:+o.year||+id.split("_")[0], suffix:o.suffix||"", city:o.city, shows:shows});
+      r.years.push({id:id, year:+o.year||+id.split("_")[0], suffix:o.suffix||"", city:o.city, splitAfter: o.splitAfter, shows:shows});
     }
   }
   r.years.sort(function(a,b){return b.year-a.year||b.id.localeCompare(a.id);});
@@ -696,14 +731,7 @@ function showView(sh){
       var pa = (a.place !== undefined && a.place !== null) ? a.place : 9999;
       var pb = (b.place !== undefined && b.place !== null) ? b.place : 9999;
       if (pa !== pb) return pa - pb;
-      var na = a.customNo || idx(a.id), nb = b.customNo || idx(b.id);
-      return na - nb;
-    });
-  } else {
-    list.sort(function(a, b) {
-      var na = a.customNo || idx(a.id), nb = b.customNo || idx(b.id);
-      if(!isNaN(na) && !isNaN(nb)) return na - nb;
-      return String(na).localeCompare(String(nb));
+      return listRaw.indexOf(a) - listRaw.indexOf(b);
     });
   }
 
@@ -713,30 +741,52 @@ function showView(sh){
   var topControls = "";
   if(sh !== "final"){
     topControls = '<div class="tabs" style="border:none;margin:0;padding:3px;background:var(--panel2);border-radius:10px;display:inline-flex;gap:4px">' +
-      '<button class="'+(ui.subTab!=='tips'?'on':'')+'" style="border:none;margin:0" data-act="subTab" data-val="points">Punkte</button>' +
-      '<button class="'+(ui.subTab==='tips'?'on':'')+'" style="border:none;margin:0" data-act="subTab" data-val="tips">Q/NQ Tipps</button>' +
+      '<button class="'+(ui.subTab!=='tips'?'on':'')+'" style="border:none;margin:0" data-act="subTab" data-val="points">Points</button>' +
+      '<button class="'+(ui.subTab==='tips'?'on':'')+'" style="border:none;margin:0" data-act="subTab" data-val="tips">Q/NQ Tips</button>' +
     '</div>';
   }
 
   var sortToggleBtn = '<div class="tabs" style="border:none;margin:0;padding:3px;background:var(--panel2);border-radius:10px;display:inline-flex;gap:4px">' +
-    '<button class="'+(ui.sortMode==='order'?'on':'')+'" style="border:none;margin:0" data-act="sortMode" data-val="order">Reihenfolge</button>' +
-    '<button class="'+(ui.sortMode==='place'?'on':'')+'" style="border:none;margin:0" data-act="sortMode" data-val="place">Platzierung</button>' +
+    '<button class="'+(ui.sortMode==='order'?'on':'')+'" style="border:none;margin:0" data-act="sortMode" data-val="order">Order</button>' +
+    '<button class="'+(ui.sortMode==='place'?'on':'')+'" style="border:none;margin:0" data-act="sortMode" data-val="place">Placement</button>' +
   '</div>';
 
+  var splitControl = "";
+  if(sh !== "final" && ui.editMode) {
+    y.splitAfter = y.splitAfter || {};
+    var defaultSplit = Math.floor(list.length / 2);
+    var currentSplit = y.splitAfter[sh] !== undefined ? y.splitAfter[sh] : defaultSplit;
+    splitControl = '<div style="display:flex;align-items:center;gap:6px;font-size:0.85rem;color:var(--muted);background:var(--panel2);padding:4px 10px;border-radius:10px;border:1px solid var(--line)"><span>1st Half up to no.:</span><input type="number" min="1" max="'+(list.length-1)+'" value="'+currentSplit+'" data-chg="splitAfter" data-show="'+sh+'" style="width:56px;height:32px;text-align:center;font-weight:700"></div>';
+  }
+
   var topBtnBar = '<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px;flex-wrap:wrap;gap:12px">'+
-    '<div><h2 style="margin:0">'+SHOWS[sh]+'</h2><p class="hint" style="margin:2px 0 0">Klicke auf Kacheln für Punkte, trage Tipps und Plätze rechts ein.</p></div>'+
+    '<div><h2 style="margin:0">'+SHOWS[sh]+'</h2><p class="hint" style="margin:2px 0 0">Click tiles for points, enter tips and places on the right.</p></div>'+
     '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'+
+      splitControl+
       topControls+
       sortToggleBtn+
       '<button class="ghost '+(ui.editMode?'primary':'')+'" data-act="toggleEditMode">✏️ Edit</button>'+
     '</div>'+
   '</div>';
 
-  var half = Math.ceil(list.length / 2);
   var leftList = [], rightList = [];
+  y.splitAfter = y.splitAfter || {};
+  var splitAt = y.splitAfter[sh] !== undefined ? y.splitAfter[sh] : Math.floor(list.length / 2);
+
   for(var i=0; i<list.length; i++){
-    if(i < half) leftList.push({item: list[i], index: i});
-    else rightList.push({item: list[i], index: i});
+    var item = list[i];
+    var currentPosition = i + 1;
+    var originalIdx = listRaw.indexOf(item);
+    if(sh !== "final" && currentPosition > splitAt && ui.sortMode === 'order') {
+      rightList.push({item: item, index: originalIdx !== -1 ? originalIdx : i});
+    } else if(sh === 'final' && i >= Math.ceil(list.length / 2) && ui.sortMode === 'order') {
+      rightList.push({item: item, index: originalIdx !== -1 ? originalIdx : i});
+    } else if(ui.sortMode === 'place') {
+      if(i >= Math.ceil(list.length / 2)) rightList.push({item: item, index: originalIdx !== -1 ? originalIdx : i});
+      else leftList.push({item: item, index: originalIdx !== -1 ? originalIdx : i});
+    } else {
+      leftList.push({item: item, index: originalIdx !== -1 ? originalIdx : i});
+    }
   }
 
   var renderCard = function(obj){
@@ -749,7 +799,7 @@ function showView(sh){
     var mainStatsHtml = "";
     if (sh !== "final" && ui.subTab === "tips") {
       if (isAutoFinal) {
-        mainStatsHtml = '<div class="tiles"><div class="tile" style="background:#7b2cbf;color:#fff;width:auto;padding:0 12px;font-family:var(--display);font-size:0.8rem;font-weight:800;display:grid;place-items:center;">AUTO-FINALIST</div></div>';
+        mainStatsHtml = '<div class="tiles"><div class="tile" style="background:#7b2cbf;color:#fff;width:auto;padding:0 12px;font-family:var(--display);font-size:0.8rem;font-weight:800;display:grid;place-items:center;">AQ</div></div>';
       } else {
         var tipsHtml = "";
         for(var j=0; j<S.jury.length; j++){
@@ -797,9 +847,12 @@ function showView(sh){
     }
 
     var qTag = (sh!=="final" && actualQ)?'<span class="q">Q</span>':"";
-    var afTag = isAutoFinal ? '<span class="autofinal">AF</span>' : "";
+    var afTag = isAutoFinal ? '<span class="autofinal">AQ</span>' : "";
     var placeVal = (e.place !== undefined && e.place !== null) ? e.place : "";
-    var displayNo = e.customNo || idx(e.id);
+    
+    var rawNo = e.customNo !== undefined ? e.customNo : idx(e.id);
+    var displayNo = (typeof rawNo === 'number' && rawNo % 1 !== 0) || (typeof rawNo === 'string' && String(rawNo).includes('.')) ? '➔' : rawNo;
+
     var rowClass = (e.place===1?" winner":"")+(sh!=="final"&&e.place>10?" out":"")+(e.dq?" dq":"")+(isAutoFinal && e.place !== 1 ? " autofinal-row":"");
 
     var smGroupHtml = "";
@@ -836,7 +889,8 @@ function showView(sh){
   var editActions = ui.editMode ? '<div class="actions"><button class="ghost" data-act="addSlot" data-show="'+sh+'">＋ Running Order</button><button class="ghost" data-act="delSlot" data-show="'+sh+'">− Remove Last</button></div>' : '';
 
   return topBtnBar + 
-    '<div class="list" style="margin-top:10px">' +
+    '<div style="display:flex;justify-content:space-between;color:var(--muted);font-weight:700;font-size:0.85rem;padding:0 4px;margin-bottom:6px"><div>1st Half</div><div>2nd Half</div></div>' +
+    '<div class="list" style="margin-top:0">' +
       '<div style="display:flex;flex-direction:column;gap:12px">'+leftColHtml+'</div>' +
       '<div style="display:flex;flex-direction:column;gap:12px">'+rightColHtml+'</div>' +
     '</div>'+
@@ -1051,7 +1105,7 @@ function openRatingModal(eId, jurId) {
   if (!e) return;
   var s = songById(e.songId);
   if (!s) {
-    showAlert("Hinweis", "Bitte wähle zuerst einen Song für diesen Startplatz aus.");
+    showAlert("Notice", "Please select a song for this slot first.");
     return;
   }
   var r = getRatings(e);
@@ -1071,12 +1125,12 @@ function openRatingModal(eId, jurId) {
     '<h3 style="margin:4px 0 2px;font-size:1.3rem;">'+esc(s.title)+'</h3>' +
     '<p style="color:var(--muted);margin:0;font-size:0.95rem;">'+esc(s.artist)+' ('+esc(CN[s.cc]||s.cc.toUpperCase())+')</p>' +
   '</div>' +
-  (me === "admin" ? '<div style="text-align:center;color:var(--gold);margin-bottom:10px;font-size:0.85rem;">Bewertung für: <b>'+esc(jname(activeJur))+'</b></div>' : '') +
-  '<p class="hint" style="text-align:center;margin-bottom:12px;font-size:0.85rem;">Wähle deine Punkte (1–10):</p>' +
+  (me === "admin" ? '<div style="text-align:center;color:var(--gold);margin-bottom:10px;font-size:0.85rem;">Rating for: <b>'+esc(jname(activeJur))+'</b></div>' : '') +
+  '<p class="hint" style="text-align:center;margin-bottom:12px;font-size:0.85rem;">Choose your points (1–10):</p>' +
   '<div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px;">'+row1+'</div>' +
   '<div style="display:flex;gap:8px;justify-content:center;margin-bottom:16px;">'+row2+'</div>' +
   '<div class="actions" style="margin-top:16px;justify-content:center;">' +
-    '<button class="ghost" data-act="closeDlg">Abbrechen</button>' +
+    '<button class="ghost" data-act="closeDlg">Cancel</button>' +
   '</div>';
 
   if (!dlg.open) dlg.showModal();
@@ -1111,13 +1165,13 @@ function fillList(){
 
 function openEditNo(entryId){
   var e = findEntry(entryId);
-  var cur = e.customNo || idx(e.id);
+  var cur = e.customNo !== undefined ? e.customNo : idx(e.id);
   var s = songById(e.songId);
   var isAutoFinal = (e.autoFinal !== undefined) ? e.autoFinal : (s && ['de', 'fr', 'it', 'es', 'gb'].indexOf(s.cc) !== -1);
   dlg.className="";
   dlg.innerHTML='<h3>Running Order & Status</h3>'+
-   '<label>Custom Number<input id="custom_no_input" value="'+esc(cur)+'"></label>'+
-   '<label style="flex-direction:row;align-items:center;gap:8px;margin-top:10px"><input type="checkbox" id="custom_autofinal_input" '+(isAutoFinal?'checked':'')+'> Auto-Finalist</label>'+
+   '<label>Custom Position / Number (e.g. 6 or 6.5)<input id="custom_no_input" value="'+esc(cur)+'"></label>'+
+   '<label style="flex-direction:row;align-items:center;gap:10px;margin-top:14px;cursor:pointer"><input type="checkbox" id="custom_autofinal_input" '+(isAutoFinal?'checked':'')+'> Auto Qualifier (AQ)</label>'+
    '<div class="actions"><button class="ghost" data-act="closeDlg">Cancel</button><button class="primary" data-act="saveCustomNo" data-e="'+entryId+'">Save</button></div>';
   if(!dlg.open) dlg.showModal();
 }
@@ -1167,8 +1221,8 @@ function openSettings(){
         save();
         dlg.close();
         render();
-        showAlert("Erfolg", "Daten wurden erfolgreich zusammengeführt (gemergt)!");
-      }catch(e){showAlert("Error","Ungültige Datei");}
+        showAlert("Success", "Data successfully merged!");
+      }catch(e){showAlert("Error","Invalid file");}
     };
     r.readAsText(f);
   });
@@ -1177,7 +1231,7 @@ function openSettings(){
 var A={
   selectWho:function(t){ me = t.dataset.id; localStorage.setItem(MEKEY, me); localStorage.setItem("esc-joined", "true"); dlg.close(); ui.enter=true; render(); return "keep"; },
   openWelcomeModal:function(){ openWelcomeModal(); return "keep"; },
-  toggleEditMode:function(){ ui.editMode = !ui.editMode; },
+  toggleEditMode:function(){ ui.editMode = !ui.editMode; ui.enter=true; },
   subTab:function(t){ ui.subTab = t.dataset.val; ui.enter=true; }, 
   sortMode:function(t){ ui.sortMode = t.dataset.val; ui.enter=true; },
   ovSubTab:function(t){ ui.ovSubTab = t.dataset.val; ui.enter=true; },
@@ -1266,7 +1320,12 @@ var A={
   saveCustomNo:function(t){
     var e=findEntry(t.dataset.e), inp=$("#custom_no_input"), afChk=$("#custom_autofinal_input");
     if(e){
-      if(inp){ var v=inp.value.trim(); if(!v||v===String(idx(e.id))) delete e.customNo; else e.customNo=v; }
+      if(inp){ 
+        var v = inp.value.trim(); 
+        var parsedNum = parseFloat(v);
+        if(v === "" || (parsedNum === idx(e.id))) delete e.customNo; 
+        else e.customNo = !isNaN(parsedNum) ? parsedNum : v; 
+      }
       if(afChk){ e.autoFinal=afChk.checked; }
       save();
     }
@@ -1325,11 +1384,21 @@ var A={
 
 document.addEventListener("input",function(ev){
   if(ev.target.id === "lib_search_input"){ ui.q = ev.target.value; render(); var inp=$("#lib_search_input"); if(inp){ inp.focus(); inp.selectionStart=inp.selectionEnd=inp.value.length; } }
+  if(ev.target.dataset.chg === "splitAfter"){
+    var y = yearObj(ui.yearId);
+    if(y){
+      y.splitAfter = y.splitAfter || {};
+      y.splitAfter[ev.target.dataset.show] = parseInt(ev.target.value) || 1;
+      save();
+      render();
+    }
+  }
 });
 
 document.addEventListener("change",function(ev){
   if(ev.target.id === "lib_year_select"){ ui.libYear = ev.target.value; render(); }
   var t=ev.target.closest("[data-chg]"); if(!t) return;
+  if(t.dataset.chg === "splitAfter") return;
   if(C[t.dataset.chg](t)!=="keep") render();
 });
 
