@@ -412,6 +412,9 @@ dialog input,dialog select{width:100%}
   background: rgba(17,6,36,0.3);
   border-color: rgba(50, 25, 95, 0.6);
 }
+/* Damit NQ-Tipps bei ausgegrauten/ausgeschiedenen Songs trotzdem voll zur Geltung kommen */
+.row.out .tiles { filter: none !important; opacity: 1 !important; }
+
 .row.dq {
   opacity: 0.25;
   filter: grayscale(1) blur(0.5px);
@@ -899,11 +902,49 @@ function showView(sh){
   var cnt={};
   for(var i=0; i<listRaw.length; i++){ if(listRaw[i].place) cnt[listRaw[i].place] = (cnt[listRaw[i].place]||0) + 1; }
 
+  // Berechne NQ-Trefferquote pro Juror für Semi-Finals
+  var nqStats = {};
+  for(var j=0; j<S.jury.length; j++){ nqStats[S.jury[j].id] = { correct: 0, totalGuessed: 0 }; }
+  if(sh !== "final"){
+    for(var i=0; i<listRaw.length; i++){
+      var e = listRaw[i];
+      var qp = getQualPred(e);
+      var actualNQ = (e.place !== undefined && e.place !== null) ? (e.place > 10) : null;
+      if(actualNQ !== null){
+        for(var j=0; j<S.jury.length; j++){
+          var jId = S.jury[j].id;
+          if(qp[jId] === false){
+            nqStats[jId].totalGuessed++;
+            if(actualNQ === true){
+              nqStats[jId].correct++;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  var nqSummaryHtml = '';
+  if(sh !== "final"){
+    var summaryItems = '';
+    for(var j=0; j<S.jury.length; j++){
+      var jur = S.jury[j];
+      var st = nqStats[jur.id];
+      summaryItems += '<div style="background:var(--panel2);border:1px solid var(--line);padding:6px 12px;border-radius:8px;font-size:0.85rem;display:inline-flex;gap:8px;align-items:center;">' +
+        '<span style="color:var(--muted)">'+esc(jur.name)+'</span>' +
+        '<b style="color:var(--gold)">'+st.correct+' / '+st.totalGuessed+' correct NQs</b>' +
+      '</div>';
+    }
+    nqSummaryHtml = '<div class="card" style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">' +
+      '<b style="font-size:0.9rem;margin-right:4px;">NQ Tip Accuracy:</b>' + summaryItems +
+    '</div>';
+  }
+
   var topControls = "";
   if(sh !== "final"){
     topControls = '<div class="tabs" style="border:none;margin:0;padding:3px;background:var(--panel2);border-radius:10px;display:inline-flex;gap:4px">' +
       '<button class="'+(ui.subTab!=='tips'?'on':'')+'" style="border:none;margin:0" data-act="subTab" data-val="points">Points</button>' +
-      '<button class="'+(ui.subTab==='tips'?'on':'')+'" style="border:none;margin:0" data-act="subTab" data-val="tips">Q/NQ Tips</button>' +
+      '<button class="'+(ui.subTab==='tips'?'on':'')+'" style="border:none;margin:0" data-act="subTab" data-val="tips">NQ Tips</button>' +
     '</div>';
   }
 
@@ -975,16 +1016,17 @@ function showView(sh){
         for(var j=0; j<S.jury.length; j++){
           var jur = S.jury[j], jQual = qp[jur.id], isMe = (jur.id === me) || (me === "admin");
           var isCurrentProfile = (jur.id === me) || (me === "admin");
-          var txt = jQual === true ? "Q" : (jQual === false ? "NQ" : "–");
+          var txt = jQual === false ? "NQ" : "–";
           var bg = "var(--panel2)", col = "var(--muted)", border = "2.5px solid transparent";
           var extraClass = "";
           
-          if (jQual === true) { col = "#4ade80"; border = "2.5px solid #189650"; bg = "rgba(24,150,80,0.1)"; }
-          else if (jQual === false) { col = "#ffb3b3"; border = "2.5px solid #d62839"; bg = "rgba(214,40,57,0.1)"; }
+          if (jQual === false) { col = "#ffb3b3"; border = "2.5px solid #d62839"; bg = "rgba(214,40,57,0.1)"; }
           
           if (actualQ !== null && jQual !== undefined) {
-            if (actualQ === jQual) { bg = "#189650"; col = "#fff"; border = "2.5px solid #4ade80"; } 
-            else { bg = "#d62839"; col = "#fff"; border = "2.5px solid #ffb3b3"; }
+            if (jQual === false) {
+              if (actualQ === false) { bg = "#189650"; col = "#fff"; border = "2.5px solid #4ade80"; } 
+              else { bg = "#d62839"; col = "#fff"; border = "2.5px solid #ffb3b3"; }
+            }
           }
           
           if (jQual === undefined) {
@@ -1078,7 +1120,8 @@ function showView(sh){
   var editActions = ui.editMode ? '<div class="actions"><button class="ghost" data-act="addSlot" data-show="'+sh+'">＋ Running Order</button><button class="ghost" data-act="delSlot" data-show="'+sh+'">− Remove Last</button></div>' : '';
 
   return topBtnBar + 
-    '<div style="display:flex;justify-content:space-between;color:var(--muted);font-weight:700;font-size:0.85rem;padding:0 4px;margin-bottom:6px"><div>1st Half</div><div>2nd Half</div></div>' +
+    nqSummaryHtml +
+    '<div style="display:flex;justify-content:space-between;color:var(--muted);font-weight:700;font-size:0.85rem;padding:0 4px;margin:12px 0 6px"><div>1st Half</div><div>2nd Half</div></div>' +
     '<div class="list" style="margin-top:0">' +
       '<div style="display:flex;flex-direction:column;gap:12px">'+leftColHtml+'</div>' +
       '<div style="display:flex;flex-direction:column;gap:12px">'+rightColHtml+'</div>' +
@@ -1094,6 +1137,9 @@ function switcher(key){
     if(y && y.shows[sh]){
       res += '<button class="'+(ui[key]===sh?"on":"")+'" data-act="'+key+'" data-show="'+sh+'">'+SHOWS[sh]+'</button>';
     }
+  }
+  if(key === "sbShow"){
+    res += '<button class="'+(ui[key]==="all"?"on":"")+'" data-act="'+key+'" data-show="all">All Songs</button>';
   }
   return '<div class="seg">'+res+'</div>';
 }
@@ -1158,8 +1204,24 @@ function battle(){
 
 function scoreboard(){
   var y=yearObj(ui.yearId), sh=ui.sbShow;
-  if(!y.shows[sh]) sh = y.shows.final ? "final" : Object.keys(y.shows)[0];
-  var rawList = y.shows[sh] || [];
+  if(sh !== "all" && !y.shows[sh]) sh = y.shows.final ? "final" : Object.keys(y.shows)[0];
+  
+  var rawList = [];
+  if(sh === "all"){
+    var seenSongs = new Set();
+    for(var sKey in y.shows){
+      var sList = y.shows[sKey] || [];
+      for(var k=0; k<sList.length; k++){
+        if(sList[k].songId && !seenSongs.has(sList[k].songId)){
+          seenSongs.add(sList[k].songId);
+          rawList.push(sList[k]);
+        }
+      }
+    }
+  } else {
+    rawList = y.shows[sh] || [];
+  }
+
   var rows = [];
   for(var i=0; i<rawList.length; i++){
     var e = rawList[i];
@@ -1435,9 +1497,11 @@ var A={
     var eId = t.dataset.e, jurId = t.dataset.jur;
     S.qualPred[eId] = S.qualPred[eId] || {};
     var cur = S.qualPred[eId][jurId];
-    if (cur === undefined) S.qualPred[eId][jurId] = true; 
-    else if (cur === true) S.qualPred[eId][jurId] = false; 
-    else delete S.qualPred[eId][jurId]; 
+    if (cur === undefined) {
+      S.qualPred[eId][jurId] = false; // Nur noch NQ-Auswahl
+    } else {
+      delete S.qualPred[eId][jurId]; 
+    }
     save(); return "render";
   },
   
