@@ -98,7 +98,7 @@ button:disabled{opacity:.35;cursor:not-allowed;transform:none!important;box-shad
   -webkit-text-fill-color:transparent;
 }
 
-h2{font-family:var(--display);font-size:1.5rem;margin:24px 0 4px}
+h2{font-family:var(--display);font-size:1.5rem;margin:0}
 h3{font-family:var(--display);margin:0 0 12px}
 .hint{color:var(--muted);margin:0 0 14px;font-size:.9rem}
 .yeartitle{font-family:var(--display);font-weight:800;font-size:clamp(2rem,6vw,3.4rem);margin:12px 0 16px;letter-spacing:-.01em}
@@ -132,6 +132,8 @@ h3{font-family:var(--display);margin:0 0 12px}
   to { opacity: 1; transform: translateY(0); } 
 }
 .row{
+  position: relative;
+  overflow: hidden;
   display:grid;
   grid-template-columns:44px 1fr auto;
   gap:12px;
@@ -142,6 +144,46 @@ h3{font-family:var(--display);margin:0 0 12px}
   align-items:center;
   animation: simpleFadeUp 0.3s ease-out backwards;
   transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.row::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 220px;
+  background-image: var(--flag-url);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.85;
+  mask-image: linear-gradient(to right, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
+  -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.row > * {
+  position: relative;
+  z-index: 1;
+}
+
+.cc-code{
+  position: absolute;
+  top: 50%;
+  left: 72px;
+  transform: translateY(-50%);
+  font-family: var(--display);
+  font-size: 0.65rem;
+  font-weight: 800;
+  background: rgba(0,0,0,0.65);
+  color: var(--ink);
+  padding: 3px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.2);
+  letter-spacing: 0.05em;
+  z-index: 2;
+  text-shadow: none;
 }
 
 @media(max-width:700px){
@@ -173,9 +215,20 @@ h3{font-family:var(--display);margin:0 0 12px}
   flex-direction:column;
   gap:6px;
   min-width:0;
+  align-items:flex-end;
+  text-align:right;
 }
 
-.meta{display:flex;align-items:center;gap:8px;font-size:0.95rem;flex-wrap:wrap;min-width:0}
+.meta{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  font-size:0.95rem;
+  flex-wrap:wrap;
+  min-width:0;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.95), 0 0 6px rgba(0,0,0,0.8);
+}
 .meta b{font-size:1.05rem}
 .flag{width:22px;height:15px;object-fit:cover;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.25);vertical-align:middle;transform:scale(1.2);display:inline-block;margin:0 2px}
 
@@ -242,8 +295,11 @@ h3{font-family:var(--display);margin:0 0 12px}
   font-size:0.8rem;
   display:flex;
   flex-wrap:wrap;
+  justify-content:flex-end;
   gap:4px 12px;
   grid-column:1/-1;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+  text-align: right;
 }
 
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
@@ -376,6 +432,28 @@ var COUNTRIES=[
 var CN={};
 for(var i=0; i<COUNTRIES.length; i++){ CN[COUNTRIES[i][0]] = COUNTRIES[i][1]; }
 
+var ISO3={
+  af:"AFG", al:"ALB", am:"ARM", au:"AUS", at:"AUT", az:"AZE",
+  bh:"BHR", bd:"BGD", by:"BLR", be:"BEL", bt:"BTN", ba:"BIH",
+  bn:"BRN", bg:"BGR", kh:"KHM", cn:"CHN", hr:"CRO", cy:"CYP", cz:"CZE",
+  dk:"DNK", ee:"EST", fi:"FIN", fr:"FRA", ge:"GEO", de:"GER", gr:"GRE",
+  hk:"HKG", hu:"HUN", is:"ISL", in:"IND", id:"IDN", ir:"IRN", iq:"IRQ",
+  ie:"IRL", il:"ISR", it:"ITA", jp:"JPN", jo:"JOR", kz:"KAZ", kw:"KWT",
+  kg:"KGZ", la:"LAO", lb:"LBN", lv:"LVA", lt:"LTU", lu:"LUX", mo:"MAC",
+  my:"MYS", mv:"MDV", mt:"MLT", md:"MDA", mc:"MCO", mn:"MNG", me:"MNE",
+  ma:"MAR", mm:"MMR", np:"NPL", nl:"NED", nz:"NZL", kp:"PRK",
+  mk:"MKD", no:"NOR", om:"OMN", pk:"PAK", ps:"PSE", ph:"PHL",
+  pl:"POL", pt:"POR", qa:"QAT", ro:"ROU", ru:"RUS", sa:"SAU", sm:"SMR",
+  rs:"SRB", sg:"SGP", sk:"SVK", si:"SVN", es:"ESP", lk:"LKA", se:"SWE",
+  ch:"SUI", sy:"SYR", tw:"TWN", tj:"TJK", th:"THA", tr:"TUR",
+  tm:"TKM", ua:"UKR", ae:"ARE", gb:"GBR", uz:"UZB",
+  vn:"VNM", ye:"YEM"
+};
+function getIso3(cc) {
+  if (!cc) return "";
+  return ISO3[cc.toLowerCase()] || cc.toUpperCase();
+}
+
 var SHOWS={sf1:"Semi-final 1",sf2:"Semi-final 2",final:"Final"};
 var DEF_N={sf1:15,sf2:15,final:26};
 var KEY="esc-scoreboard-v2",MEKEY="esc-me";
@@ -397,7 +475,7 @@ function load(){
 }
 var S=load();
 var me=localStorage.getItem(MEKEY)||"j1";
-var ui={big:null,q:"",view:"home",yearId:null,tab:"sf1",subTab:"points",sortMode:"order",ovSubTab:"semis",sbShow:"final",editMode:false,bA:null,bB:null,assign:null,editSong:null,pickJur:null,libYear:"",libSort:"name",compareCc:null,enter:false};
+var ui={big:null,q:"",view:"home",yearId:null,tab:"sf1",subTab:"points",sortMode:"order",ovSubTab:"semis",sbShow:"final",editMode:false,bA:null,bB:null,assign:null,editSong:null,libYear:"",libSort:"name",compareCc:null,enter:false};
 
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){showAlert("Error", "Could not save in this browser.");}push();}
 
@@ -758,6 +836,29 @@ function overviewTab(){
 function showView(sh){
   var y=yearObj(ui.yearId), listRaw=y.shows[sh], lab=initials();
   
+  // Calculate total points per jury for this show
+  var juryTotals = {};
+  for(var j=0; j<S.jury.length; j++){ juryTotals[S.jury[j].id] = 0; }
+  for(var i=0; i<listRaw.length; i++){
+    var e = listRaw[i];
+    if(e.songId) {
+      var r = getRatings(e);
+      for(var j=0; j<S.jury.length; j++){
+        var jId = S.jury[j].id;
+        if(r[jId]) juryTotals[jId] += r[jId];
+      }
+    }
+  }
+
+  var juryBubblesHtml = '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">';
+  for(var j=0; j<S.jury.length; j++){
+    var jId = S.jury[j].id;
+    juryBubblesHtml += '<div style="background:var(--panel2);border:1px solid var(--line);padding:4px 10px;border-radius:999px;font-size:0.8rem;font-weight:700;display:inline-flex;align-items:center;gap:6px;"><span style="color:var(--muted)">'+esc(S.jury[j].name)+'</span><span style="color:var(--gold)">'+juryTotals[jId]+' pts</span></div>';
+  }
+  juryBubblesHtml += '</div>';
+
+  var titleWithBubbles = '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:12px;"><h2>'+SHOWS[sh]+'</h2>'+juryBubblesHtml+'</div>';
+
   var list = listRaw.slice();
   if (ui.sortMode === 'place') {
     list.sort(function(a, b) {
@@ -793,7 +894,7 @@ function showView(sh){
   }
 
   var topBtnBar = '<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px;flex-wrap:wrap;gap:12px">'+
-    '<div><h2 style="margin:0">'+SHOWS[sh]+'</h2><p class="hint" style="margin:2px 0 0">Click tiles for points, enter tips and places on the right.</p></div>'+
+    titleWithBubbles+
     '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'+
       splitControl+
       topControls+
@@ -824,7 +925,7 @@ function showView(sh){
 
   var renderCard = function(obj){
     var e = obj.item, i = obj.index, s = songById(e.songId), r = getRatings(e);
-    var activeJur = (me === "admin" && ui.pickJur) ? ui.pickJur : me;
+    var activeJur = me;
     var nt = getNotes(e), qp = getQualPred(e);
     var isAutoFinal = (e.autoFinal !== undefined) ? e.autoFinal : (s && ['de', 'fr', 'it', 'es', 'gb'].indexOf(s.cc) !== -1);
     var actualQ = (e.place !== undefined && e.place !== null) ? (e.place <= 10) : null;
@@ -868,7 +969,7 @@ function showView(sh){
         var cls = "tile" + (isMe?" me":"") + (v!==undefined&&v!==null?"":" empty");
         var inner = "<small>"+esc(lab[j])+"</small><b>"+(v!==undefined&&v!==null?v:"–")+"</b>";
         
-        if(isMe && s){ tiles += '<button class="'+cls+'" style="'+(v?pc(v):"")+'" data-act="openPick" data-e="'+e.id+'" data-jur="'+jur.id+'" title="'+esc(jur.name)+'">'+inner+'</button>'; }
+        if(s){ tiles += '<button class="'+cls+'" style="'+(v?pc(v):"")+'" data-act="openPick" data-e="'+e.id+'" data-jur="'+jur.id+'" title="'+esc(jur.name)+'">'+inner+'</button>'; }
         else { tiles += '<div class="'+cls+'" style="'+(v?pc(v):"")+'" title="'+esc(jur.name)+'">'+inner+'</div>'; }
       }
       mainStatsHtml = '<div class="tiles">'+tiles+'</div><div class="avg"><b>'+(avg==null?"–":avg.toFixed(1))+'</b><small>AVG</small></div>';
@@ -899,15 +1000,18 @@ function showView(sh){
       '</div>';
     }
 
-    var mainContent = s ? '<div class="meta">'+flag(s.cc)+'<span><b>'+esc(s.title)+'</b> – '+esc(s.artist)+'</span>'+qTag+afTag+smGroupHtml+'</div>'
+    var mainContent = s ? '<div class="meta"><span><b>'+esc(s.title)+'</b> – '+esc(s.artist)+'</span>'+qTag+afTag+smGroupHtml+'</div>'
       : '<div style="display:flex;align-items:center;gap:8px"><button class="primary sm" data-act="pick" data-e="'+e.id+'">＋ Song</button>'+smGroupHtml+'</div>';
 
-    // Auto Qualifier: Unsichtbarer Platzhalter für absolut exakte Ausrichtung
     var placeInputHtml = isAutoFinal 
       ? '<div class="pl" style="opacity:0;pointer-events:none"><input type="number" disabled><small>PLACE</small></div>' 
       : '<div class="pl"><input type="number" min="1" max="'+list.length+'" placeholder="–" value="'+placeVal+'" class="'+(e.place&&cnt[e.place]>1?"dup":"")+'" data-chg="place" data-e="'+e.id+'" '+(s?"":"disabled")+' aria-label="Place"><small>PLACE</small></div>';
 
-    return '<div class="row '+rowClass+'">'+
+    var rowStyle = (s && s.cc) ? ' style="--flag-url: url(\'https://flagcdn.com/' + s.cc + '.svg\')"' : '';
+    var ccBadge = (s && s.cc) ? '<div class="cc-code">'+esc(getIso3(s.cc))+'</div>' : '';
+
+    return '<div class="row '+rowClass+'"'+rowStyle+'>'+
+      ccBadge+
       '<div class="no" data-act="editNo" data-e="'+e.id+'" title="Change order/status">'+esc(displayNo)+'</div>'+
       '<div class="row-content">'+
         mainContent+
@@ -1164,7 +1268,7 @@ function openRatingModal(eId, jurId) {
     '<h3 style="margin:4px 0 2px;font-size:1.3rem;">'+esc(s.title)+'</h3>' +
     '<p style="color:var(--muted);margin:0;font-size:0.95rem;">'+esc(s.artist)+' ('+esc(CN[s.cc]||s.cc.toUpperCase())+')</p>' +
   '</div>' +
-  (me === "admin" ? '<div style="text-align:center;color:var(--gold);margin-bottom:10px;font-size:0.85rem;">Rating for: <b>'+esc(jname(activeJur))+'</b></div>' : '') +
+  '<div style="text-align:center;color:var(--gold);margin-bottom:10px;font-size:0.85rem;">Rating for: <b>'+esc(jname(activeJur))+'</b></div>' +
   '<p class="hint" style="text-align:center;margin-bottom:12px;font-size:0.85rem;">Choose your points (1–10):</p>' +
   '<div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px;">'+row1+'</div>' +
   '<div style="display:flex;gap:8px;justify-content:center;margin-bottom:16px;">'+row2+'</div>' +
@@ -1299,7 +1403,7 @@ var A={
     return "keep";
   },
   openNewYearDlg:function(){openNewYearModal();return "keep";},
-  tab:function(t){ui.tab=t.dataset.tab;ui.subTab="points";ui.sortMode="order";ui.ovSubTab="semis";ui.pickJur=null;ui.editMode=false;ui.enter=true;},
+  tab:function(t){ui.tab=t.dataset.tab;ui.subTab="points";ui.sortMode="order";ui.ovSubTab="semis";ui.editMode=false;ui.enter=true;},
   openPick:function(t){
     openRatingModal(t.dataset.e, t.dataset.jur || me);
     return "keep";
