@@ -74,10 +74,10 @@ h3{font-family:var(--display);margin:0 0 12px}
 .no{font-family:var(--display);font-weight:700;font-size:.85rem;color:var(--muted);background:var(--panel2);border-radius:6px;height:36px;display:flex;align-items:center;justify-content:center;align-self:center;padding:0 4px;cursor:pointer;border:1px solid transparent}
 .no:hover{border-color:var(--gold);color:var(--gold)}
 .main select{width:100%}
-.meta{display:flex;align-items:center;gap:10px;min-height:36px;font-size:1.05rem}
+.meta{display:flex;align-items:center;gap:12px;min-height:36px;font-size:1.05rem}
 .meta b{font-size:1.15rem}
-.meta .flag{width:32px;height:22px;object-fit:cover;border-radius:3px}
-.flag{width:24px;height:17px;object-fit:cover;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.25);vertical-align:middle}
+.meta .flag{width:26px;height:18px;object-fit:cover;border-radius:3px;transform:scale(1.35);display:inline-block;margin:0 3px;vertical-align:middle}
+.flag{width:20px;height:14px;object-fit:cover;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.25);vertical-align:middle;transform:scale(1.3);display:inline-block;margin:0 2px}
 .rate{grid-column:2;display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .pt{width:36px;height:36px;padding:0;border:2px solid transparent;font-weight:800;opacity:.5}
 .pt:hover:not(:disabled){opacity:.9}
@@ -96,6 +96,7 @@ td input[type=number]{width:72px}
 .seg{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
 .seg button.on{background:var(--pink);border-color:var(--pink);font-weight:700}
 .q{display:inline-block;background:#1f9d55;color:#fff;border-radius:6px;padding:0 6px;font-size:.75rem;font-weight:800;margin-left:6px}
+.autofinal{display:inline-block;background:#7b2cbf;color:#fff;border-radius:6px;padding:0 6px;font-size:.75rem;font-weight:800;margin-left:6px}
 .rank{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line)}
 .rank .p{font-family:var(--display);font-weight:800;font-size:1.3rem;width:36px;color:var(--gold)}
 .vs{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
@@ -133,6 +134,7 @@ button.tile:hover{filter:brightness(1.08);transform:translateY(-2px) scale(1.06)
 .row.out:hover{opacity:.95}
 .row.dq{filter:grayscale(1);opacity:.35;text-decoration:line-through}
 .row.winner{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+.row.autofinal-row{border-color:#9d4edd;box-shadow:0 0 0 1px rgba(157,78,221,0.5)}
 .row.epic-10{border:2px solid var(--gold);animation:epicGlow 2s infinite ease-in-out}
 
 .notes{grid-column:2 / -1;color:var(--muted);font-size:.82rem;display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:4px}
@@ -193,7 +195,7 @@ button.primary:hover:not(:disabled){box-shadow:0 0 0 3px rgba(255,45,149,.35),0 
 .row{transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
 .row:hover{transform:translateY(-3px);border-color:var(--pink);box-shadow:0 10px 24px rgba(0,0,0,.35)}
 .meta .flag{transition:transform .3s ease}
-.row:hover .meta .flag{transform:scale(1.2) rotate(-6deg)}
+.row:hover .meta .flag{transform:scale(1.4) rotate(-6deg)}
 .avg b{display:inline-block;transition:transform .2s}
 .row:hover .avg b{transform:scale(1.18)}
 
@@ -258,12 +260,12 @@ var esc=function(s){return String(s ? s : "").replace(/[&<>"']/g,function(c){ret
 function fresh(){
   var jList = [];
   for(var i=1; i<=4; i++){ jList.push({id:"j"+i, name:"Player "+i}); }
-  return {jury:jList, songs:[], years:[], ratings:{}, pred:{}, notes:{}};
+  return {jury:jList, songs:[], years:[], ratings:{}, pred:{}, notes:{}, qualPred:{}};
 }
 function load(){
   try{
     var d=JSON.parse(localStorage.getItem(KEY));
-    if(d && d.jury){ d.notes = d.notes || {}; return d; }
+    if(d && d.jury){ d.notes = d.notes || {}; d.qualPred = d.qualPred || {}; return d; }
   }catch(e){}
   return fresh();
 }
@@ -278,6 +280,7 @@ function clearEntry(id){
     if(e.songId) delete S.ratings[e.songId];
     delete S.ratings[id];
     delete S.notes[id];
+    delete S.qualPred[id];
   }
 }
 
@@ -292,6 +295,12 @@ function getNotes(e){
   if(!e) return {};
   if(e.songId && S.notes[e.songId]) return S.notes[e.songId];
   if(S.notes[e.id]) return S.notes[e.id];
+  return {};
+}
+
+function getQualPred(e){
+  if(!e) return {};
+  if(S.qualPred[e.id]) return S.qualPred[e.id];
   return {};
 }
 
@@ -328,7 +337,7 @@ var netText=function(){return {local:"Local only",connecting:"Connecting…",onl
 var badge=function(){var n=$("#net");if(n)n.textContent=netText();};
 
 function toTree(){
-  var t={jury:{},songs:{},years:{},ratings:S.ratings,notes:S.notes,pred:S.pred};
+  var t={jury:{},songs:{},years:{},ratings:S.ratings,notes:S.notes,pred:S.pred,qualPred:S.qualPred};
   for(var i=0; i<S.jury.length; i++){
     var j = S.jury[i];
     t.jury[j.id] = {name:j.name};
@@ -345,7 +354,7 @@ function toTree(){
       var shList = y.shows[sh];
       for(var k=0; k<shList.length; k++){
         var e = shList[k];
-        o.shows[sh][e.id] = {n:e.customNo || idx(e.id), songId:e.songId, place:e.place, dq:e.dq};
+        o.shows[sh][e.id] = {n:e.customNo || idx(e.id), songId:e.songId, place:e.place, dq:e.dq, autoFinal: e.autoFinal};
       }
     }
     t.years[y.id]=o;
@@ -391,7 +400,7 @@ function fromTree(t){
         for(var id2 in shObj){
           if(shObj.hasOwnProperty(id2)){
             var e = shObj[id2];
-            arr.push({id:id2, songId:e.songId, place:e.place, customNo:e.n, dq:e.dq});
+            arr.push({id:id2, songId:e.songId, place:e.place, customNo:e.n, dq:e.dq, autoFinal: e.autoFinal});
           }
         }
         arr.sort(function(a,b){
@@ -405,7 +414,7 @@ function fromTree(t){
     }
   }
   r.years.sort(function(a,b){return b.year-a.year||b.id.localeCompare(a.id);});
-  r.ratings=t.ratings||{}; r.notes=t.notes||{}; r.pred=t.pred||{};
+  r.ratings=t.ratings||{}; r.notes=t.notes||{}; r.pred=t.pred||{}; r.qualPred=t.qualPred||{};
   return r;
 }
 
@@ -619,7 +628,6 @@ function showView(sh){
     }
   }
 
-  // Find max and min points for styling (only if total > 0 and no absolute tie across all)
   var maxPts = -1, minPts = Infinity;
   var hasValues = false;
   for(var j=0; j<S.jury.length; j++){
@@ -653,7 +661,7 @@ function showView(sh){
   }
   totalsHtml += '</div>';
 
-  var h='<h2>'+SHOWS[sh]+'</h2><p class="hint">Pick a song for each running order slot. Tap the running order number to change it. Tap your tile to give 1–10 points.</p>'+totalsHtml;
+  var h='<h2>'+SHOWS[sh]+'</h2><p class="hint">Pick a song for each running order slot. Use the arrows to reorder. Tap your tile to give 1–10 points.</p>'+totalsHtml;
   
   var rowsHtml = "";
   for(var i=0; i<list.length; i++){
@@ -663,6 +671,7 @@ function showView(sh){
     var activeJur = (me === "admin" && ui.pickJur) ? ui.pickJur : me;
     var mine = r[activeJur];
     var nt = getNotes(e);
+    var qp = getQualPred(e);
     
     var vals = [];
     for(var j=0; j<S.jury.length; j++){
@@ -708,14 +717,47 @@ function showView(sh){
       }
     }
 
+    var isAutoFinal = (e.autoFinal !== undefined) ? e.autoFinal : (s && ['de', 'fr', 'it', 'es', 'gb'].indexOf(s.cc) !== -1);
+
+    // Qualification Tip for Semis: Kompaktes Dropdown-Menü pro Jury-Mitglied (L : [Q/NQ] - T : [Q/NQ])
+    var qualTipHtml = "";
+    if(sh !== "final" && !isAutoFinal){
+      var actualQ = (e.place !== undefined && e.place !== null) ? (e.place <= 10) : null;
+      var qSelects = "";
+      
+      for(var j=0; j<S.jury.length; j++){
+        var jur = S.jury[j];
+        var jQual = qp[jur.id]; // true, false or undefined
+        var selVal = jQual === true ? "true" : (jQual === false ? "false" : "");
+        
+        var selectStyle = "background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:2px 6px;font-size:0.75rem;font-weight:700;";
+        if(actualQ !== null && jQual !== undefined){
+          selectStyle = (jQual === actualQ) ? "background:rgba(24,150,80,0.25);border:1px solid #189650;color:#fff;" : "background:rgba(214,40,57,0.25);border:1px solid #d62839;color:#fff;";
+        }
+
+        qSelects += '<div style="display:inline-flex;align-items:center;gap:4px;font-size:0.78rem;">' +
+          '<span style="color:var(--muted);font-weight:700;">'+esc(lab[j])+':</span>' +
+          '<select style="'+selectStyle+'" data-chg="qual" data-e="'+e.id+'" data-jur="'+jur.id+'">' +
+            '<option value="" '+(selVal===""?"selected":"")+'>–</option>' +
+            '<option value="true" '+(selVal==="true"?"selected":"")+'>Q</option>' +
+            '<option value="false" '+(selVal==="false"?"selected":"")+'>NQ</option>' +
+          '</select>' +
+        '</div>';
+      }
+      qualTipHtml = '<div style="grid-column:2;display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:6px;font-size:0.82rem;"><span style="color:var(--muted);font-weight:600;">Tipp:</span>'+qSelects+'</div>';
+    }
+
     var q = (sh!=="final" && e.place && e.place<=10)?'<span class="q">Qualified</span>':"";
+    var af = isAutoFinal ? '<span class="autofinal">Auto-Finalist</span>' : "";
     var placeVal = (e.place !== undefined && e.place !== null) ? e.place : "";
     var displayNo = e.customNo || idx(e.id);
-    var rowClass = (e.place===1?" winner":"")+(sh!=="final"&&e.place>10?" out":"")+(e.dq?" dq":"")+(allTen?" epic-10":"");
+    
+    // Auto-Finalisten bekommen nun eine eigene dezente Stilklasse (.autofinal-row) statt dem gelben Gewinner-Glow
+    var rowClass = (e.place===1?" winner":"")+(sh!=="final"&&e.place>10?" out":"")+(e.dq?" dq":"")+(allTen?" epic-10":"")+(isAutoFinal && e.place !== 1 ? " autofinal-row":"");
 
-    var mainContent = s ? '<div class="meta">'+flag(s.cc)+'<span><b>'+esc(s.title)+'</b> – '+esc(s.artist)+'</span>'+q+
-      '<div class="sm-group"><button class="ghost sm" data-act="pick" data-e="'+e.id+'">Change</button><button class="ghost sm danger" data-act="toggleDq" data-e="'+e.id+'">'+(e.dq?"Undq":"DQ")+'</button></div></div>'
-      : '<button class="primary" data-act="pick" data-e="'+e.id+'">＋ Song</button>';
+    var mainContent = s ? '<div class="meta">'+flag(s.cc)+'<span><b>'+esc(s.title)+'</b> – '+esc(s.artist)+'</span>'+q+af+
+      '<div class="sm-group"><button class="ghost sm" data-act="moveUp" data-show="'+sh+'" data-idx="'+i+'" title="Nach oben">▲</button><button class="ghost sm" data-act="moveDown" data-show="'+sh+'" data-idx="'+i+'" title="Nach unten">▼</button><button class="ghost sm" data-act="pick" data-e="'+e.id+'">Change</button><button class="ghost sm danger" data-act="toggleDq" data-e="'+e.id+'">'+(e.dq?"Undq":"DQ")+'</button></div></div>'
+      : '<div style="display:flex;align-items:center;gap:8px"><button class="primary" data-act="pick" data-e="'+e.id+'">＋ Song</button><div class="sm-group"><button class="ghost sm" data-act="moveUp" data-show="'+sh+'" data-idx="'+i+'">▲</button><button class="ghost sm" data-act="moveDown" data-show="'+sh+'" data-idx="'+i+'">▼</button></div></div>';
 
     rowsHtml += '<div class="row'+rowClass+'">'+
       '<div class="no" data-act="editNo" data-e="'+e.id+'" title="Change running order or status">'+esc(displayNo)+'</div>'+
@@ -723,10 +765,46 @@ function showView(sh){
       '<div class="stats"><div class="tiles">'+tiles+'</div>'+
         '<div class="avg"><b>'+(avg==null?"–":avg.toFixed(1))+'</b><small>AVG</small></div>'+
         '<div class="pl"><input type="number" min="1" max="'+list.length+'" placeholder="–" value="'+placeVal+'" class="'+(e.place&&cnt[e.place]>1?"dup":"")+'" data-chg="place" data-e="'+e.id+'" '+(s?"":"disabled")+' aria-label="Place"><small>PLACE</small></div></div>'+
-      picker+(notesStr?'<div class="notes">'+notesStr+'</div>':"")+'</div>';
+      picker+qualTipHtml+(notesStr?'<div class="notes">'+notesStr+'</div>':"")+'</div>';
   }
 
   h += '<div class="list">'+rowsHtml+'</div>';
+
+  // Qualification Leaderboard / Stats for Semis
+  if(sh !== "final"){
+    var hasAnyPlace = false;
+    for(var i=0; i<list.length; i++){ if(list[i].place != null) { hasAnyPlace = true; break; } }
+    
+    if(hasAnyPlace){
+      var scores = {};
+      for(var j=0; j<S.jury.length; j++){ scores[S.jury[j].id] = 0; }
+      var totalEvaluated = 0;
+
+      for(var i=0; i<list.length; i++){
+        var e = list[i];
+        if(e.place != null && e.songId){
+          totalEvaluated++;
+          var actualQ = e.place <= 10;
+          var qpMap = getQualPred(e);
+          for(var j=0; j<S.jury.length; j++){
+            var jId = S.jury[j].id;
+            if(qpMap[jId] !== undefined && qpMap[jId] === actualQ){
+              scores[jId] = (scores[jId] || 0) + 1;
+            }
+          }
+        }
+      }
+
+      var sortedScores = S.jury.slice().sort(function(a,b){ return (scores[b.id]||0) - (scores[a.id]||0); });
+      var statRows = "";
+      for(var j=0; j<sortedScores.length; j++){
+        var jur = sortedScores[j];
+        statRows += '<div class="rank"><span class="p">#'+(j+1)+'</span><b style="flex:1">'+esc(jur.name)+'</b><span class="cell" style="background:var(--panel2)">'+(scores[jur.id]||0)+' von '+totalEvaluated+' richtig</span></div>';
+      }
+      h += '<h2>🏆 Qualifikations-Tipp-Statistik</h2><p class="hint">Wer hat am häufigsten korrekt getippt, ob ein Land ins Finale kommt?</p><div class="card" style="padding:4px 0">'+statRows+'</div>';
+    }
+  }
+
   return h+'<div class="actions"><button class="ghost" data-act="addSlot" data-show="'+sh+'">＋ Running Order</button>'+
     '<button class="ghost" data-act="delSlot" data-show="'+sh+'">− Remove Last</button>'+
     '<button class="ghost" data-act="openLibraryView">Song Library</button></div>';
@@ -1186,15 +1264,21 @@ function fillList(){
 function openEditNo(entryId){
   var e = findEntry(entryId);
   var cur = e.customNo || idx(e.id);
+  var s = songById(e.songId);
+  var isAutoFinal = (e.autoFinal !== undefined) ? e.autoFinal : (s && ['de', 'fr', 'it', 'es', 'gb'].indexOf(s.cc) !== -1);
+
   dlg.className="";
-  dlg.innerHTML='<h3>Running Order / Status</h3>'+
-   '<p class="hint">Select an option or enter a custom number:</p>'+
+  dlg.innerHTML='<h3>Running Order & Status</h3>'+
+   '<p class="hint">Select an option, enter a custom number, or toggle Auto-Finalist:</p>'+
    '<div class="preset-grid" style="grid-template-columns:repeat(3, 1fr)">'+
      '<button class="preset-btn" data-setno="'+idx(e.id)+'">Standard</button>'+
      '<button class="preset-btn" data-setno="Host">Host</button>'+
      '<button class="preset-btn" data-setno="➔">➔</button>'+
    '</div>'+
    '<label>Custom Value / Number<input id="custom_no_input" value="'+esc(cur)+'"></label>'+
+   '<label style="flex-direction:row;align-items:center;gap:8px;margin-top:12px;cursor:pointer;">'+
+     '<input type="checkbox" id="custom_autofinal_input" '+(isAutoFinal?'checked':'')+'> Auto-Finalist (Direkt im Finale) '+
+   '</label>'+
    '<div class="actions"><button class="ghost" data-act="closeDlg">Cancel</button><button class="primary" data-act="saveCustomNo" data-e="'+entryId+'">Save</button></div>';
   if(!dlg.open) dlg.showModal();
 }
@@ -1212,7 +1296,7 @@ function openSettings(){
    '<div class="actions" style="margin:-4px 0 12px"><button data-act="saveDb">Connect</button></div>'+
    '<p class="hint">With a database, everyone sees the same data. Without one, each browser saves locally.</p>'+
    '<div class="actions"><button data-act="export">Export File</button>'+
-   '<button data-act="importPick">Import File</button><input id="imp" type="file" accept="application/json" hidden></div>'+
+   '<label style="background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 14px;cursor:pointer;display:inline-block;text-align:center;flex:1;">Import File <input id="imp" type="file" accept="application/json" style="display:none"></label></div>'+
    '<div class="actions"><button class="ghost" data-act="closeDlg">Close</button><button class="primary" data-act="saveNames">Save Names</button></div>';
   if(!dlg.open)dlg.showModal();
   $("#imp").addEventListener("change",function(ev){
@@ -1255,7 +1339,7 @@ function merge(o){
       }
     }
   }
-  var keys=["ratings","pred","notes"];
+  var keys=["ratings","pred","notes","qualPred"];
   for(var ki=0; ki<keys.length; ki++){
     var k=keys[ki];
     var obj=o[k]||{};
@@ -1342,7 +1426,7 @@ var A={
     openConfirm("Delete Contest", "Really delete contest "+y.year+(y.suffix?" ("+y.suffix+")":"")+" including all songs and points?", function(){
       for(var sh in y.shows){
         var l = y.shows[sh];
-        for(var i=0; i<l.length; i++){delete S.ratings[l[i].id]; delete S.pred[l[i].id]; delete S.notes[l[i].id]; if(l[i].songId) delete S.ratings[l[i].songId];}
+        for(var i=0; i<l.length; i++){delete S.ratings[l[i].id]; delete S.pred[l[i].id]; delete S.notes[l[i].id]; delete S.qualPred[l[i].id]; if(l[i].songId) delete S.ratings[l[i].songId];}
       }
       S.years=S.years.filter(function(x){return x!==y;});save();ui.yearId=null;ui.view="home";render();
     });
@@ -1360,6 +1444,26 @@ var A={
     
     ui.pickE=null;ui.pickJur=null;save();
   },
+  moveUp:function(t){
+    var y=yearObj(ui.yearId), sh=t.dataset.show, idx_pos=+t.dataset.idx;
+    var list=y.shows[sh];
+    if(idx_pos > 0){
+      var tmp = list[idx_pos];
+      list[idx_pos] = list[idx_pos-1];
+      list[idx_pos-1] = tmp;
+      save();
+    }
+  },
+  moveDown:function(t){
+    var y=yearObj(ui.yearId), sh=t.dataset.show, idx_pos=+t.dataset.idx;
+    var list=y.shows[sh];
+    if(idx_pos < list.length - 1){
+      var tmp = list[idx_pos];
+      list[idx_pos] = list[idx_pos+1];
+      list[idx_pos+1] = tmp;
+      save();
+    }
+  },
   addSlot:function(t){
     var y=yearObj(ui.yearId),l=y.shows[t.dataset.show];
     l.push({id:y.id+"-"+t.dataset.show+"-"+(l.length+1)});save();
@@ -1370,10 +1474,10 @@ var A={
     var e=l[l.length-1];
     if(e.songId||S.ratings[e.id]){
       openConfirm("Remove Slot", "Remove running order slot "+l.length+"?", function(){
-        l.pop();delete S.ratings[e.id];delete S.pred[e.id];save();render();
+        l.pop();delete S.ratings[e.id];delete S.pred[e.id];delete S.qualPred[e.id];save();render();
       });
     }else{
-      l.pop();delete S.ratings[e.id];delete S.pred[e.id];save();
+      l.pop();delete S.ratings[e.id];delete S.pred[e.id];delete S.qualPred[e.id];save();
     }
   },
   editNo:function(t){
@@ -1388,10 +1492,22 @@ var A={
   saveCustomNo:function(t){
     var e = findEntry(t.dataset.e);
     var inp = $("#custom_no_input");
-    if(e && inp){
-      var v = inp.value.trim();
-      if(!v || v === String(idx(e.id))) delete e.customNo;
-      else e.customNo = v;
+    var afChk = $("#custom_autofinal_input");
+    if(e){
+      if(inp){
+        var v = inp.value.trim();
+        if(!v || v === String(idx(e.id))) delete e.customNo;
+        else e.customNo = v;
+      }
+      if(afChk){
+        var s = songById(e.songId);
+        var defAf = s && ['de', 'fr', 'it', 'es', 'gb'].indexOf(s.cc) !== -1;
+        if(afChk.checked !== defAf) {
+          e.autoFinal = afChk.checked;
+        } else {
+          delete e.autoFinal;
+        }
+      }
       save();
     }
     dlg.close();
@@ -1545,6 +1661,18 @@ var C={
     var id=t.dataset.e,j=t.dataset.j,v=parseInt(t.value);
     S.pred[id]=S.pred[id]||{};
     if(v>0)S.pred[id][j]=v;else delete S.pred[id][j];save();
+  },
+  qual:function(t){
+    var eId = t.dataset.e;
+    var jurId = t.dataset.jur;
+    var val = t.value;
+    S.qualPred[eId] = S.qualPred[eId] || {};
+    if(val === ""){
+      delete S.qualPred[eId][jurId];
+    } else {
+      S.qualPred[eId][jurId] = (val === "true");
+    }
+    save();
   },
   bA:function(t){ui.bA=t.value;},
   bB:function(t){ui.bB=t.value;},
