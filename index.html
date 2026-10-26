@@ -886,7 +886,7 @@ function showView(sh){
   '</div>';
 
   var splitControl = "";
-  if(sh !== "final" && ui.editMode) {
+  if(ui.editMode) {
     y.splitAfter = y.splitAfter || {};
     var defaultSplit = Math.floor(list.length / 2);
     var currentSplit = y.splitAfter[sh] !== undefined ? y.splitAfter[sh] : defaultSplit;
@@ -911,9 +911,7 @@ function showView(sh){
     var item = list[i];
     var currentPosition = i + 1;
     var originalIdx = listRaw.indexOf(item);
-    if(sh !== "final" && currentPosition > splitAt && ui.sortMode === 'order') {
-      rightList.push({item: item, index: originalIdx !== -1 ? originalIdx : i});
-    } else if(sh === 'final' && i >= Math.ceil(list.length / 2) && ui.sortMode === 'order') {
+    if(currentPosition > splitAt && ui.sortMode === 'order') {
       rightList.push({item: item, index: originalIdx !== -1 ? originalIdx : i});
     } else if(ui.sortMode === 'place') {
       if(i >= Math.ceil(list.length / 2)) rightList.push({item: item, index: originalIdx !== -1 ? originalIdx : i});
@@ -981,14 +979,14 @@ function showView(sh){
     }
 
     var qTag = (sh!=="final" && actualQ)?'<span class="q">Q</span>':"";
-    var afTag = isAutoFinal ? '<span class="autofinal">AQ</span>' : "";
+    var afTag = (sh !== "final" && isAutoFinal) ? '<span class="autofinal">AQ</span>' : "";
     var placeVal = (e.place !== undefined && e.place !== null) ? e.place : "";
     
     var rawNo = e.customNo !== undefined && e.customNo !== null && e.customNo !== "" ? parseFloat(e.customNo) : idx(e.id);
     var displayNo = (rawNo % 1 !== 0) ? '➔' : rawNo;
 
     var isOut = (sh !== "final" && e.place !== undefined && e.place !== null && e.place > 10);
-    var rowClass = (e.place===1?" winner":"")+(isOut?" out":"")+(e.dq?" dq":"")+(isAutoFinal && e.place !== 1 ? " autofinal-row":"");
+    var rowClass = (e.place===1?" winner":"")+(isOut?" out":"")+(e.dq?" dq":"")+(sh !== "final" && isAutoFinal && e.place !== 1 ? " autofinal-row":"");
 
     var smGroupHtml = "";
     if(ui.editMode){
@@ -1003,7 +1001,7 @@ function showView(sh){
     var mainContent = s ? '<div class="meta"><span><b>'+esc(s.title)+'</b> – '+esc(s.artist)+'</span>'+qTag+afTag+smGroupHtml+'</div>'
       : '<div style="display:flex;align-items:center;gap:8px"><button class="primary sm" data-act="pick" data-e="'+e.id+'">＋ Song</button>'+smGroupHtml+'</div>';
 
-    var placeInputHtml = isAutoFinal 
+    var placeInputHtml = (sh !== "final" && isAutoFinal) 
       ? '<div class="pl" style="opacity:0;pointer-events:none"><input type="number" disabled><small>PLACE</small></div>' 
       : '<div class="pl"><input type="number" min="1" max="'+list.length+'" placeholder="–" value="'+placeVal+'" class="'+(e.place&&cnt[e.place]>1?"dup":"")+'" data-chg="place" data-e="'+e.id+'" '+(s?"":"disabled")+' aria-label="Place"><small>PLACE</small></div>';
 
