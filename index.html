@@ -1076,10 +1076,52 @@ function openSettings(){
    '<div class="actions"><button data-act="export">Export</button><label style="background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px;cursor:pointer;flex:1;text-align:center">Import<input id="imp" type="file" style="display:none"></label></div>'+
    '<div class="actions"><button class="ghost" data-act="closeDlg">Close</button><button class="primary" data-act="saveNames">Save</button></div>';
   if(!dlg.open)dlg.showModal();
+  
+  // MERGE IMPORT LOGIC IMPLEMENTED HERE:
   $("#imp").addEventListener("change",function(ev){
     var f=ev.target.files[0]; if(!f)return;
     var r=new FileReader();
-    r.onload=function(){try{S=JSON.parse(r.result);save();dlg.close();render();}catch(e){showAlert("Error","Invalid file");}};
+    r.onload=function(){
+      try{
+        var imported=JSON.parse(r.result);
+        
+        // Merge jury
+        var juryMap={};
+        S.jury.forEach(function(j){ juryMap[j.id]=j; });
+        if(imported.jury){ imported.jury.forEach(function(j){ juryMap[j.id]=j; }); }
+        S.jury=Object.values(juryMap);
+
+        // Merge songs
+        var songMap={};
+        S.songs.forEach(function(s){ songMap[s.id]=s; });
+        if(imported.songs){ imported.songs.forEach(function(s){ songMap[s.id]=s; }); }
+        S.songs=Object.values(songMap);
+
+        // Merge years
+        var yearMap={};
+        S.years.forEach(function(y){ yearMap[y.id]=y; });
+        if(imported.years){ imported.years.forEach(function(y){ yearMap[y.id]=y; }); }
+        S.years=Object.values(yearMap);
+        S.years.sort(function(a,b){return b.year-a.year||b.id.localeCompare(a.id);});
+
+        // Merge ratings, notes, pred, qualPred
+        ['ratings','notes','pred','qualPred'].forEach(function(key){
+          S[key]=S[key]||{};
+          if(imported[key]){
+            for(var id in imported[key]){
+              if(imported[key].hasOwnProperty(id)){
+                S[key][id]=Object.assign({}, S[key][id]||{}, imported[key][id]);
+              }
+            }
+          }
+        });
+
+        save();
+        dlg.close();
+        render();
+        showAlert("Erfolg", "Daten wurden erfolgreich zusammengeführt (gemergt)!");
+      }catch(e){showAlert("Error","Ungültige Datei");}
+    };
     r.readAsText(f);
   });
 }
