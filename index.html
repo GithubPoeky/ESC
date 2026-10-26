@@ -334,7 +334,7 @@ function load(){
 }
 var S=load();
 var me=localStorage.getItem(MEKEY)||"j1";
-var ui={big:null,q:"",view:"home",yearId:null,tab:"sf1",subTab:"points",ovSubTab:"semis",sbShow:"final",editMode:false,bA:null,bB:null,assign:null,editSong:null,pickE:null,pickJur:null,libYear:"",libSort:"name",compareCc:null,enter:false};
+var ui={big:null,q:"",view:"home",yearId:null,tab:"sf1",subTab:"points",sortMode:"order",ovSubTab:"semis",sbShow:"final",editMode:false,bA:null,bB:null,assign:null,editSong:null,pickE:null,pickJur:null,libYear:"",libSort:"name",compareCc:null,enter:false};
 
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){showAlert("Error", "Could not save in this browser.");}push();}
 
@@ -688,9 +688,28 @@ function overviewTab(){
 }
 
 function showView(sh){
-  var y=yearObj(ui.yearId),list=y.shows[sh],lab=initials();
+  var y=yearObj(ui.yearId), listRaw=y.shows[sh], lab=initials();
+  
+  // Sortierung anwenden
+  var list = listRaw.slice();
+  if (ui.sortMode === 'place') {
+    list.sort(function(a, b) {
+      var pa = (a.place !== undefined && a.place !== null) ? a.place : 9999;
+      var pb = (b.place !== undefined && b.place !== null) ? b.place : 9999;
+      if (pa !== pb) return pa - pb;
+      var na = a.customNo || idx(a.id), nb = b.customNo || idx(b.id);
+      return na - nb;
+    });
+  } else {
+    list.sort(function(a, b) {
+      var na = a.customNo || idx(a.id), nb = b.customNo || idx(b.id);
+      if(!isNaN(na) && !isNaN(nb)) return na - nb;
+      return String(na).localeCompare(String(nb));
+    });
+  }
+
   var cnt={};
-  for(var i=0; i<list.length; i++){ if(list[i].place) cnt[list[i].place] = (cnt[list[i].place]||0) + 1; }
+  for(var i=0; i<listRaw.length; i++){ if(listRaw[i].place) cnt[listRaw[i].place] = (cnt[listRaw[i].place]||0) + 1; }
 
   var topControls = "";
   if(sh !== "final"){
@@ -700,10 +719,16 @@ function showView(sh){
     '</div>';
   }
 
+  var sortToggleBtn = '<div class="tabs" style="border:none;margin:0;padding:3px;background:var(--panel2);border-radius:10px;display:inline-flex;gap:4px">' +
+    '<button class="'+(ui.sortMode==='order'?'on':'')+'" style="border:none;margin:0" data-act="sortMode" data-val="order">Reihenfolge</button>' +
+    '<button class="'+(ui.sortMode==='place'?'on':'')+'" style="border:none;margin:0" data-act="sortMode" data-val="place">Platzierung</button>' +
+  '</div>';
+
   var topBtnBar = '<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px;flex-wrap:wrap;gap:12px">'+
     '<div><h2 style="margin:0">'+SHOWS[sh]+'</h2><p class="hint" style="margin:2px 0 0">Klicke auf Kacheln für Punkte, trage Tipps und Plätze rechts ein.</p></div>'+
     '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'+
       topControls+
+      sortToggleBtn+
       '<button class="ghost '+(ui.editMode?'primary':'')+'" data-act="toggleEditMode">✏️ Edit</button>'+
     '</div>'+
   '</div>';
@@ -1077,7 +1102,6 @@ function openSettings(){
    '<div class="actions"><button class="ghost" data-act="closeDlg">Close</button><button class="primary" data-act="saveNames">Save</button></div>';
   if(!dlg.open)dlg.showModal();
   
-  // MERGE IMPORT LOGIC IMPLEMENTED HERE:
   $("#imp").addEventListener("change",function(ev){
     var f=ev.target.files[0]; if(!f)return;
     var r=new FileReader();
@@ -1085,26 +1109,22 @@ function openSettings(){
       try{
         var imported=JSON.parse(r.result);
         
-        // Merge jury
         var juryMap={};
         S.jury.forEach(function(j){ juryMap[j.id]=j; });
         if(imported.jury){ imported.jury.forEach(function(j){ juryMap[j.id]=j; }); }
         S.jury=Object.values(juryMap);
 
-        // Merge songs
         var songMap={};
         S.songs.forEach(function(s){ songMap[s.id]=s; });
         if(imported.songs){ imported.songs.forEach(function(s){ songMap[s.id]=s; }); }
         S.songs=Object.values(songMap);
 
-        // Merge years
         var yearMap={};
         S.years.forEach(function(y){ yearMap[y.id]=y; });
         if(imported.years){ imported.years.forEach(function(y){ yearMap[y.id]=y; }); }
         S.years=Object.values(yearMap);
         S.years.sort(function(a,b){return b.year-a.year||b.id.localeCompare(a.id);});
 
-        // Merge ratings, notes, pred, qualPred
         ['ratings','notes','pred','qualPred'].forEach(function(key){
           S[key]=S[key]||{};
           if(imported[key]){
@@ -1131,6 +1151,7 @@ var A={
   openWelcomeModal:function(){ openWelcomeModal(); return "keep"; },
   toggleEditMode:function(){ ui.editMode = !ui.editMode; },
   subTab:function(t){ ui.subTab = t.dataset.val; ui.enter=true; }, 
+  sortMode:function(t){ ui.sortMode = t.dataset.val; ui.enter=true; },
   ovSubTab:function(t){ ui.ovSubTab = t.dataset.val; ui.enter=true; },
   
   toggleQual:function(t){
@@ -1144,7 +1165,7 @@ var A={
   },
   
   home:function(){ui.yearId=null;ui.view="home";ui.enter=true;},
-  openYear:function(t){ui.yearId=t.dataset.id;ui.view="year";ui.tab="sf1";ui.subTab="points";ui.ovSubTab="semis";ui.editMode=false;ui.enter=true;},
+  openYear:function(t){ui.yearId=t.dataset.id;ui.view="year";ui.tab="sf1";ui.subTab="points";ui.sortMode="order";ui.ovSubTab="semis";ui.editMode=false;ui.enter=true;},
   openCompare:function(){ui.view="compare";ui.enter=true;},
   openLibraryView:function(){ui.view="library";ui.enter=true;},
   addNewSongMain:function(){openSong(null,null);return "keep";},
@@ -1157,7 +1178,7 @@ var A={
     return "keep";
   },
   openNewYearDlg:function(){openNewYearModal();return "keep";},
-  tab:function(t){ui.tab=t.dataset.tab;ui.subTab="points";ui.ovSubTab="semis";ui.pickE=null;ui.pickJur=null;ui.editMode=false;ui.enter=true;},
+  tab:function(t){ui.tab=t.dataset.tab;ui.subTab="points";ui.sortMode="order";ui.ovSubTab="semis";ui.pickE=null;ui.pickJur=null;ui.editMode=false;ui.enter=true;},
   openPick:function(t){
     var eId = t.dataset.e, jurId = t.dataset.jur || me;
     if(ui.pickE === eId && ui.pickJur === jurId){ ui.pickE = null; ui.pickJur = null; }
@@ -1176,7 +1197,7 @@ var A={
     }
     S.years.push({id:id,year:yNum,suffix:suffix,city:$("#ny_city").value.trim()||undefined,shows:shows});
     S.years.sort(function(a,b){return b.year-a.year;});
-    save(); dlg.close(); ui.yearId=id; ui.view="year"; ui.tab="sf1"; ui.subTab="points"; ui.ovSubTab="semis"; ui.enter=true;
+    save(); dlg.close(); ui.yearId=id; ui.view="year"; ui.tab="sf1"; ui.subTab="points"; ui.sortMode="order"; ui.ovSubTab="semis"; ui.enter=true;
   },
   delYear:function(){
     var y=yearObj(ui.yearId);
