@@ -464,7 +464,7 @@ var ISO3={
   ma:"MAR", mm:"MMR", np:"NPL", nl:"NED", nz:"NZL", kp:"PRK",
   mk:"MKD", no:"NOR", om:"OMN", pk:"PAK", ps:"PSE", ph:"PHL",
   pl:"POL", pt:"POR", qa:"QAT", ro:"ROU", ru:"RUS", sa:"SAU", sm:"SMR",
-  rs:"SRB", sg:"SGP", sk:"SVK", si:"SVN", es:"ESP", lk:"LKA", se:"SWE",
+  rs:"SRB", sg:"SGP", sk:"SVK", si:"SVN", kr:"KOR", es:"ESP", lk:"LKA", se:"SWE",
   ch:"SUI", sy:"SYR", tw:"TWN", tj:"TJK", th:"THA", tr:"TUR",
   tm:"TKM", ua:"UKR", ae:"ARE", gb:"GBR", uz:"UZB",
   vn:"VNM", ye:"YEM"
@@ -596,10 +596,12 @@ function fromTree(t){
     if(tYears.hasOwnProperty(id)){
       var o = tYears[id]; var shows={};
       for(var sh in SHOWS){
-        var shObj = (o.shows || {})[sh] || {}; var arr = [];
-        for(var id2 in shObj){ if(shObj.hasOwnProperty(id2)){ var e = shObj[id2]; arr.push({id:id2, songId:e.songId, place:e.place, customNo:e.n, dq:e.dq, autoFinal: e.autoFinal}); } }
-        sortShowsList(arr);
-        shows[sh] = arr;
+        if(o.shows && o.shows[sh]){
+          var shObj = o.shows[sh]; var arr = [];
+          for(var id2 in shObj){ if(shObj.hasOwnProperty(id2)){ var e = shObj[id2]; arr.push({id:id2, songId:e.songId, place:e.place, customNo:e.n, dq:e.dq, autoFinal: e.autoFinal}); } }
+          sortShowsList(arr);
+          shows[sh] = arr;
+        }
       }
       r.years.push({id:id, year:+o.year||+id.split("_")[0], suffix:o.suffix||"", city:o.city, splitAfter: o.splitAfter, shows:shows});
     }
@@ -731,33 +733,29 @@ function home(){
   (sortedYears.length?'<div class="grid">'+yCards+'</div>':'<p class="empty">No Eurovision contest added yet. Use the ＋ button in the bottom right corner.</p>');
 }
 
-var TABS=[
-  ["sf1","Semi-final 1"],
-  ["sf2","Semi-final 2"],
-  ["overview","Overview"],
-  ["final","Final"],
-  ["battle","Points battle"],
-  ["sb","Scoreboard"]
-];
-
 function yearView(){
   var y=yearObj(ui.yearId);
   if(!y) { ui.yearId=null; ui.view="home"; return home(); }
+  
+  if(!y.shows[ui.tab] && ui.tab !== "overview" && ui.tab !== "battle" && ui.tab !== "sb"){
+    ui.tab = y.shows.sf1 ? "sf1" : "final";
+  }
+
   var body = "";
-  if(ui.tab==="sf1") body=showView("sf1");
-  else if(ui.tab==="sf2") body=showView("sf2");
+  if(y.shows[ui.tab]) body=showView(ui.tab);
   else if(ui.tab==="overview") body=overviewTab();
-  else if(ui.tab==="final") body=showView("final");
   else if(ui.tab==="battle") body=battle();
   else if(ui.tab==="sb") body=scoreboard();
 
   var titleLabel = y.year + (y.suffix ? " (" + y.suffix + ")" : "");
   var tabHtml = "";
-  for(var i=0; i<TABS.length; i++){
-    var k=TABS[i][0], l=TABS[i][1];
-    var isFinal = (k === "final");
-    tabHtml += '<button class="'+(ui.tab===k?"on":"")+(isFinal?" final-tab":"")+'" data-act="tab" data-tab="'+k+'">'+l+'</button>';
-  }
+  if(y.shows.sf1) tabHtml += '<button class="'+(ui.tab==="sf1"?"on":"")+'" data-act="tab" data-tab="sf1">Semi-final 1</button>';
+  if(y.shows.sf2) tabHtml += '<button class="'+(ui.tab==="sf2"?"on":"")+'" data-act="tab" data-tab="sf2">Semi-final 2</button>';
+  tabHtml += '<button class="'+(ui.tab==="overview"?"on":"")+'" data-act="tab" data-tab="overview">Overview</button>';
+  tabHtml += '<button class="'+(ui.tab==="final"?"on":"")+' final-tab" data-act="tab" data-tab="final">Final</button>';
+  tabHtml += '<button class="'+(ui.tab==="battle"?"on":"")+'" data-act="tab" data-tab="battle">Points battle</button>';
+  tabHtml += '<button class="'+(ui.tab==="sb"?"on":"")+'" data-act="tab" data-tab="sb">Scoreboard</button>';
+
   return '<div style="padding-top:14px"><button class="ghost" data-act="home">← All Contests</button>'+
     '<button class="ghost danger" data-act="delYear" style="float:right">Delete Contest</button><button class="ghost" data-act="editCity" style="float:right;margin-right:8px">'+(y.city?"Edit":"Add")+' Host City</button></div>'+
     '<h1 class="yeartitle">Eurovision '+esc(titleLabel)+'</h1>'+(y.city?'<p class="hint" style="margin:-6px 0 14px">'+esc(y.city)+'</p>':"")+
@@ -782,10 +780,14 @@ function initials(){
 function overviewTab(){
   var y = yearObj(ui.yearId), lab = initials();
   
-  var subTabsHtml = '<div class="tabs" style="border:none;margin:16px 0">' +
-    '<button class="'+(ui.ovSubTab==='semis'?'on':'')+'" data-act="ovSubTab" data-val="semis" style="background:'+(ui.ovSubTab==='semis'?'var(--pink)':'var(--panel2)')+';color:'+(ui.ovSubTab==='semis'?'#fff':'var(--ink)')+'">Semi-finals</button>' +
-    '<button class="'+(ui.ovSubTab==='final'?'on':'')+'" data-act="ovSubTab" data-val="final" style="background:'+(ui.ovSubTab==='final'?'var(--pink)':'var(--panel2)')+';color:'+(ui.ovSubTab==='final'?'#fff':'var(--ink)')+'">Final</button>' +
-  '</div>';
+  var hasSemis = !!(y.shows.sf1 || y.shows.sf2);
+  var subTabsHtml = '';
+  if (hasSemis) {
+    subTabsHtml = '<div class="tabs" style="border:none;margin:16px 0">' +
+      '<button class="'+(ui.ovSubTab==='semis'?'on':'')+'" data-act="ovSubTab" data-val="semis" style="background:'+(ui.ovSubTab==='semis'?'var(--pink)':'var(--panel2)')+';color:'+(ui.ovSubTab==='semis'?'#fff':'var(--ink)')+'">Semi-finals</button>' +
+      '<button class="'+(ui.ovSubTab==='final'?'on':'')+'" data-act="ovSubTab" data-val="final" style="background:'+(ui.ovSubTab==='final'?'var(--pink)':'var(--panel2)')+';color:'+(ui.ovSubTab==='final'?'#fff':'var(--ink)')+'">Final</button>' +
+    '</div>';
+  }
 
   var getPtsHeader = function(alignRight){
     var h = '<div style="display:flex;gap:4px;margin-bottom:6px;'+(alignRight?'justify-content:flex-end':'justify-content:flex-start')+';padding:0 2px;">';
@@ -796,7 +798,7 @@ function overviewTab(){
     return h;
   };
 
-  if(ui.ovSubTab === 'final'){
+  if(ui.ovSubTab === 'final' || !hasSemis){
     var list = y.shows.final;
     var rowsOv = "";
     for(var i=0; i<list.length; i++){
@@ -817,7 +819,7 @@ function overviewTab(){
   }
 
   var renderSideCol = function(shKey, title, isMirror){
-    var list = y.shows[shKey];
+    var list = y.shows[shKey] || [];
     var rows = "";
     for(var i=0; i<list.length; i++){
       var e = list[i], s = songById(e.songId), r = getRatings(e);
@@ -845,18 +847,23 @@ function overviewTab(){
     '</div>';
   };
 
+  var gridCols = '';
+  if(y.shows.sf1 && y.shows.sf2){
+    gridCols = renderSideCol("sf1", "Semi-final 1", false) + renderSideCol("sf2", "Semi-final 2", true);
+  } else if(y.shows.sf1){
+    gridCols = renderSideCol("sf1", "Semi-final 1", false);
+  } else if(y.shows.sf2){
+    gridCols = renderSideCol("sf2", "Semi-final 2", false);
+  }
+
   return '<h2>Overview</h2><p class="hint">Everyone\'s points side by side. Disqualified or non-qualifying countries are greyed out.</p>' +
     subTabsHtml +
-    '<div class="ov-grid-side">' +
-      renderSideCol("sf1", "Semi-final 1", false) +
-      renderSideCol("sf2", "Semi-final 2", true) +
-    '</div>';
+    '<div class="ov-grid-side">' + gridCols + '</div>';
 }
 
 function showView(sh){
-  var y=yearObj(ui.yearId), listRaw=y.shows[sh], lab=initials();
+  var y=yearObj(ui.yearId), listRaw=y.shows[sh]||[], lab=initials();
   
-  // Calculate total points per jury for this show
   var juryTotals = {};
   for(var j=0; j<S.jury.length; j++){ juryTotals[S.jury[j].id] = 0; }
   for(var i=0; i<listRaw.length; i++){
@@ -906,11 +913,21 @@ function showView(sh){
   '</div>';
 
   var splitControl = "";
-  if(ui.editMode) {
+  if(ui.editMode && list.length > 1) {
     y.splitAfter = y.splitAfter || {};
     var defaultSplit = Math.floor(list.length / 2);
     var currentSplit = y.splitAfter[sh] !== undefined ? y.splitAfter[sh] : defaultSplit;
     splitControl = '<div style="display:flex;align-items:center;gap:6px;font-size:0.85rem;color:var(--muted);background:var(--panel2);padding:4px 10px;border-radius:10px;border:1px solid var(--line)"><span>1st Half up to no.:</span><input type="number" min="1" max="'+(list.length-1)+'" value="'+currentSplit+'" data-chg="splitAfter" data-show="'+sh+'" style="width:56px;height:32px;text-align:center;font-weight:700"></div>';
+  }
+
+  var showMgmtBtns = "";
+  if (ui.editMode) {
+    var hasSf1 = !!y.shows.sf1;
+    var hasSf2 = !!y.shows.sf2;
+    showMgmtBtns = '<div style="display:flex;gap:6px;align-items:center;margin-top:8px;width:100%">' +
+      (hasSf1 ? '<button class="ghost sm danger" data-act="removeShow" data-show="sf1">− SF1 entfernen</button>' : '<button class="ghost sm" data-act="addShow" data-show="sf1">＋ SF1 hinzufügen</button>') +
+      (hasSf2 ? '<button class="ghost sm danger" data-act="removeShow" data-show="sf2">− SF2 entfernen</button>' : '<button class="ghost sm" data-act="addShow" data-show="sf2">＋ SF2 hinzufügen</button>') +
+    '</div>';
   }
 
   var topBtnBar = '<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px;flex-wrap:wrap;gap:12px">'+
@@ -921,6 +938,7 @@ function showView(sh){
       sortToggleBtn+
       '<button class="ghost '+(ui.editMode?'primary':'')+'" data-act="toggleEditMode">✏️ Edit</button>'+
     '</div>'+
+    showMgmtBtns+
   '</div>';
 
   var leftList = [], rightList = [];
@@ -945,7 +963,7 @@ function showView(sh){
     var e = obj.item, i = obj.index, s = songById(e.songId), r = getRatings(e);
     var activeJur = me;
     var nt = getNotes(e), qp = getQualPred(e);
-    var isAutoFinal = (e.autoFinal !== undefined) ? e.autoFinal : (s && ['de', 'fr', 'it', 'es', 'gb'].indexOf(s.cc) !== -1);
+    var isAutoFinal = (e.autoFinal !== undefined) ? e.autoFinal : (s && ['de', 'fr', 'it', 'es', 'gb', 'kr'].indexOf(s.cc) !== -1);
     var actualQ = (e.place !== undefined && e.place !== null) ? (e.place <= 10) : null;
     
     var mainStatsHtml = "";
@@ -969,7 +987,6 @@ function showView(sh){
             else { bg = "#d62839"; col = "#fff"; border = "2.5px solid #ffb3b3"; }
           }
           
-          // Ungetippte Boxen: Nur die eigene Box bekommt den Hover-Effekt, andere bleiben permanent unsichtbar
           if (jQual === undefined) {
             if (isCurrentProfile) {
               extraClass = " tip-hidden";
@@ -1071,13 +1088,18 @@ function showView(sh){
 }
 
 function switcher(key){
+  var y = yearObj(ui.yearId);
   var res = "";
-  for(var sh in SHOWS){ res += '<button class="'+(ui[key]===sh?"on":"")+'" data-act="'+key+'" data-show="'+sh+'">'+SHOWS[sh]+'</button>'; }
+  for(var sh in SHOWS){
+    if(y && y.shows[sh]){
+      res += '<button class="'+(ui[key]===sh?"on":"")+'" data-act="'+key+'" data-show="'+sh+'">'+SHOWS[sh]+'</button>';
+    }
+  }
   return '<div class="seg">'+res+'</div>';
 }
 
 function battle(){
-  var y=yearObj(ui.yearId), allFin=y.shows.final;
+  var y=yearObj(ui.yearId), allFin=y.shows.final || [];
   var fin = [];
   for(var i=0; i<allFin.length; i++){if(songById(allFin[i].songId) && !allFin[i].dq) fin.push(allFin[i]);}
 
@@ -1136,7 +1158,8 @@ function battle(){
 
 function scoreboard(){
   var y=yearObj(ui.yearId), sh=ui.sbShow;
-  var rawList = y.shows[sh];
+  if(!y.shows[sh]) sh = y.shows.final ? "final" : Object.keys(y.shows)[0];
+  var rawList = y.shows[sh] || [];
   var rows = [];
   for(var i=0; i<rawList.length; i++){
     var e = rawList[i];
@@ -1239,7 +1262,7 @@ function openNewYearModal(){
   dlg.className="";
   dlg.innerHTML='<h3>Add New Contest</h3>'+
     '<label>Year<input id="ny_year" type="number" value="'+thisYear+'"></label>'+
-    '<label>Suffix (optional)<input id="ny_suffix" placeholder="e.g. Junior"></label>'+
+    '<label>Suffix (optional)<input id="ny_suffix" placeholder="e.g. Junior or Asia"></label>'+
     '<label>Host City<input id="ny_city"></label>'+
     '<div class="actions"><button class="ghost" data-act="closeDlg">Cancel</button><button class="primary" data-act="saveNewYear">Create</button></div>';
   if(!dlg.open) dlg.showModal();
@@ -1339,7 +1362,7 @@ function openEditNo(entryId){
   var e = findEntry(entryId);
   var cur = e.customNo !== undefined && e.customNo !== null && e.customNo !== "" ? e.customNo : idx(e.id);
   var s = songById(e.songId);
-  var isAutoFinal = (e.autoFinal !== undefined) ? e.autoFinal : (s && ['de', 'fr', 'it', 'es', 'gb'].indexOf(s.cc) !== -1);
+  var isAutoFinal = (e.autoFinal !== undefined) ? e.autoFinal : (s && ['de', 'fr', 'it', 'es', 'gb', 'kr'].indexOf(s.cc) !== -1);
   dlg.className="";
   dlg.innerHTML='<h3>Running Order & Status</h3>'+
    '<label>Custom Position / Number (e.g. 6 or 6.5)<input id="custom_no_input" value="'+esc(cur)+'"></label>'+
@@ -1419,7 +1442,13 @@ var A={
   },
   
   home:function(){ui.yearId=null;ui.view="home";ui.enter=true;},
-  openYear:function(t){ui.yearId=t.dataset.id;ui.view="year";ui.tab="sf1";ui.subTab="points";ui.sortMode="order";ui.ovSubTab="semis";ui.editMode=false;ui.enter=true;},
+  openYear:function(t){
+    ui.yearId=t.dataset.id;
+    ui.view="year";
+    var y=yearObj(ui.yearId);
+    ui.tab = (y && y.shows.sf1) ? "sf1" : "final";
+    ui.subTab="points";ui.sortMode="order";ui.ovSubTab="semis";ui.editMode=false;ui.enter=true;
+  },
   openCompare:function(){ui.view="compare";ui.enter=true;},
   openLibraryView:function(){ui.view="library";ui.enter=true;},
   addNewSongMain:function(){openSong(null,null);return "keep";},
@@ -1458,8 +1487,10 @@ var A={
     if(yearObj(id)) return "keep";
     var shows={};
     for(var sh in SHOWS){
-      shows[sh]=[];
-      for(var i=1; i<=DEF_N[sh]; i++){ shows[sh].push({id:id+"-"+sh+"-"+i}); }
+      if(sh === "sf1" || sh === "sf2" || sh === "final"){
+        shows[sh]=[];
+        for(var i=1; i<=DEF_N[sh]; i++){ shows[sh].push({id:id+"-"+sh+"-"+i}); }
+      }
     }
     S.years.push({id:id,year:yNum,suffix:suffix,city:$("#ny_city").value.trim()||undefined,shows:shows});
     S.years.sort(function(a,b){return b.year-a.year;});
@@ -1471,6 +1502,27 @@ var A={
       S.years=S.years.filter(function(x){return x!==y;});save();ui.yearId=null;ui.view="home";ui.enter=true;render();
     });
     return "keep";
+  },
+  addShow:function(t){
+    var y=yearObj(ui.yearId);
+    var sh=t.dataset.show;
+    if(y && !y.shows[sh]){
+      y.shows[sh] = [];
+      for(var i=1; i<=DEF_N[sh]; i++){ y.shows[sh].push({id:y.id+"-"+sh+"-"+i}); }
+      save();
+      ui.enter=true;
+    }
+  },
+  removeShow:function(t){
+    var y=yearObj(ui.yearId);
+    var sh=t.dataset.show;
+    openConfirm("Show entfernen", "Möchtest du " + SHOWS[sh] + " wirklich entfernen? Alle Tipps und Einträge gehen verloren.", function(){
+      delete y.shows[sh];
+      if(ui.tab === sh) ui.tab = y.shows.sf1 ? "sf1" : "final";
+      if(ui.sbShow === sh) ui.sbShow = y.shows.final ? "final" : Object.keys(y.shows)[0];
+      save();
+      render();
+    });
   },
   moveUp:function(t){
     var y=yearObj(ui.yearId), l=y.shows[t.dataset.show], idx_pos=+t.dataset.idx;
