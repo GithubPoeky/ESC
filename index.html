@@ -141,6 +141,7 @@ h3{font-family:var(--display);margin:0 0 12px}
   padding:10px 12px;
   align-items:center;
   animation: simpleFadeUp 0.3s ease-out backwards;
+  transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 @media(max-width:700px){
@@ -312,7 +313,35 @@ dialog input,dialog select{width:100%}
 .ov-pill .flag{width:22px;height:15px;object-fit:cover;border-radius:2px;flex-shrink:0;}
 .ov-place{width:36px;text-align:center;font-weight:800;color:var(--gold);font-size:0.9rem}
 
-.row.winner{border-color:var(--gold);box-shadow:0 0 15px rgba(255,209,102,.3)}
+/* Winner & Knocked Out (Eliminated) Animations */
+@keyframes goldGlow {
+  0% { box-shadow: 0 0 10px rgba(255, 209, 102, 0.4); border-color: var(--gold); }
+  50% { box-shadow: 0 0 22px rgba(255, 209, 102, 0.8); border-color: #fff6cc; }
+  100% { box-shadow: 0 0 10px rgba(255, 209, 102, 0.4); border-color: var(--gold); }
+}
+.row.winner {
+  border: 2px solid var(--gold);
+  animation: goldGlow 2.5s infinite ease-in-out;
+}
+.row.winner .meta b {
+  background: linear-gradient(135deg, #ffd166 0%, #ffae00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 10px rgba(255,209,102,0.3);
+}
+
+.row.out {
+  opacity: 0.35;
+  filter: grayscale(0.8) blur(0.3px);
+  background: rgba(17,6,36,0.3);
+  border-color: rgba(50, 25, 95, 0.6);
+}
+.row.dq {
+  opacity: 0.25;
+  filter: grayscale(1) blur(0.5px);
+  background: rgba(214, 40, 57, 0.05);
+  border-color: rgba(214, 40, 57, 0.3);
+}
 .row.autofinal-row{border-color:#9d4edd}
 
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -421,6 +450,15 @@ var lastFlat={},busy=0,net=DB?"connecting":"local";
 var netText=function(){return {local:"Local only",connecting:"Connecting…",online:"● Shared",error:"Offline, retrying"}[net];};
 var badge=function(){var n=$("#net");if(n)n.textContent=netText();};
 
+function sortShowsList(list){
+  return list.sort(function(a, b) {
+    var na = (a.customNo !== undefined && a.customNo !== null && a.customNo !== "") ? parseFloat(a.customNo) : idx(a.id);
+    var nb = (b.customNo !== undefined && b.customNo !== null && b.customNo !== "") ? parseFloat(b.customNo) : idx(b.id);
+    if (!isNaN(na) && !isNaN(nb)) return na - nb;
+    return String(na).localeCompare(String(nb));
+  });
+}
+
 function toTree(){
   var t={jury:{},songs:{},years:{},ratings:S.ratings,notes:S.notes,pred:S.pred,qualPred:S.qualPred};
   for(var i=0; i<S.jury.length; i++){ t.jury[S.jury[i].id] = {name:S.jury[i].name}; }
@@ -462,12 +500,7 @@ function fromTree(t){
       for(var sh in SHOWS){
         var shObj = (o.shows || {})[sh] || {}; var arr = [];
         for(var id2 in shObj){ if(shObj.hasOwnProperty(id2)){ var e = shObj[id2]; arr.push({id:id2, songId:e.songId, place:e.place, customNo:e.n, dq:e.dq, autoFinal: e.autoFinal}); } }
-        arr.sort(function(a,b){
-          var na = a.customNo !== undefined ? parseFloat(a.customNo) : idx(a.id);
-          var nb = b.customNo !== undefined ? parseFloat(b.customNo) : idx(b.id);
-          if(!isNaN(na) && !isNaN(nb)) return na - nb;
-          return String(na).localeCompare(String(nb));
-        });
+        sortShowsList(arr);
         shows[sh] = arr;
       }
       r.years.push({id:id, year:+o.year||+id.split("_")[0], suffix:o.suffix||"", city:o.city, splitAfter: o.splitAfter, shows:shows});
@@ -850,10 +883,11 @@ function showView(sh){
     var afTag = isAutoFinal ? '<span class="autofinal">AQ</span>' : "";
     var placeVal = (e.place !== undefined && e.place !== null) ? e.place : "";
     
-    var rawNo = e.customNo !== undefined ? e.customNo : idx(e.id);
-    var displayNo = (typeof rawNo === 'number' && rawNo % 1 !== 0) || (typeof rawNo === 'string' && String(rawNo).includes('.')) ? '➔' : rawNo;
+    var rawNo = e.customNo !== undefined && e.customNo !== null && e.customNo !== "" ? parseFloat(e.customNo) : idx(e.id);
+    var displayNo = (rawNo % 1 !== 0) ? '➔' : rawNo;
 
-    var rowClass = (e.place===1?" winner":"")+(sh!=="final"&&e.place>10?" out":"")+(e.dq?" dq":"")+(isAutoFinal && e.place !== 1 ? " autofinal-row":"");
+    var isOut = (sh !== "final" && e.place !== undefined && e.place !== null && e.place > 10);
+    var rowClass = (e.place===1?" winner":"")+(isOut?" out":"")+(e.dq?" dq":"")+(isAutoFinal && e.place !== 1 ? " autofinal-row":"");
 
     var smGroupHtml = "";
     if(ui.editMode){
@@ -868,6 +902,11 @@ function showView(sh){
     var mainContent = s ? '<div class="meta">'+flag(s.cc)+'<span><b>'+esc(s.title)+'</b> – '+esc(s.artist)+'</span>'+qTag+afTag+smGroupHtml+'</div>'
       : '<div style="display:flex;align-items:center;gap:8px"><button class="primary sm" data-act="pick" data-e="'+e.id+'">＋ Song</button>'+smGroupHtml+'</div>';
 
+    // Auto Qualifier: Unsichtbarer Platzhalter für absolut exakte Ausrichtung
+    var placeInputHtml = isAutoFinal 
+      ? '<div class="pl" style="opacity:0;pointer-events:none"><input type="number" disabled><small>PLACE</small></div>' 
+      : '<div class="pl"><input type="number" min="1" max="'+list.length+'" placeholder="–" value="'+placeVal+'" class="'+(e.place&&cnt[e.place]>1?"dup":"")+'" data-chg="place" data-e="'+e.id+'" '+(s?"":"disabled")+' aria-label="Place"><small>PLACE</small></div>';
+
     return '<div class="row '+rowClass+'">'+
       '<div class="no" data-act="editNo" data-e="'+e.id+'" title="Change order/status">'+esc(displayNo)+'</div>'+
       '<div class="row-content">'+
@@ -876,7 +915,7 @@ function showView(sh){
       '</div>'+
       '<div style="display:flex;align-items:center;gap:12px">'+
         '<div class="stats">'+mainStatsHtml+'</div>'+
-        '<div class="pl"><input type="number" min="1" max="'+list.length+'" placeholder="–" value="'+placeVal+'" class="'+(e.place&&cnt[e.place]>1?"dup":"")+'" data-chg="place" data-e="'+e.id+'" '+(s?"":"disabled")+' aria-label="Place"><small>PLACE</small></div>'+
+        placeInputHtml+
       '</div>'+
     '</div>';
   };
@@ -1165,7 +1204,7 @@ function fillList(){
 
 function openEditNo(entryId){
   var e = findEntry(entryId);
-  var cur = e.customNo !== undefined ? e.customNo : idx(e.id);
+  var cur = e.customNo !== undefined && e.customNo !== null && e.customNo !== "" ? e.customNo : idx(e.id);
   var s = songById(e.songId);
   var isAutoFinal = (e.autoFinal !== undefined) ? e.autoFinal : (s && ['de', 'fr', 'it', 'es', 'gb'].indexOf(s.cc) !== -1);
   dlg.className="";
@@ -1326,7 +1365,22 @@ var A={
         if(v === "" || (parsedNum === idx(e.id))) delete e.customNo; 
         else e.customNo = !isNaN(parsedNum) ? parsedNum : v; 
       }
-      if(afChk){ e.autoFinal=afChk.checked; }
+      if(afChk){ 
+        e.autoFinal=afChk.checked; 
+        if(e.autoFinal) {
+          delete e.place;
+        }
+      }
+      
+      for(var i=0; i<S.years.length; i++){
+        var y = S.years[i];
+        for(var sh in y.shows){
+          var list = y.shows[sh];
+          for(var k=0; k<list.length; k++){
+            if(list[k].id === e.id){ sortShowsList(list); break; }
+          }
+        }
+      }
       save();
     }
     dlg.close();
