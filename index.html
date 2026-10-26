@@ -199,19 +199,6 @@ h3{font-family:var(--display);margin:0 0 12px}
 .pl input{width:56px;height:44px;text-align:center;font-family:var(--display);font-size:1.25rem;font-weight:800;color:var(--gold);background:var(--bg);border:2px solid var(--gold);border-radius:10px;padding:0}
 .pl small{font-size:0.6rem;color:var(--gold);font-weight:700;letter-spacing:.05em}
 
-.rate{
-  display:flex;
-  flex-wrap:wrap;
-  gap:4px;
-  padding-top:6px;
-  border-top:1px solid var(--line);
-  width:100%;
-  grid-column:1/-1;
-}
-.pt{width:34px;height:34px;padding:0;border:2px solid transparent;font-family:var(--number-font);font-size:1.2rem;opacity:.5}
-.pt:hover:not(:disabled){opacity:.9}
-.pt.on{opacity:1;border-color:#fff;box-shadow:0 0 0 2px var(--pink)}
-
 .notes{
   color:var(--muted);
   font-size:0.8rem;
@@ -240,9 +227,22 @@ td input[type=number]{width:72px}
 .rank .p{font-family:var(--display);font-weight:800;font-size:1.3rem;width:36px;color:var(--gold)}
 .vs{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 
-dialog{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:22px;width:min(440px,92vw)}
+dialog{
+  background:var(--panel);
+  color:var(--ink);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:24px;
+  width:min(440px,92vw);
+  animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 dialog.wide{width:min(680px,92vw)}
 dialog::backdrop{background:rgba(5,2,15,.85);backdrop-filter:blur(4px);animation:fadeIn .25s ease}
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.92) translateY(16px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
 dialog label{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;color:var(--muted);font-size:.88rem}
 dialog input,dialog select{width:100%}
 .preset-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:8px;margin:12px 0 16px}
@@ -334,7 +334,7 @@ function load(){
 }
 var S=load();
 var me=localStorage.getItem(MEKEY)||"j1";
-var ui={big:null,q:"",view:"home",yearId:null,tab:"sf1",subTab:"points",sortMode:"order",ovSubTab:"semis",sbShow:"final",editMode:false,bA:null,bB:null,assign:null,editSong:null,pickE:null,pickJur:null,libYear:"",libSort:"name",compareCc:null,enter:false};
+var ui={big:null,q:"",view:"home",yearId:null,tab:"sf1",subTab:"points",sortMode:"order",ovSubTab:"semis",sbShow:"final",editMode:false,bA:null,bB:null,assign:null,editSong:null,pickJur:null,libYear:"",libSort:"name",compareCc:null,enter:false};
 
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){showAlert("Error", "Could not save in this browser.");}push();}
 
@@ -690,7 +690,6 @@ function overviewTab(){
 function showView(sh){
   var y=yearObj(ui.yearId), listRaw=y.shows[sh], lab=initials();
   
-  // Sortierung anwenden
   var list = listRaw.slice();
   if (ui.sortMode === 'place') {
     list.sort(function(a, b) {
@@ -743,7 +742,7 @@ function showView(sh){
   var renderCard = function(obj){
     var e = obj.item, i = obj.index, s = songById(e.songId), r = getRatings(e);
     var activeJur = (me === "admin" && ui.pickJur) ? ui.pickJur : me;
-    var mine = r[activeJur], nt = getNotes(e), qp = getQualPred(e);
+    var nt = getNotes(e), qp = getQualPred(e);
     var isAutoFinal = (e.autoFinal !== undefined) ? e.autoFinal : (s && ['de', 'fr', 'it', 'es', 'gb'].indexOf(s.cc) !== -1);
     var actualQ = (e.place !== undefined && e.place !== null) ? (e.place <= 10) : null;
     
@@ -792,12 +791,6 @@ function showView(sh){
       mainStatsHtml = '<div class="tiles">'+tiles+'</div><div class="avg"><b>'+(avg==null?"–":avg.toFixed(1))+'</b><small>AVG</small></div>';
     }
 
-    var ptsBtns = "";
-    for(var p=1; p<=10; p++){
-      ptsBtns += '<button class="pt'+(mine===p?" on":"")+'" style="'+pc(p)+'" data-act="rate" data-e="'+e.id+'" data-p="'+p+'" aria-label="'+p+' points">'+p+'</button>';
-    }
-    var picker = (ui.pickE===e.id && (sh === 'final' || ui.subTab === 'points'))?'<div class="rate">'+(me==="admin"?'<div style="width:100%;font-size:0.8rem;color:var(--gold);margin-bottom:2px">Rating for: <b>'+esc(jname(ui.pickJur||me))+'</b></div>':'')+ptsBtns+'<input class="note" placeholder="Note (optional)" value="'+esc(nt[activeJur]?nt[activeJur]:'')+'" data-chg="note" data-e="'+e.id+'" data-jur="'+activeJur+'"></div>':"";
-    
     var notesStr = "";
     for(var j=0; j<S.jury.length; j++){
       if(nt[S.jury[j].id]){ notesStr += '<span><b>'+esc(S.jury[j].name)+':</b> '+esc(nt[S.jury[j].id])+'</span>'; }
@@ -826,7 +819,6 @@ function showView(sh){
       '<div class="no" data-act="editNo" data-e="'+e.id+'" title="Change order/status">'+esc(displayNo)+'</div>'+
       '<div class="row-content">'+
         mainContent+
-        picker+
         (notesStr?'<div class="notes">'+notesStr+'</div>':'')+
       '</div>'+
       '<div style="display:flex;align-items:center;gap:12px">'+
@@ -1054,6 +1046,42 @@ function openSong(id,assign){
   if(!dlg.open)dlg.showModal();
 }
 
+function openRatingModal(eId, jurId) {
+  var e = findEntry(eId);
+  if (!e) return;
+  var s = songById(e.songId);
+  if (!s) {
+    showAlert("Hinweis", "Bitte wähle zuerst einen Song für diesen Startplatz aus.");
+    return;
+  }
+  var r = getRatings(e);
+  var activeJur = jurId || me;
+  var mine = r[activeJur];
+
+  var row1 = "", row2 = "";
+  for(var p=1; p<=10; p++){
+    var btnHtml = '<button class="rate-modal-btn '+(mine===p?"on":"")+'" style="'+pc(p)+';width:48px;height:54px;font-family:var(--number-font);font-size:1.4rem;border-radius:10px;border:2.5px solid '+(mine===p?'#fff':'transparent')+';cursor:pointer;display:grid;place-items:center;transition:transform 0.15s ease, box-shadow 0.15s ease;" data-act="rateModal" data-e="'+eId+'" data-jur="'+activeJur+'" data-p="'+p+'">'+p+'</button>';
+    if (p <= 5) row1 += btnHtml;
+    else row2 += btnHtml;
+  }
+
+  dlg.className = "";
+  dlg.innerHTML = '<div style="text-align:center;margin-bottom:16px;">' +
+    '<div style="margin-bottom:8px;transform:scale(1.4);display:inline-block;">'+flag(s.cc)+'</div>' +
+    '<h3 style="margin:4px 0 2px;font-size:1.3rem;">'+esc(s.title)+'</h3>' +
+    '<p style="color:var(--muted);margin:0;font-size:0.95rem;">'+esc(s.artist)+' ('+esc(CN[s.cc]||s.cc.toUpperCase())+')</p>' +
+  '</div>' +
+  (me === "admin" ? '<div style="text-align:center;color:var(--gold);margin-bottom:10px;font-size:0.85rem;">Bewertung für: <b>'+esc(jname(activeJur))+'</b></div>' : '') +
+  '<p class="hint" style="text-align:center;margin-bottom:12px;font-size:0.85rem;">Wähle deine Punkte (1–10):</p>' +
+  '<div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px;">'+row1+'</div>' +
+  '<div style="display:flex;gap:8px;justify-content:center;margin-bottom:16px;">'+row2+'</div>' +
+  '<div class="actions" style="margin-top:16px;justify-content:center;">' +
+    '<button class="ghost" data-act="closeDlg">Abbrechen</button>' +
+  '</div>';
+
+  if (!dlg.open) dlg.showModal();
+}
+
 function openPicker(entryId){ ui.assign=entryId; pickerHtml(); }
 function pickerHtml(){
   ui.q=""; ui.libYear="";
@@ -1178,11 +1206,23 @@ var A={
     return "keep";
   },
   openNewYearDlg:function(){openNewYearModal();return "keep";},
-  tab:function(t){ui.tab=t.dataset.tab;ui.subTab="points";ui.sortMode="order";ui.ovSubTab="semis";ui.pickE=null;ui.pickJur=null;ui.editMode=false;ui.enter=true;},
+  tab:function(t){ui.tab=t.dataset.tab;ui.subTab="points";ui.sortMode="order";ui.ovSubTab="semis";ui.pickJur=null;ui.editMode=false;ui.enter=true;},
   openPick:function(t){
-    var eId = t.dataset.e, jurId = t.dataset.jur || me;
-    if(ui.pickE === eId && ui.pickJur === jurId){ ui.pickE = null; ui.pickJur = null; }
-    else { ui.pickE = eId; ui.pickJur = jurId; }
+    openRatingModal(t.dataset.e, t.dataset.jur || me);
+    return "keep";
+  },
+  rateModal:function(t){
+    var id = t.dataset.e, p = +t.dataset.p, jurId = t.dataset.jur;
+    var e = findEntry(id);
+    var key = (e && e.songId) ? e.songId : id;
+    S.ratings[key] = S.ratings[key] || {};
+    
+    if (S.ratings[key][jurId] === p) delete S.ratings[key][jurId];
+    else S.ratings[key][jurId] = p;
+    
+    save();
+    dlg.close();
+    return "keep";
   },
   sbShow:function(t){ui.sbShow=t.dataset.show;},
   saveNewYear:function(){
@@ -1205,15 +1245,6 @@ var A={
       S.years=S.years.filter(function(x){return x!==y;});save();ui.yearId=null;ui.view="home";ui.enter=true;render();
     });
     return "keep";
-  },
-  rate:function(t){
-    var id=t.dataset.e, p=+t.dataset.p;
-    var e=findEntry(id), targetJur = (me === "admin" && ui.pickJur) ? ui.pickJur : me;
-    var key = (e && e.songId) ? e.songId : id;
-    S.ratings[key]=S.ratings[key]||{};
-    if(S.ratings[key][targetJur]===p) delete S.ratings[key][targetJur];
-    else S.ratings[key][targetJur]=p;
-    ui.pickE=null; ui.pickJur=null; save();
   },
   moveUp:function(t){
     var y=yearObj(ui.yearId), l=y.shows[t.dataset.show], idx_pos=+t.dataset.idx;
@@ -1310,14 +1341,12 @@ document.addEventListener("click",function(ev){
 });
 
 var C={
-  note:function(t){
-    var id=t.dataset.e, v=t.value.trim(), e=findEntry(id), targetJur=t.dataset.jur||me;
-    var key = (e && e.songId) ? e.songId : id;
-    S.notes[key]=S.notes[key]||{};
-    if(v) S.notes[key][targetJur]=v; else delete S.notes[key][targetJur];
-    save();
+  place:function(t){ 
+    var e=findEntry(t.dataset.e), v=parseInt(t.value); 
+    if(v>0) e.place=v; else delete e.place; 
+    save(); 
+    return "keep"; 
   },
-  place:function(t){ var e=findEntry(t.dataset.e), v=parseInt(t.value); if(v>0) e.place=v; else delete e.place; save(); },
   pred:function(t){ var id=t.dataset.e, j=t.dataset.j, v=parseInt(t.value); S.pred[id]=S.pred[id]||{}; if(v>0) S.pred[id][j]=v; else delete S.pred[id][j]; save(); },
   bA:function(t){ui.bA=t.value;},
   bB:function(t){ui.bB=t.value;},
