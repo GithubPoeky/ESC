@@ -276,6 +276,26 @@ h3{font-family:var(--display);margin:0 0 12px}
 .tile.empty{background:var(--panel2);color:var(--muted)}
 .tile.me{border-color:#fff}
 
+/* Hover reveal ONLY for your own unvoted NQ tip tile */
+.tile.tip-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.95);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.row:hover .tile.tip-hidden {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
+/* Other jurors' unvoted tiles remain permanently invisible */
+.tile.tip-permanently-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.95);
+}
+
 .avg{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:44px}
 .avg b{font-family:var(--display);font-size:1.15rem}
 .avg small{font-size:0.6rem;color:var(--muted);letter-spacing:.04em}
@@ -936,21 +956,32 @@ function showView(sh){
         var tipsHtml = "";
         for(var j=0; j<S.jury.length; j++){
           var jur = S.jury[j], jQual = qp[jur.id], isMe = (jur.id === me) || (me === "admin");
+          var isCurrentProfile = (jur.id === me) || (me === "admin");
           var txt = jQual === true ? "Q" : (jQual === false ? "NQ" : "–");
-          var bg = "var(--panel2)", col = "var(--muted)", border = "2px solid transparent";
+          var bg = "var(--panel2)", col = "var(--muted)", border = "2.5px solid transparent";
+          var extraClass = "";
           
-          if (jQual === true) { col = "#4ade80"; border = "2px solid #189650"; bg = "rgba(24,150,80,0.1)"; }
-          else if (jQual === false) { col = "#ffb3b3"; border = "2px solid #d62839"; bg = "rgba(214,40,57,0.1)"; }
+          if (jQual === true) { col = "#4ade80"; border = "2.5px solid #189650"; bg = "rgba(24,150,80,0.1)"; }
+          else if (jQual === false) { col = "#ffb3b3"; border = "2.5px solid #d62839"; bg = "rgba(214,40,57,0.1)"; }
           
           if (actualQ !== null && jQual !== undefined) {
-            if (actualQ === jQual) { bg = "#189650"; col = "#fff"; border = "2px solid #4ade80"; } 
-            else { bg = "#d62839"; col = "#fff"; border = "2px solid #ffb3b3"; } 
+            if (actualQ === jQual) { bg = "#189650"; col = "#fff"; border = "2.5px solid #4ade80"; } 
+            else { bg = "#d62839"; col = "#fff"; border = "2.5px solid #ffb3b3"; }
+          }
+          
+          // Ungetippte Boxen: Nur die eigene Box bekommt den Hover-Effekt, andere bleiben permanent unsichtbar
+          if (jQual === undefined) {
+            if (isCurrentProfile) {
+              extraClass = " tip-hidden";
+            } else {
+              extraClass = " tip-permanently-hidden";
+            }
           }
           
           var clickAttr = isMe ? 'data-act="toggleQual" data-e="'+e.id+'" data-jur="'+jur.id+'"' : '';
           var curStyle = isMe ? 'cursor:pointer;' : 'cursor:default;';
           
-          tipsHtml += '<button class="tile '+(isMe?"me":"empty")+'" style="background:'+bg+';color:'+col+';border:'+border+';'+curStyle+'" '+clickAttr+' title="'+esc(jur.name)+'"><small style="background:transparent;border:none;padding:1px 0">'+esc(lab[j])+'</small><b>'+txt+'</b></button>';
+          tipsHtml += '<button class="tile '+(isMe?"me":"empty")+extraClass+'" style="background:'+bg+';color:'+col+';border:'+border+';'+curStyle+'" '+clickAttr+' title="'+esc(jur.name)+'"><small style="background:transparent;border:none;padding:1px 0">'+esc(lab[j])+'</small><b>'+txt+'</b></button>';
         }
         mainStatsHtml = '<div class="tiles">'+tipsHtml+'</div>';
       }
