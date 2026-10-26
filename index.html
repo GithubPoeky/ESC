@@ -621,6 +621,15 @@ function overviewTab(){
     '<button class="'+(ui.ovSubTab==='final'?'on':'')+'" data-act="ovSubTab" data-val="final" style="background:'+(ui.ovSubTab==='final'?'var(--pink)':'var(--panel2)')+';color:'+(ui.ovSubTab==='final'?'#fff':'var(--ink)')+'">Final</button>' +
   '</div>';
 
+  var getPtsHeader = function(alignRight){
+    var h = '<div style="display:flex;gap:4px;margin-bottom:6px;'+(alignRight?'justify-content:flex-end':'justify-content:flex-start')+';padding:0 2px;">';
+    for(var j=0; j<S.jury.length; j++){
+      h += '<div style="width:34px;text-align:center;font-size:0.75rem;font-weight:700;color:var(--muted);" title="'+esc(S.jury[j].name)+'">'+esc(lab[j])+'</div>';
+    }
+    h += '</div>';
+    return h;
+  };
+
   if(ui.ovSubTab === 'final'){
     var list = y.shows.final;
     var rowsOv = "";
@@ -638,7 +647,7 @@ function overviewTab(){
       rowsOv += '<div class="ov-row-item">'+pts+pill+pl+'</div>';
     }
     return '<h2>Overview</h2><p class="hint">Everyone\'s points side by side. Disqualified or non-qualifying countries are greyed out.</p>' +
-      subTabsHtml + '<div class="card" style="margin-top:16px"><h3 style="text-align:center;margin-bottom:16px">Final</h3><div style="display:flex;flex-direction:column;gap:8px">'+rowsOv+'</div></div>';
+      subTabsHtml + '<div class="card" style="margin-top:16px"><h3 style="text-align:center;margin-bottom:12px">Final</h3>' + getPtsHeader(false) + '<div style="display:flex;flex-direction:column;gap:8px">'+rowsOv+'</div></div>';
   }
 
   var renderSideCol = function(shKey, title, isMirror){
@@ -665,6 +674,7 @@ function overviewTab(){
 
     return '<div class="ov-column">' +
       '<div class="ov-col-title">'+title+'</div>' +
+      getPtsHeader(isMirror) +
       '<div style="display:flex;flex-direction:column;gap:8px">'+rows+'</div>' +
     '</div>';
   };
