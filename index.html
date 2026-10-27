@@ -621,12 +621,19 @@ function fromTree(t){
   for(var id in tYears){
     if(tYears.hasOwnProperty(id)){
       var o = tYears[id]; var shows={};
-      for(var sh in SHOWS){
-        if(o.shows && o.shows[sh]){
-          var shObj = o.shows[sh]; var arr = [];
-          for(var id2 in shObj){ if(shObj.hasOwnProperty(id2)){ var e = shObj[id2]; arr.push({id:id2, songId:e.songId, place:e.place, customNo:e.n, dq:e.dq, autoFinal: e.autoFinal}); } }
-          sortShowsList(arr);
-          shows[sh] = arr;
+      if(o.shows){
+        for(var sh in o.shows){
+          if(o.shows.hasOwnProperty(sh)){
+            var shObj = o.shows[sh] || {}; var arr = [];
+            for(var id2 in shObj){
+              if(shObj.hasOwnProperty(id2)){
+                var e = shObj[id2];
+                arr.push({id:id2, songId:e.songId, place:e.place, customNo:e.n, dq:e.dq, autoFinal: e.autoFinal});
+              }
+            }
+            sortShowsList(arr);
+            shows[sh] = arr;
+          }
         }
       }
       r.years.push({id:id, year:+o.year||+id.split("_")[0], suffix:o.suffix||"", city:o.city, splitAfter: o.splitAfter, shows:shows});
@@ -764,7 +771,7 @@ function yearView(){
   if(!y) { ui.yearId=null; ui.view="home"; return home(); }
   
   if(!y.shows[ui.tab] && ui.tab !== "overview" && ui.tab !== "battle" && ui.tab !== "sb"){
-    ui.tab = y.shows.sf1 ? "sf1" : "final";
+    ui.tab = y.shows.sf1 ? "sf1" : (y.shows.sf2 ? "sf2" : (y.shows.final ? "final" : "overview"));
   }
 
   var body = "";
@@ -778,7 +785,7 @@ function yearView(){
   if(y.shows.sf1) tabHtml += '<button class="'+(ui.tab==="sf1"?"on":"")+'" data-act="tab" data-tab="sf1">Semi-final 1</button>';
   if(y.shows.sf2) tabHtml += '<button class="'+(ui.tab==="sf2"?"on":"")+'" data-act="tab" data-tab="sf2">Semi-final 2</button>';
   tabHtml += '<button class="'+(ui.tab==="overview"?"on":"")+'" data-act="tab" data-tab="overview">Overview</button>';
-  tabHtml += '<button class="'+(ui.tab==="final"?"on":"")+' final-tab" data-act="tab" data-tab="final">Grand Final</button>';
+  if(y.shows.final) tabHtml += '<button class="'+(ui.tab==="final"?"on":"")+' final-tab" data-act="tab" data-tab="final">Grand Final</button>';
   tabHtml += '<button class="'+(ui.tab==="battle"?"on":"")+'" data-act="tab" data-tab="battle">Points battle</button>';
   tabHtml += '<button class="'+(ui.tab==="sb"?"on":"")+'" data-act="tab" data-tab="sb">Scoreboard</button>';
 
@@ -825,7 +832,7 @@ function overviewTab(){
   };
 
   if(ui.ovSubTab === 'final' || !hasSemis){
-    var list = y.shows.final;
+    var list = y.shows.final || [];
     var rowsOv = "";
     for(var i=0; i<list.length; i++){
       var e = list[i], s = songById(e.songId), r = getRatings(e);
@@ -977,9 +984,11 @@ function showView(sh){
   if (ui.editMode) {
     var hasSf1 = !!y.shows.sf1;
     var hasSf2 = !!y.shows.sf2;
-    showMgmtBtns = '<div style="display:flex;gap:6px;align-items:center;margin-top:8px;width:100%">' +
+    var hasFinal = !!y.shows.final;
+    showMgmtBtns = '<div style="display:flex;gap:6px;align-items:center;margin-top:8px;width:100%;flex-wrap:wrap">' +
       (hasSf1 ? '<button class="ghost sm danger" data-act="removeShow" data-show="sf1">− SF1 entfernen</button>' : '<button class="ghost sm" data-act="addShow" data-show="sf1">＋ SF1 hinzufügen</button>') +
       (hasSf2 ? '<button class="ghost sm danger" data-act="removeShow" data-show="sf2">− SF2 entfernen</button>' : '<button class="ghost sm" data-act="addShow" data-show="sf2">＋ SF2 hinzufügen</button>') +
+      (hasFinal ? '<button class="ghost sm danger" data-act="removeShow" data-show="final">− Final entfernen</button>' : '<button class="ghost sm" data-act="addShow" data-show="final">＋ Final hinzufügen</button>') +
     '</div>';
   }
 
@@ -1529,7 +1538,7 @@ var A={
     ui.yearId=t.dataset.id;
     ui.view="year";
     var y=yearObj(ui.yearId);
-    ui.tab = (y && y.shows.sf1) ? "sf1" : "final";
+    ui.tab = (y && y.shows.sf1) ? "sf1" : (y && y.shows.sf2 ? "sf2" : (y && y.shows.final ? "final" : "overview"));
     ui.subTab="points";ui.sortMode="order";ui.ovSubTab="semis";ui.editMode=false;ui.enter=true;
   },
   openCompare:function(){ui.view="compare";ui.enter=true;},
@@ -1591,7 +1600,8 @@ var A={
     var sh=t.dataset.show;
     if(y && !y.shows[sh]){
       y.shows[sh] = [];
-      for(var i=1; i<=DEF_N[sh]; i++){ y.shows[sh].push({id:y.id+"-"+sh+"-"+i}); }
+      var count = DEF_N[sh] || 25;
+      for(var i=1; i<=count; i++){ y.shows[sh].push({id:y.id+"-"+sh+"-"+i}); }
       save();
       ui.enter=true;
     }
@@ -1601,7 +1611,7 @@ var A={
     var sh=t.dataset.show;
     openConfirm("Show entfernen", "Möchtest du " + SHOWS[sh] + " wirklich entfernen? Alle Tipps und Einträge gehen verloren.", function(){
       delete y.shows[sh];
-      if(ui.tab === sh) ui.tab = y.shows.sf1 ? "sf1" : "final";
+      if(ui.tab === sh) ui.tab = y.shows.sf1 ? "sf1" : (y.shows.sf2 ? "sf2" : (y.shows.final ? "final" : "overview"));
       if(ui.sbShow === sh) ui.sbShow = y.shows.final ? "final" : Object.keys(y.shows)[0];
       save();
       render();
