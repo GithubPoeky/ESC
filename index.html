@@ -880,28 +880,6 @@ function showView(sh){
     }
   }
 
-  var juryBubblesHtml = '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">';
-  for(var j=0; j<S.jury.length; j++){
-    var jId = S.jury[j].id;
-    juryBubblesHtml += '<div style="background:var(--panel2);border:1px solid var(--line);padding:4px 10px;border-radius:999px;font-size:0.8rem;font-weight:700;display:inline-flex;align-items:center;gap:6px;"><span style="color:var(--muted)">'+esc(S.jury[j].name)+'</span><span style="color:var(--gold)">'+juryTotals[jId]+' pts</span></div>';
-  }
-  juryBubblesHtml += '</div>';
-
-  var titleWithBubbles = '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:12px;"><h2>'+SHOWS[sh]+'</h2>'+juryBubblesHtml+'</div>';
-
-  var list = listRaw.slice();
-  if (ui.sortMode === 'place') {
-    list.sort(function(a, b) {
-      var pa = (a.place !== undefined && a.place !== null) ? a.place : 9999;
-      var pb = (b.place !== undefined && b.place !== null) ? b.place : 9999;
-      if (pa !== pb) return pa - pb;
-      return listRaw.indexOf(a) - listRaw.indexOf(b);
-    });
-  }
-
-  var cnt={};
-  for(var i=0; i<listRaw.length; i++){ if(listRaw[i].place) cnt[listRaw[i].place] = (cnt[listRaw[i].place]||0) + 1; }
-
   // Berechne NQ-Trefferquote pro Juror für Semi-Finals
   var nqStats = {};
   for(var j=0; j<S.jury.length; j++){ nqStats[S.jury[j].id] = { correct: 0, totalGuessed: 0 }; }
@@ -924,21 +902,33 @@ function showView(sh){
     }
   }
 
-  var nqSummaryHtml = '';
-  if(sh !== "final"){
-    var summaryItems = '';
-    for(var j=0; j<S.jury.length; j++){
-      var jur = S.jury[j];
-      var st = nqStats[jur.id];
-      summaryItems += '<div style="background:var(--panel2);border:1px solid var(--line);padding:6px 12px;border-radius:8px;font-size:0.85rem;display:inline-flex;gap:8px;align-items:center;">' +
-        '<span style="color:var(--muted)">'+esc(jur.name)+'</span>' +
-        '<b style="color:var(--gold)">'+st.correct+' / '+st.totalGuessed+' correct NQs</b>' +
-      '</div>';
+  var juryBubblesHtml = '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">';
+  for(var j=0; j<S.jury.length; j++){
+    var jId = S.jury[j].id;
+    var ptsText = juryTotals[jId] + ' pts';
+    var nqExtra = '';
+    if(sh !== "final"){
+      var st = nqStats[jId];
+      nqExtra = ' <span style="font-size:0.7rem;font-weight:600;color:var(--muted);border-left:1px solid var(--line);padding-left:6px;">' + st.correct + ' / ' + st.totalGuessed + ' NQs</span>';
     }
-    nqSummaryHtml = '<div class="card" style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">' +
-      '<b style="font-size:0.9rem;margin-right:4px;">NQ Tip Accuracy:</b>' + summaryItems +
-    '</div>';
+    juryBubblesHtml += '<div style="background:var(--panel2);border:1px solid var(--line);padding:4px 10px;border-radius:999px;font-size:0.8rem;font-weight:700;display:inline-flex;align-items:center;gap:6px;"><span style="color:var(--muted)">'+esc(S.jury[j].name)+'</span><span style="color:var(--gold)">'+ptsText+'</span>'+nqExtra+'</div>';
   }
+  juryBubblesHtml += '</div>';
+
+  var titleWithBubbles = '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:12px;"><h2>'+SHOWS[sh]+'</h2>'+juryBubblesHtml+'</div>';
+
+  var list = listRaw.slice();
+  if (ui.sortMode === 'place') {
+    list.sort(function(a, b) {
+      var pa = (a.place !== undefined && a.place !== null) ? a.place : 9999;
+      var pb = (b.place !== undefined && b.place !== null) ? b.place : 9999;
+      if (pa !== pb) return pa - pb;
+      return listRaw.indexOf(a) - listRaw.indexOf(b);
+    });
+  }
+
+  var cnt={};
+  for(var i=0; i<listRaw.length; i++){ if(listRaw[i].place) cnt[listRaw[i].place] = (cnt[listRaw[i].place]||0) + 1; }
 
   var topControls = "";
   if(sh !== "final"){
@@ -1120,7 +1110,6 @@ function showView(sh){
   var editActions = ui.editMode ? '<div class="actions"><button class="ghost" data-act="addSlot" data-show="'+sh+'">＋ Running Order</button><button class="ghost" data-act="delSlot" data-show="'+sh+'">− Remove Last</button></div>' : '';
 
   return topBtnBar + 
-    nqSummaryHtml +
     '<div style="display:flex;justify-content:space-between;color:var(--muted);font-weight:700;font-size:0.85rem;padding:0 4px;margin:12px 0 6px"><div>1st Half</div><div>2nd Half</div></div>' +
     '<div class="list" style="margin-top:0">' +
       '<div style="display:flex;flex-direction:column;gap:12px">'+leftColHtml+'</div>' +
