@@ -521,7 +521,7 @@ function load(){
 }
 var S=load();
 var me=localStorage.getItem(MEKEY)||"j1";
-var ui={big:null,q:"",view:"home",yearId:null,tab:"sf1",subTab:"points",sortMode:"order",ovSubTab:"semis",sbShow:"final",editMode:false,bA:null,bB:null,assign:null,editSong:null,libYear:"",libSort:"name",compareCc:null,enter:false};
+var ui={big:null,q:"",view:"home",yearId:null,tab:"sf1",subTab:"points",sortMode:"order",ovSubTab:"semis",sbShow:"final",editMode:false,assign:null,editSong:null,libYear:"",libSort:"name",compareCc:null,enter:false};
 
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){showAlert("Error", "Could not save in this browser.");}push();}
 
@@ -786,7 +786,7 @@ function yearView(){
   if(y.shows.sf2) tabHtml += '<button class="'+(ui.tab==="sf2"?"on":"")+'" data-act="tab" data-tab="sf2">Semi-final 2</button>';
   tabHtml += '<button class="'+(ui.tab==="overview"?"on":"")+'" data-act="tab" data-tab="overview">Overview</button>';
   if(y.shows.final) tabHtml += '<button class="'+(ui.tab==="final"?"on":"")+' final-tab" data-act="tab" data-tab="final">Grand Final</button>';
-  tabHtml += '<button class="'+(ui.tab==="battle"?"on":"")+'" data-act="tab" data-tab="battle">Points battle</button>';
+  tabHtml += '<button class="'+(ui.tab==="battle"?"on":"")+'" data-act="tab" data-tab="battle">Points Battle</button>';
   tabHtml += '<button class="'+(ui.tab==="sb"?"on":"")+'" data-act="tab" data-tab="sb">Scoreboard</button>';
 
   return '<div style="padding-top:14px"><button class="ghost" data-act="home">← All Contests</button>'+
@@ -1168,57 +1168,90 @@ function battle(){
   var fin = [];
   for(var i=0; i<allFin.length; i++){if(songById(allFin[i].songId) && !allFin[i].dq) fin.push(allFin[i]);}
 
-  ui.bA = ui.bA || (me==="admin"?S.jury[0].id:me);
-  if(!ui.bB || ui.bB===ui.bA){
-    for(var i=0; i<S.jury.length; i++){if(S.jury[i].id!==ui.bA){ui.bB=S.jury[i].id;break;}}
-  }
-  var A=ui.bA, B=ui.bB;
+  // Sort by actual place (Place 1 at top, down to last place)
+  fin.sort(function(a, b) {
+    var pa = (a.place !== undefined && a.place !== null) ? a.place : 9999;
+    var pb = (b.place !== undefined && b.place !== null) ? b.place : 9999;
+    return pa - pb;
+  });
 
-  var sel = function(k, v){
-    var opts="";
-    for(var i=0; i<S.jury.length; i++){
-      var j=S.jury[i];
-      opts+='<option value="'+j.id+'" '+(j.id===v?"selected":"")+'>'+esc(j.name)+'</option>';
-    }
-    return '<select data-chg="'+k+'">'+opts+'</select>';
-  };
-
-  var dupSet = function(j){
-    var c={};
+  var dupSets = {};
+  for(var j=0; j<S.jury.length; j++){
+    var jId = S.jury[j].id;
+    var c = {};
     for(var i=0; i<fin.length; i++){
-      var v=(S.pred[fin[i].id]||{})[j];
-      if(v) c[v]=(c[v]||0)+1;
+      var v = (S.pred[fin[i].id] || {})[jId];
+      if(v) c[v] = (c[v] || 0) + 1;
     }
-    return c;
-  };
-  var dA=dupSet(A), dB=dupSet(B);
-  var sa=0, sb=0, n=0;
+    dupSets[jId] = c;
+  }
+
+  var guessHeaders = "";
+  var diffHeaders = "";
+  for(var j=0; j<S.jury.length; j++){
+    guessHeaders += '<th class="c">'+esc(S.jury[j].name)+' (Tipp)</th>';
+    diffHeaders += '<th class="c">'+esc(S.jury[j].name)+' (Abw.)</th>';
+  }
 
   var rows="";
+  var jurorTotals = {};
+  for(var j=0; j<S.jury.length; j++){ jurorTotals[S.jury[j].id] = {sum: 0, count: 0}; }
+
   for(var i=0; i<fin.length; i++){
-    var e=fin[i], s=songById(e.songId), p=S.pred[e.id]||{}, a=p[A], b=p[B], act=e.place;
-    var da=a&&act?Math.abs(a-act):null, db=b&&act?Math.abs(b-act):null;
-    if(da!=null&&db!=null){sa+=da; sb+=db; n++;}
+    var e=fin[i], s=songById(e.songId), p=S.pred[e.id]||{}, act=e.place;
+    var guessCells="";
+    var diffCells="";
     
-    var dcell = function(d){return d==null?"–":d===0?'<span class="cell" style="'+pc(10)+'">🎯 0</span>':'<span class="cell" style="'+pc(Math.max(1,10-d))+'">'+d+'</span>';};
-    var inp = function(j,v,dups){var valStr=(v!==undefined&&v!==null)?v:""; return '<input type="number" min="1" max="'+fin.length+'" value="'+valStr+'" class="'+(v&&dups[v]>1?"dup":"")+'" data-chg="pred" data-e="'+e.id+'" data-j="'+j+'">';};
+    for(var j=0; j<S.jury.length; j++){
+      var jId = S.jury[j].id;
+      var v = p[jId];
+      var valStr = (v !== undefined && v !== null) ? v : "";
+      var isDup = v && dupSets[jId][v] > 1;
+      
+      guessCells += '<td class="c"><input type="number" min="1" max="'+fin.length+'" value="'+valStr+'" class="'+(isDup?"dup":"")+'" data-chg="pred" data-e="'+e.id+'" data-j="'+jId+'" style="width:60px;text-align:center"></td>';
+      
+      var diffCell = "–";
+      if(v !== undefined && v !== null && act !== undefined && act !== null){
+        var d = Math.abs(v - act);
+        jurorTotals[jId].sum += d;
+        jurorTotals[jId].count++;
+        if(d === 0){
+          diffCell = '<span class="cell" style="'+pc(10)+';font-size:0.85rem;padding:3px 8px;">🎯 0</span>';
+        } else {
+          diffCell = '<span class="cell" style="'+pc(Math.max(1, 10 - d))+';font-size:0.85rem;padding:3px 8px;">'+d+'</span>';
+        }
+      }
+      diffCells += '<td class="c">'+diffCell+'</td>';
+    }
     var placeActStr = (act!==undefined&&act!==null)?act:"–";
-    rows+='<tr><td>'+flag(s.cc)+' '+esc(CN[s.cc])+'</td><td>'+inp(A,a,dA)+'</td><td>'+inp(B,b,dB)+'</td><td class="c">'+placeActStr+'</td><td class="c">'+dcell(da)+'</td><td class="c">'+dcell(db)+'</td></tr>';
+    rows+='<tr><td>'+flag(s.cc)+' '+esc(CN[s.cc]||s.cc)+'</td>'+guessCells+diffCells+'<td class="c"><b>'+placeActStr+'</b></td></tr>';
   }
 
-  var verdict='<span class="hint">Enter actual final places to see results.</span>';
-  if(n>0){
-    var done=n===fin.length?"":' <span class="hint">('+n+' of '+fin.length+' compared)</span>';
-    if(sa===sb) verdict='<b>It\'s a draw!</b> Both have '+sa+' points.'+done;
-    else if(sa<sb) verdict='<b>👑 '+esc(jname(A))+' wins</b> with '+sa+' points.'+done;
-    else verdict='<b>👑 '+esc(jname(B))+' wins</b> with '+sb+' points.'+done;
+  var rankings = [];
+  for(var j=0; j<S.jury.length; j++){
+    var jId = S.jury[j].id;
+    if(jurorTotals[jId].count > 0){
+      rankings.push({name: S.jury[j].name, sum: jurorTotals[jId].sum, count: jurorTotals[jId].count});
+    }
   }
-  return '<h2>Points battle</h2><p class="hint">Predict final placements beforehand.</p>'+
-  '<div class="vs">'+sel("bA",A)+' <b>vs</b> '+sel("bB",B)+'</div>'+
-  (fin.length?'<div class="tw" style="margin-top:12px"><table><thead><tr><th>Country</th><th>'+esc(jname(A))+'</th><th>'+esc(jname(B))+'</th><th class="c">Actual</th><th class="c">'+esc(jname(A))+' Pts</th><th class="c">'+esc(jname(B))+' Pts</th></tr></thead>'+
+  rankings.sort(function(a, b){ return a.sum - b.sum; });
+
+  var verdictHtml = '<span class="hint">Trage die Tipps und tatsächlichen Plätze ein, um das Leaderboard zu sehen.</span>';
+  if(rankings.length > 0){
+    var rankList = "";
+    for(var r=0; r<rankings.length; r++){
+      var item = rankings[r];
+      var medal = r === 0 ? "👑 " : (r === 1 ? "🥈 " : (r === 2 ? "🥉 " : ""));
+      rankList += '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line)"><span>'+medal+'<b>'+esc(item.name)+'</b></span><span><b>'+item.sum+'</b> Fehlerpunkte ('+item.count+' verglichen)</span></div>';
+    }
+    verdictHtml = '<h3 style="margin-bottom:8px">Leaderboard</h3><div style="display:flex;flex-direction:column;gap:4px">'+rankList+'</div>';
+  }
+
+  return '<h2>Points Battle</h2><p class="hint">Tippe die Platzierungen nebeneinander. Die Abweichungen werden in separaten Spalten rechts daneben angezeigt (🎯 bei Volltreffer). Songs sind nach dem tatsächlichen Ergebnis sortiert (Platz 1 oben).</p>'+
+  (fin.length?'<div class="tw" style="margin-top:12px"><table><thead><tr><th>Country</th>'+guessHeaders+diffHeaders+'<th class="c">Actual</th></tr></thead>'+
   '<tbody>'+rows+'</tbody></table></div>'+
-  '<div class="verdict">'+verdict+'</div>'
-  :'<p class="empty">Please select songs for the Grand Final first.</p>');
+  '<div class="verdict">'+verdictHtml+'</div>'
+  :'<p class="empty">Bitte wähle zuerst Songs für das Grand Final aus.</p>');
 }
 
 function scoreboard(){
@@ -1774,8 +1807,6 @@ var C={
     return "keep"; 
   },
   pred:function(t){ var id=t.dataset.e, j=t.dataset.j, v=parseInt(t.value); S.pred[id]=S.pred[id]||{}; if(v>0) S.pred[id][j]=v; else delete S.pred[id][j]; save(); },
-  bA:function(t){ui.bA=t.value;},
-  bB:function(t){ui.bB=t.value;},
   compareCc:function(t){ui.compareCc=t.value;render();}
 };
 
