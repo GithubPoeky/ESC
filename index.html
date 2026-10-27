@@ -17,10 +17,31 @@
 }
 *{box-sizing:border-box}
 html{background:var(--bg)}
-body{margin:0;font-family:var(--body);color:var(--ink);background:
+body{
+  margin:0;font-family:var(--body);color:var(--ink);background:
   radial-gradient(900px 420px at 50% -10%,rgba(255,45,149,.15),transparent 60%),
   radial-gradient(700px 380px at 10% 20%,rgba(110,50,220,.2),transparent 60%),var(--bg);
-  min-height:100vh;line-height:1.42; overflow-x:hidden;}
+  min-height:100vh;line-height:1.42; overflow-x:hidden;
+  position: relative;
+}
+
+/* Animierter Hintergrund-Effekt */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  pointer-events: none;
+  z-index: -1;
+  background: 
+    radial-gradient(900px 420px at 30% 10%, rgba(255,45,149,.15), transparent 60%),
+    radial-gradient(800px 400px at 80% 70%, rgba(110,50,220,.2), transparent 60%);
+  animation: bgFloat 14s ease-in-out infinite alternate;
+}
+@keyframes bgFloat {
+  0% { transform: translateY(0px) scale(1); filter: hue-rotate(0deg); }
+  50% { transform: translateY(-25px) scale(1.04); filter: hue-rotate(15deg); }
+  100% { transform: translateY(20px) scale(0.97); filter: hue-rotate(-10deg); }
+}
 
 #app { transition: opacity 0.3s ease; }
 #app.enter { animation: popIn 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
@@ -230,8 +251,9 @@ h3{font-family:var(--display);margin:0 0 12px}
   flex-wrap:wrap;
   min-width:0;
   text-shadow: 0 1px 3px rgba(0,0,0,0.95), 0 0 6px rgba(0,0,0,0.8);
+  font-family: var(--display);
 }
-.meta b{font-size:1.05rem}
+.meta b{font-size:1.05rem; font-weight: 800; letter-spacing: -0.01em;}
 .flag{width:22px;height:15px;object-fit:cover;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.25);vertical-align:middle;transform:scale(1.2);display:inline-block;margin:0 2px}
 
 .stats{
@@ -322,6 +344,7 @@ h3{font-family:var(--display);margin:0 0 12px}
   grid-column:1/-1;
   text-shadow: 0 1px 2px rgba(0,0,0,0.9);
   text-align: right;
+  font-family: var(--body);
 }
 
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
@@ -337,7 +360,6 @@ td input[type=number]{width:72px}
 .verdict b{font-family:var(--display);font-size:1.3rem}
 .seg{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
 .seg button.on{background:var(--pink);border-color:var(--pink);font-weight:700}
-.q{display:inline-block;background:#1f9d55;color:#fff;border-radius:4px;padding:0 4px;font-size:0.65rem;font-weight:800;margin-left:4px;white-space:nowrap;flex-shrink:0}
 .autofinal{display:inline-block;background:#7b2cbf;color:#fff;border-radius:4px;padding:0 4px;font-size:0.65rem;font-weight:800;margin-left:4px;white-space:nowrap;flex-shrink:0}
 .rank{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line)}
 .rank .p{font-family:var(--display);font-weight:800;font-size:1.3rem;width:36px;color:var(--gold)}
@@ -414,7 +436,6 @@ dialog input,dialog select{width:100%}
   background: rgba(17,6,36,0.3);
   border-color: rgba(50, 25, 95, 0.6);
 }
-/* Damit NQ-Tipps bei ausgegrauten/ausgeschiedenen Songs trotzdem voll zur Geltung kommen */
 .row.out .tiles { filter: none !important; opacity: 1 !important; }
 
 .row.dq {
@@ -479,7 +500,7 @@ function getIso3(cc) {
   return ISO3[cc.toLowerCase()] || cc.toUpperCase();
 }
 
-var SHOWS={sf1:"Semi-final 1",sf2:"Semi-final 2",final:"Final"};
+var SHOWS={sf1:"Semi-final 1",sf2:"Semi-final 2",final:"Grand Final"};
 var DEF_N={sf1:15,sf2:15,final:26};
 var KEY="esc-scoreboard-v2",MEKEY="esc-me";
 
@@ -757,7 +778,7 @@ function yearView(){
   if(y.shows.sf1) tabHtml += '<button class="'+(ui.tab==="sf1"?"on":"")+'" data-act="tab" data-tab="sf1">Semi-final 1</button>';
   if(y.shows.sf2) tabHtml += '<button class="'+(ui.tab==="sf2"?"on":"")+'" data-act="tab" data-tab="sf2">Semi-final 2</button>';
   tabHtml += '<button class="'+(ui.tab==="overview"?"on":"")+'" data-act="tab" data-tab="overview">Overview</button>';
-  tabHtml += '<button class="'+(ui.tab==="final"?"on":"")+' final-tab" data-act="tab" data-tab="final">Final</button>';
+  tabHtml += '<button class="'+(ui.tab==="final"?"on":"")+' final-tab" data-act="tab" data-tab="final">Grand Final</button>';
   tabHtml += '<button class="'+(ui.tab==="battle"?"on":"")+'" data-act="tab" data-tab="battle">Points battle</button>';
   tabHtml += '<button class="'+(ui.tab==="sb"?"on":"")+'" data-act="tab" data-tab="sb">Scoreboard</button>';
 
@@ -790,7 +811,7 @@ function overviewTab(){
   if (hasSemis) {
     subTabsHtml = '<div class="tabs" style="border:none;margin:16px 0">' +
       '<button class="'+(ui.ovSubTab==='semis'?'on':'')+'" data-act="ovSubTab" data-val="semis" style="background:'+(ui.ovSubTab==='semis'?'var(--pink)':'var(--panel2)')+';color:'+(ui.ovSubTab==='semis'?'#fff':'var(--ink)')+'">Semi-finals</button>' +
-      '<button class="'+(ui.ovSubTab==='final'?'on':'')+'" data-act="ovSubTab" data-val="final" style="background:'+(ui.ovSubTab==='final'?'var(--pink)':'var(--panel2)')+';color:'+(ui.ovSubTab==='final'?'#fff':'var(--ink)')+'">Final</button>' +
+      '<button class="'+(ui.ovSubTab==='final'?'on':'')+'" data-act="ovSubTab" data-val="final" style="background:'+(ui.ovSubTab==='final'?'var(--pink)':'var(--panel2)')+';color:'+(ui.ovSubTab==='final'?'#fff':'var(--ink)')+'">Grand Final</button>' +
     '</div>';
   }
 
@@ -820,7 +841,7 @@ function overviewTab(){
       rowsOv += '<div class="ov-row-item">'+pts+pill+pl+'</div>';
     }
     return '<h2>Overview</h2><p class="hint">Everyone\'s points side by side. Disqualified or non-qualifying countries are greyed out.</p>' +
-      subTabsHtml + '<div class="card" style="margin-top:16px"><h3 style="text-align:center;margin-bottom:12px">Final</h3>' + getPtsHeader(false) + '<div style="display:flex;flex-direction:column;gap:8px">'+rowsOv+'</div></div>';
+      subTabsHtml + '<div class="card" style="margin-top:16px"><h3 style="text-align:center;margin-bottom:12px">Grand Final</h3>' + getPtsHeader(false) + '<div style="display:flex;flex-direction:column;gap:8px">'+rowsOv+'</div></div>';
   }
 
   var renderSideCol = function(shKey, title, isMirror){
@@ -1060,7 +1081,6 @@ function showView(sh){
       if(nt[S.jury[j].id]){ notesStr += '<span><b>'+esc(S.jury[j].name)+':</b> '+esc(nt[S.jury[j].id])+'</span>'; }
     }
 
-    var qTag = (sh!=="final" && actualQ)?'<span class="q">Q</span>':"";
     var afTag = (sh !== "final" && isAutoFinal) ? '<span class="autofinal">AQ</span>' : "";
     var placeVal = (e.place !== undefined && e.place !== null) ? e.place : "";
     
@@ -1080,7 +1100,7 @@ function showView(sh){
       '</div>';
     }
 
-    var mainContent = s ? '<div class="meta"><span><b>'+esc(s.title)+'</b> – '+esc(s.artist)+'</span>'+qTag+afTag+smGroupHtml+'</div>'
+    var mainContent = s ? '<div class="meta"><span><b>'+esc(s.title)+'</b> – '+esc(s.artist)+'</span>'+afTag+smGroupHtml+'</div>'
       : '<div style="display:flex;align-items:center;gap:8px"><button class="primary sm" data-act="pick" data-e="'+e.id+'">＋ Song</button>'+smGroupHtml+'</div>';
 
     var placeInputHtml = (sh !== "final" && isAutoFinal) 
@@ -1190,7 +1210,7 @@ function battle(){
   (fin.length?'<div class="tw" style="margin-top:12px"><table><thead><tr><th>Country</th><th>'+esc(jname(A))+'</th><th>'+esc(jname(B))+'</th><th class="c">Actual</th><th class="c">'+esc(jname(A))+' Pts</th><th class="c">'+esc(jname(B))+' Pts</th></tr></thead>'+
   '<tbody>'+rows+'</tbody></table></div>'+
   '<div class="verdict">'+verdict+'</div>'
-  :'<p class="empty">Please select songs for the final first.</p>');
+  :'<p class="empty">Please select songs for the Grand Final first.</p>');
 }
 
 function scoreboard(){
