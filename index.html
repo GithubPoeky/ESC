@@ -163,7 +163,9 @@ h3{font-family:var(--display);margin:0 0 12px}
   align-items:center;
   animation: simpleFadeUp 0.3s ease-out backwards;
   transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  cursor: pointer;
 }
+.row:hover{border-color:var(--pink);}
 
 .row::before {
   content: "";
@@ -478,6 +480,61 @@ dialog input,dialog select{width:100%}
 }
 .row.autofinal-row{border-color:#9d4edd}
 
+/* Live Mode Styles - Dunkler und dezent */
+.live-mode-banner {
+  background: var(--panel);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: 1px solid var(--line);
+}
+.live-current-card {
+  background: var(--panel2);
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.live-current-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255,209,102,0.2);
+}
+.live-queue-grid {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+.live-queue-item {
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 14px;
+  min-width: 150px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+.live-queue-item:hover {
+  border-color: var(--pink);
+  transform: translateY(-2px);
+}
+.live-queue-item.active {
+  border-color: var(--gold);
+  background: var(--panel);
+  box-shadow: 0 0 14px rgba(255,209,102,0.3);
+}
+
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 </style>
 </head>
@@ -553,7 +610,7 @@ function load(){
 }
 var S=load();
 var me=localStorage.getItem(MEKEY)||"j1";
-var ui={big:null,q:"",view:"home",yearId:null,tab:"sf1",subTab:"points",sortMode:"order",ovSubTab:"semis",sbShow:"final",editMode:false,assign:null,editSong:null,libYear:"",libSort:"name",compareCc:null,enter:false};
+var ui={big:null,q:"",view:"home",yearId:null,tab:"sf1",subTab:"points",sortMode:"order",ovSubTab:"semis",sbShow:"final",editMode:false,assign:null,editSong:null,libYear:"",libSort:"name",compareCc:null,enter:false,liveMode:false,liveIndex:0};
 
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){showAlert("Error", "Could not save in this browser.");}push();}
 
@@ -807,10 +864,14 @@ function yearView(){
   }
 
   var body = "";
-  if(y.shows[ui.tab]) body=showView(ui.tab);
-  else if(ui.tab==="overview") body=overviewTab();
-  else if(ui.tab==="battle") body=battle();
-  else if(ui.tab==="sb") body=scoreboard();
+  if(ui.liveMode){
+    body = liveModeView(ui.tab);
+  } else {
+    if(y.shows[ui.tab]) body=showView(ui.tab);
+    else if(ui.tab==="overview") body=overviewTab();
+    else if(ui.tab==="battle") body=battle();
+    else if(ui.tab==="sb") body=scoreboard();
+  }
 
   var titleLabel = y.year + (y.suffix ? " (" + y.suffix + ")" : "");
   var tabHtml = "";
@@ -825,20 +886,82 @@ function yearView(){
   var hasSf2 = !!y.shows.sf2;
   var hasFinal = !!y.shows.final;
 
+  var liveBtnStyle = ui.liveMode ? 'background:#ff2d95;color:#fff;border-color:#ff2d95;font-weight:700;' : 'background:var(--panel2);color:var(--gold);border-color:var(--gold);font-weight:700;';
+
   return '<div style="padding-top:14px"><button class="ghost" data-act="home">← All Contests</button>'+
     '<button class="ghost danger" data-act="delYear" style="float:right">Delete Contest</button><button class="ghost" data-act="editCity" style="float:right;margin-right:8px">'+(y.city?"Edit":"Add")+' Host City</button></div>'+
     '<h1 class="yeartitle">Eurovision '+esc(titleLabel)+'</h1>'+(y.city?'<p class="hint" style="margin:-6px 0 14px">'+esc(y.city)+'</p>':"")+
     '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:12px">'+
       '<div class="tabs" style="margin:0;border:none;padding:0">'+tabHtml+'</div>'+
       '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
-        '<button class="ghost '+(ui.editMode?'primary':'')+'" data-act="toggleEditMode">✏️ Edit</button>'+
-        (ui.editMode ? 
-          (hasSf1 ? '<button class="ghost sm danger" data-act="removeShow" data-show="sf1">− SF1 entfernen</button>' : '<button class="ghost sm" data-act="addShow" data-show="sf1">＋ SF1 hinzufügen</button>') +
-          (hasSf2 ? '<button class="ghost sm danger" data-act="removeShow" data-show="sf2">− SF2 entfernen</button>' : '<button class="ghost sm" data-act="addShow" data-show="sf2">＋ SF2 hinzufügen</button>') +
-          (hasFinal ? '<button class="ghost sm danger" data-act="removeShow" data-show="final">− Final entfernen</button>' : '<button class="ghost sm" data-act="addShow" data-show="final">＋ Final hinzufügen</button>')
+        '<button data-act="toggleLiveMode" style="'+liveBtnStyle+'">🔴 '+(ui.liveMode?'Live-Modus beenden':'Live Mode')+'</button>'+
+        (!ui.liveMode ? '<button class="ghost '+(ui.editMode?'primary':'')+'" data-act="toggleEditMode">✏️ Edit</button>' : '')+
+        (!ui.liveMode && ui.editMode ? 
+          (hasSf1 ? '<button class="ghost sm danger" data-act="removeShow" data-show="sf1">− SF1</button>' : '<button class="ghost sm" data-act="addShow" data-show="sf1">＋ SF1</button>') +
+          (hasSf2 ? '<button class="ghost sm danger" data-act="removeShow" data-show="sf2">− SF2</button>' : '<button class="ghost sm" data-act="addShow" data-show="sf2">＋ SF2</button>') +
+          (hasFinal ? '<button class="ghost sm danger" data-act="removeShow" data-show="final">− Final</button>' : '<button class="ghost sm" data-act="addShow" data-show="final">＋ Final</button>')
         : '')+
       '</div>'+
     '</div>'+body;
+}
+
+function liveModeView(sh){
+  var y = yearObj(ui.yearId);
+  var list = y.shows[sh] || [];
+  if(list.length === 0) return '<p class="empty">Keine Songs in dieser Show vorhanden.</p>';
+
+  if(ui.liveIndex >= list.length) ui.liveIndex = 0;
+  var currentEntry = list[ui.liveIndex];
+  var s = songById(currentEntry.songId);
+  var r = getRatings(currentEntry);
+  var nt = getNotes(currentEntry);
+
+  var queueHtml = '';
+  for(var i=0; i<list.length; i++){
+    var item = list[i], songItem = songById(item.songId);
+    var isSel = (i === ui.liveIndex);
+    var labelTitle = songItem ? songItem.title : ('Start ' + (i+1));
+    queueHtml += '<div class="live-queue-item'+(isSel?' active':'')+'" data-act="setLiveIndex" data-idx="'+i+'">' +
+      '<div style="font-size:0.75rem;color:var(--muted)">Nr. '+(i+1)+'</div>' +
+      '<div style="font-weight:700;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(songItem?flag(songItem.cc)+' ':'')+esc(labelTitle)+'</div>' +
+    '</div>';
+  }
+
+  var juryRatingBox = '';
+  for(var j=0; j<S.jury.length; j++){
+    var jur = S.jury[j], val = r[jur.id];
+    juryRatingBox += '<div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center;flex:1;min-width:90px;'+(val?pc(val):'')+'">' +
+      '<div style="font-size:0.75rem;font-weight:700;color:var(--muted);margin-bottom:4px;">'+esc(jur.name)+'</div>' +
+      '<div style="font-family:var(--number-font);font-size:1.8rem;">'+(val!==undefined&&val!==null?val:'–')+'</div>' +
+      (nt[jur.id] ? '<div style="font-size:0.75rem;margin-top:4px;color:var(--ink);opacity:0.8;">'+esc(nt[jur.id])+'</div>' : '') +
+    '</div>';
+  }
+
+  var currentSongDisplay = s ? 
+    '<div style="display:flex;align-items:center;gap:20px;width:100%;">' +
+      '<div style="transform:scale(2.2);margin:0 16px;">'+flag(s.cc)+'</div>' +
+      '<div style="flex:1;">' +
+        '<div style="font-size:0.85rem;color:var(--gold);font-weight:700;margin-bottom:2px;">AKTUELL AUF DER BÜHNE · Startnummer '+(ui.liveIndex+1)+'</div>' +
+        '<h2 style="font-size:2.4rem;margin:0 0 4px;">'+esc(s.title)+'</h2>' +
+        '<p style="font-size:1.3rem;color:var(--muted);margin:0;">'+esc(s.artist)+' ('+esc(CN[s.cc]||s.cc.toUpperCase())+')</p>' +
+      '</div>' +
+      '<div style="font-size:0.9rem;color:var(--muted);text-align:right;">Klicken zum Bewerten ✏️</div>' +
+    '</div>'
+    : '<div style="flex:1;text-align:center;padding:12px;"><h3>Startnummer '+(ui.liveIndex+1)+'</h3><p class="empty" style="margin:4px 0 12px">Kein Song zugewiesen.</p><button class="primary" data-act="pick" data-e="'+currentEntry.id+'">＋ Song hinzufügen</button></div>';
+
+  return '<div class="live-mode-banner">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:12px;">' +
+      '<h2 style="color:#fff;margin:0;font-size:1.2rem;">🔴 LIVE MODUS</h2>' +
+      '<div style="display:flex;gap:8px;">' +
+        '<button data-act="prevLive" style="background:var(--panel2);color:#fff;font-weight:600;">◀ Vorheriger</button>' +
+        '<button data-act="nextLive" style="background:var(--panel2);color:#fff;font-weight:600;">Nächster ▶</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="live-current-card" data-act="openDetailModal" data-e="'+currentEntry.id+'">' + currentSongDisplay + '</div>' +
+    '<div style="display:flex;gap:10px;margin-top:4px;">'+juryRatingBox+'</div>' +
+  '</div>' +
+  '<h3 style="margin-bottom:8px;">Running Order (Klicke zum Umschalten)</h3>' +
+  '<div class="live-queue-grid">'+queueHtml+'</div>';
 }
 
 function initials(){
@@ -1150,7 +1273,7 @@ function showView(sh){
     var rowStyle = (s && s.cc) ? ' style="--flag-url: url(\'https://flagcdn.com/' + s.cc + '.svg\')"' : '';
     var ccBadge = (s && s.cc) ? '<div class="cc-code">'+esc(getIso3(s.cc))+'</div>' : '';
 
-    return '<div class="row '+rowClass+'"'+rowStyle+'>'+
+    return '<div class="row '+rowClass+'"'+rowStyle+' data-act="openDetailModal" data-e="'+e.id+'">'+
       ccBadge+
       '<div class="no" data-act="editNo" data-e="'+e.id+'" title="Change order/status">'+esc(displayNo)+'</div>'+
       '<div class="row-content">'+
@@ -1487,40 +1610,60 @@ function openSong(id,assign){
   }, 50);
 }
 
-function openRatingModal(eId, jurId) {
+function openDetailModal(eId){
   var e = findEntry(eId);
-  if (!e) return;
+  if(!e) return;
   var s = songById(e.songId);
-  if (!s) {
-    showAlert("Notice", "Please select a song for this slot first.");
+  var r = getRatings(e);
+  var nt = getNotes(e);
+
+  if(!s){
+    openPicker(eId);
     return;
   }
-  var r = getRatings(e);
-  var activeJur = jurId || me;
-  var mine = r[activeJur];
 
-  var row1 = "", row2 = "";
-  for(var p=1; p<=10; p++){
-    var btnHtml = '<button class="rate-modal-btn '+(mine===p?"on":"")+'" style="'+pc(p)+';width:48px;height:54px;font-family:var(--number-font);font-size:1.4rem;border-radius:10px;border:2.5px solid '+(mine===p?'#fff':'transparent')+';cursor:pointer;display:grid;place-items:center;transition:transform 0.15s ease, box-shadow 0.15s ease;" data-act="rateModal" data-e="'+eId+'" data-jur="'+activeJur+'" data-p="'+p+'">'+p+'</button>';
-    if (p <= 5) row1 += btnHtml;
-    else row2 += btnHtml;
+  var juryBoxes = "";
+  for(var j=0; j<S.jury.length; j++){
+    var jur = S.jury[j];
+    var val = r[jur.id];
+    var note = nt[jur.id] || "";
+    var isMe = (jur.id === me) || (me === "admin");
+
+    var row1="", row2="";
+    for(var p=1; p<=10; p++){
+      var bHtml = '<button class="rate-modal-btn" style="'+pc(p)+';width:36px;height:40px;font-family:var(--number-font);font-size:1.1rem;border-radius:8px;border:2px solid '+(val===p?'#fff':'transparent')+';cursor:pointer;display:grid;place-items:center;" data-act="rateModal" data-e="'+eId+'" data-jur="'+jur.id+'" data-p="'+p+'">'+p+'</button>';
+      if(p<=5) row1+=bHtml; else row2+=bHtml;
+    }
+
+    juryBoxes += '<div style="background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
+        '<b>'+esc(jur.name)+'</b>' +
+        '<span style="font-family:var(--number-font);font-size:1.3rem;color:var(--gold);">'+(val!==undefined&&val!==null?val+'/10 Pts':'–')+'</span>' +
+      '</div>' +
+      (isMe ? '<div style="display:flex;gap:4px;justify-content:center;margin-bottom:6px;">'+row1+'</div><div style="display:flex;gap:4px;justify-content:center;margin-bottom:10px;">'+row2+'</div>' : '') +
+      '<label style="margin:0;font-size:0.8rem;">Notiz:' +
+        '<input type="text" value="'+esc(note)+'" data-chg="note" data-e="'+eId+'" data-jur="'+jur.id+'" placeholder="Notiz für '+esc(jur.name)+'..." style="margin-top:2px;font-size:0.85rem;">' +
+      '</label>' +
+    '</div>';
   }
 
-  dlg.className = "";
+  dlg.className = "wide";
   dlg.innerHTML = '<div style="text-align:center;margin-bottom:16px;">' +
-    '<div style="margin-bottom:8px;transform:scale(1.4);display:inline-block;">'+flag(s.cc)+'</div>' +
-    '<h3 style="margin:4px 0 2px;font-size:1.3rem;">'+esc(s.title)+'</h3>' +
-    '<p style="color:var(--muted);margin:0;font-size:0.95rem;">'+esc(s.artist)+' ('+esc(CN[s.cc]||s.cc.toUpperCase())+')</p>' +
+    '<div style="margin-bottom:8px;transform:scale(1.5);display:inline-block;">'+flag(s.cc)+'</div>' +
+    '<h2 style="margin:6px 0 2px;">'+esc(s.title)+'</h2>' +
+    '<p style="color:var(--muted);margin:0;font-size:1.05rem;">'+esc(s.artist)+' ('+esc(CN[s.cc]||s.cc.toUpperCase())+')</p>' +
   '</div>' +
-  '<div style="text-align:center;color:var(--gold);margin-bottom:10px;font-size:0.85rem;">Rating for: <b>'+esc(jname(activeJur))+'</b></div>' +
-  '<p class="hint" style="text-align:center;margin-bottom:12px;font-size:0.85rem;">Choose your points (1–10):</p>' +
-  '<div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px;">'+row1+'</div>' +
-  '<div style="display:flex;gap:8px;justify-content:center;margin-bottom:16px;">'+row2+'</div>' +
-  '<div class="actions" style="margin-top:16px;justify-content:center;">' +
-    '<button class="ghost" data-act="closeDlg">Cancel</button>' +
+  '<div style="max-height:60vh;overflow-y:auto;padding-right:4px;">'+juryBoxes+'</div>' +
+  '<div class="actions" style="margin-top:16px;justify-content:space-between;">' +
+    '<button class="ghost danger" data-act="pick" data-e="'+eId+'">Song wechseln</button>' +
+    '<button class="primary" data-act="closeDlg">Fertig</button>' +
   '</div>';
 
-  if (!dlg.open) dlg.showModal();
+  if(!dlg.open) dlg.showModal();
+}
+
+function openRatingModal(eId, jurId) {
+  openDetailModal(eId);
 }
 
 function openPicker(entryId){ ui.assign=entryId; pickerHtml(); }
@@ -1628,9 +1771,14 @@ var A={
   selectWho:function(t){ me = t.dataset.id; localStorage.setItem(MEKEY, me); localStorage.setItem("esc-joined", "true"); dlg.close(); ui.enter=true; render(); return "keep"; },
   openWelcomeModal:function(){ openWelcomeModal(); return "keep"; },
   toggleEditMode:function(){ ui.editMode = !ui.editMode; ui.enter=true; },
+  toggleLiveMode:function(){ ui.liveMode = !ui.liveMode; ui.enter=true; },
+  setLiveIndex:function(t){ ui.liveIndex = parseInt(t.dataset.idx)||0; ui.enter=true; },
+  nextLive:function(){ var y=yearObj(ui.yearId), l=y.shows[ui.tab]||[]; if(l.length){ ui.liveIndex=(ui.liveIndex+1)%l.length; ui.enter=true; } },
+  prevLive:function(){ var y=yearObj(ui.yearId), l=y.shows[ui.tab]||[]; if(l.length){ ui.liveIndex=(ui.liveIndex-1+l.length)%l.length; ui.enter=true; } },
   subTab:function(t){ ui.subTab = t.dataset.val; ui.enter=true; }, 
   sortMode:function(t){ ui.sortMode = t.dataset.val; ui.enter=true; },
   ovSubTab:function(t){ ui.ovSubTab = t.dataset.val; ui.enter=true; },
+  openDetailModal:function(t){ openDetailModal(t.dataset.e); return "keep"; },
   
   toggleQual:function(t){
     var eId = t.dataset.e, jurId = t.dataset.jur;
@@ -1644,10 +1792,11 @@ var A={
     save(); return "render";
   },
   
-  home:function(){ui.yearId=null;ui.view="home";ui.enter=true;},
+  home:function(){ui.yearId=null;ui.view="home";ui.liveMode=false;ui.enter=true;},
   openYear:function(t){
     ui.yearId=t.dataset.id;
     ui.view="year";
+    ui.liveMode=false;
     var y=yearObj(ui.yearId);
     ui.tab = (y && y.shows.sf1) ? "sf1" : (y && y.shows.sf2 ? "sf2" : (y && y.shows.final ? "final" : "overview"));
     ui.subTab="points";ui.sortMode="order";ui.ovSubTab="semis";ui.editMode=false;ui.enter=true;
@@ -1679,7 +1828,7 @@ var A={
     else S.ratings[key][jurId] = p;
     
     save();
-    dlg.close();
+    openDetailModal(id);
     return "keep";
   },
   sbShow:function(t){ui.sbShow=t.dataset.show;},
@@ -1782,7 +1931,7 @@ var A={
   pick:function(t){openPicker(t.dataset.e);return "keep";},
   choose:function(t){
     var e=findEntry(ui.assign), id=t.dataset.id;
-    e.songId=id; save(); dlg.close(); return "keep";
+    e.songId=id; save(); dlg.close(); openDetailModal(e.id); return "keep";
   },
   delSong:function(t){
     var id=t.dataset.id;
@@ -1799,9 +1948,20 @@ var A={
     else {
       var id="s"+Date.now().toString(36);
       S.songs.push({id:id,cc:cc,artist:artist,title:title,year:songYear});
-      if(ui.assign){ var e=findEntry(ui.assign); if(e) e.songId=id; }
+      if(ui.assign){ 
+        var e=findEntry(ui.assign); 
+        if(e) e.songId=id; 
+      }
     }
-    save(); if(ui.assign) dlg.close(); else render(); return "keep";
+    save(); 
+    if(ui.assign){ 
+      var assignedId = ui.assign;
+      dlg.close(); 
+      openDetailModal(assignedId); 
+    } else { 
+      render(); 
+    } 
+    return "keep";
   },
   editCity:function(){
     var y=yearObj(ui.yearId);
@@ -1886,7 +2046,6 @@ function setupCountrySearch(inputId, resultsId, hiddenInputId, onSelectCallback)
   });
 
   resultsBox.addEventListener("mousedown", function(ev){
-    // mousedown nutzen, damit das Schließen zuverlässig vor dem Blur greift
     var item = ev.target.closest(".search-dropdown-item");
     if(!item || !item.dataset.cc) return;
     var cc = item.dataset.cc;
@@ -1898,7 +2057,6 @@ function setupCountrySearch(inputId, resultsId, hiddenInputId, onSelectCallback)
   });
 
   input.addEventListener("blur", function(){
-    // Kurzer Timeout, damit Klicks auf die Liste noch registriert werden können
     setTimeout(function(){
       resultsBox.classList.remove("active");
     }, 200);
@@ -1922,12 +2080,21 @@ document.addEventListener("input",function(ev){
       render();
     }
   }
+  if(ev.target.dataset.chg === "note"){
+    var eId = ev.target.dataset.e, jurId = ev.target.dataset.jur, val = ev.target.value;
+    var e = findEntry(eId);
+    var key = (e && e.songId) ? e.songId : eId;
+    S.notes[key] = S.notes[key] || {};
+    if(val.trim()) S.notes[key][jurId] = val;
+    else delete S.notes[key][jurId];
+    save();
+  }
 });
 
 document.addEventListener("change",function(ev){
   if(ev.target.id === "lib_year_select"){ ui.libYear = ev.target.value; render(); }
   var t=ev.target.closest("[data-chg]"); if(!t) return;
-  if(t.dataset.chg === "splitAfter") return;
+  if(t.dataset.chg === "splitAfter" || t.dataset.chg === "note") return;
   if(C[t.dataset.chg](t)!=="keep") render();
 });
 
