@@ -480,7 +480,7 @@ dialog input,dialog select{width:100%}
 }
 .row.autofinal-row{border-color:#9d4edd}
 
-/* Live Mode Styles - Dunkler und dezent */
+/* Live Mode Styles */
 .live-mode-banner {
   background: var(--panel);
   border-radius: 16px;
@@ -599,18 +599,18 @@ var esc=function(s){return String(s ? s : "").replace(/[&<>"']/g,function(c){ret
 function fresh(){
   var jList = [];
   for(var i=1; i<=4; i++){ jList.push({id:"j"+i, name:"Player "+i}); }
-  return {jury:jList, songs:[], years:[], ratings:{}, pred:{}, notes:{}, qualPred:{}};
+  return {jury:jList, songs:[], years:[], ratings:{}, pred:{}, notes:{}, qualPred:{}, liveState:{}};
 }
 function load(){
   try{
     var d=JSON.parse(localStorage.getItem(KEY));
-    if(d && d.jury){ d.notes = d.notes || {}; d.qualPred = d.qualPred || {}; return d; }
+    if(d && d.jury){ d.notes = d.notes || {}; d.qualPred = d.qualPred || {}; d.liveState = d.liveState || {}; return d; }
   }catch(e){}
   return fresh();
 }
 var S=load();
 var me=localStorage.getItem(MEKEY)||"j1";
-var ui={big:null,q:"",view:"home",yearId:null,tab:"sf1",subTab:"points",sortMode:"order",ovSubTab:"semis",sbShow:"final",editMode:false,assign:null,editSong:null,libYear:"",libSort:"name",compareCc:null,enter:false,liveMode:false,liveIndex:0};
+var ui={big:null,q:"",view:"home",yearId:null,tab:"sf1",subTab:"points",sortMode:"order",ovSubTab:"semis",sbShow:"final",editMode:false,assign:null,editSong:null,libYear:"",libSort:"name",compareCc:null,enter:false};
 
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){showAlert("Error", "Could not save in this browser.");}push();}
 
@@ -673,7 +673,7 @@ function sortShowsList(list){
 }
 
 function toTree(){
-  var t={jury:{},songs:{},years:{},ratings:S.ratings,notes:S.notes,pred:S.pred,qualPred:S.qualPred};
+  var t={jury:{},songs:{},years:{},ratings:S.ratings,notes:S.notes,pred:S.pred,qualPred:S.qualPred,liveState:S.liveState};
   for(var i=0; i<S.jury.length; i++){ t.jury[S.jury[i].id] = {name:S.jury[i].name}; }
   for(var i=0; i<S.songs.length; i++){ var x = S.songs[i]; t.songs[x.id] = {cc:x.cc, artist:x.artist, title:x.title, year:x.year}; }
   for(var i=0; i<S.years.length; i++){
@@ -729,7 +729,7 @@ function fromTree(t){
     }
   }
   r.years.sort(function(a,b){return b.year-a.year||b.id.localeCompare(a.id);});
-  r.ratings=t.ratings||{}; r.notes=t.notes||{}; r.pred=t.pred||{}; r.qualPred=t.qualPred||{};
+  r.ratings=t.ratings||{}; r.notes=t.notes||{}; r.pred=t.pred||{}; r.qualPred=t.qualPred||{}; r.liveState=t.liveState||{};
   return r;
 }
 
@@ -799,6 +799,18 @@ var pc=function(p){
 };
 var idx=function(id){return +String(id).split("-").pop();};
 
+function isLiveActive(){
+  if(!ui.yearId) return false;
+  var st = S.liveState[ui.yearId];
+  return st && st.active === true;
+}
+
+function getLiveIndex(){
+  if(!ui.yearId) return 0;
+  var st = S.liveState[ui.yearId];
+  return (st && st.index !== undefined) ? st.index : 0;
+}
+
 function render(){
   var sy=window.scrollY;
   if(ui.enter) {
@@ -863,8 +875,9 @@ function yearView(){
     ui.tab = y.shows.sf1 ? "sf1" : (y.shows.sf2 ? "sf2" : (y.shows.final ? "final" : "overview"));
   }
 
+  var liveActive = isLiveActive();
   var body = "";
-  if(ui.liveMode){
+  if(liveActive){
     body = liveModeView(ui.tab);
   } else {
     if(y.shows[ui.tab]) body=showView(ui.tab);
@@ -886,7 +899,7 @@ function yearView(){
   var hasSf2 = !!y.shows.sf2;
   var hasFinal = !!y.shows.final;
 
-  var liveBtnStyle = ui.liveMode ? 'background:#ff2d95;color:#fff;border-color:#ff2d95;font-weight:700;' : 'background:var(--panel2);color:var(--gold);border-color:var(--gold);font-weight:700;';
+  var liveBtnStyle = liveActive ? 'background:#ff2d95;color:#fff;border-color:#ff2d95;font-weight:700;' : 'background:var(--panel2);color:var(--gold);border-color:var(--gold);font-weight:700;';
 
   return '<div style="padding-top:14px"><button class="ghost" data-act="home">← All Contests</button>'+
     '<button class="ghost danger" data-act="delYear" style="float:right">Delete Contest</button><button class="ghost" data-act="editCity" style="float:right;margin-right:8px">'+(y.city?"Edit":"Add")+' Host City</button></div>'+
@@ -894,9 +907,9 @@ function yearView(){
     '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:12px">'+
       '<div class="tabs" style="margin:0;border:none;padding:0">'+tabHtml+'</div>'+
       '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
-        '<button data-act="toggleLiveMode" style="'+liveBtnStyle+'">🔴 '+(ui.liveMode?'Live-Modus beenden':'Live Mode')+'</button>'+
-        (!ui.liveMode ? '<button class="ghost '+(ui.editMode?'primary':'')+'" data-act="toggleEditMode">✏️ Edit</button>' : '')+
-        (!ui.liveMode && ui.editMode ? 
+        '<button data-act="toggleLiveMode" style="'+liveBtnStyle+'">🔴 '+(liveActive?'Live-Modus beenden':'Live Mode')+'</button>'+
+        (!liveActive ? '<button class="ghost '+(ui.editMode?'primary':'')+'" data-act="toggleEditMode">✏️ Edit</button>' : '')+
+        (!liveActive && ui.editMode ? 
           (hasSf1 ? '<button class="ghost sm danger" data-act="removeShow" data-show="sf1">− SF1</button>' : '<button class="ghost sm" data-act="addShow" data-show="sf1">＋ SF1</button>') +
           (hasSf2 ? '<button class="ghost sm danger" data-act="removeShow" data-show="sf2">− SF2</button>' : '<button class="ghost sm" data-act="addShow" data-show="sf2">＋ SF2</button>') +
           (hasFinal ? '<button class="ghost sm danger" data-act="removeShow" data-show="final">− Final</button>' : '<button class="ghost sm" data-act="addShow" data-show="final">＋ Final</button>')
@@ -910,8 +923,9 @@ function liveModeView(sh){
   var list = y.shows[sh] || [];
   if(list.length === 0) return '<p class="empty">Keine Songs in dieser Show vorhanden.</p>';
 
-  if(ui.liveIndex >= list.length) ui.liveIndex = 0;
-  var currentEntry = list[ui.liveIndex];
+  var liveIdx = getLiveIndex();
+  if(liveIdx >= list.length) liveIdx = 0;
+  var currentEntry = list[liveIdx];
   var s = songById(currentEntry.songId);
   var r = getRatings(currentEntry);
   var nt = getNotes(currentEntry);
@@ -919,7 +933,7 @@ function liveModeView(sh){
   var queueHtml = '';
   for(var i=0; i<list.length; i++){
     var item = list[i], songItem = songById(item.songId);
-    var isSel = (i === ui.liveIndex);
+    var isSel = (i === liveIdx);
     var labelTitle = songItem ? songItem.title : ('Start ' + (i+1));
     queueHtml += '<div class="live-queue-item'+(isSel?' active':'')+'" data-act="setLiveIndex" data-idx="'+i+'">' +
       '<div style="font-size:0.75rem;color:var(--muted)">Nr. '+(i+1)+'</div>' +
@@ -941,17 +955,17 @@ function liveModeView(sh){
     '<div style="display:flex;align-items:center;gap:20px;width:100%;">' +
       '<div style="transform:scale(2.2);margin:0 16px;">'+flag(s.cc)+'</div>' +
       '<div style="flex:1;">' +
-        '<div style="font-size:0.85rem;color:var(--gold);font-weight:700;margin-bottom:2px;">AKTUELL AUF DER BÜHNE · Startnummer '+(ui.liveIndex+1)+'</div>' +
+        '<div style="font-size:0.85rem;color:var(--gold);font-weight:700;margin-bottom:2px;">AKTUELL AUF DER BÜHNE · Startnummer '+(liveIdx+1)+'</div>' +
         '<h2 style="font-size:2.4rem;margin:0 0 4px;">'+esc(s.title)+'</h2>' +
         '<p style="font-size:1.3rem;color:var(--muted);margin:0;">'+esc(s.artist)+' ('+esc(CN[s.cc]||s.cc.toUpperCase())+')</p>' +
       '</div>' +
       '<div style="font-size:0.9rem;color:var(--muted);text-align:right;">Klicken zum Bewerten ✏️</div>' +
     '</div>'
-    : '<div style="flex:1;text-align:center;padding:12px;"><h3>Startnummer '+(ui.liveIndex+1)+'</h3><p class="empty" style="margin:4px 0 12px">Kein Song zugewiesen.</p><button class="primary" data-act="pick" data-e="'+currentEntry.id+'">＋ Song hinzufügen</button></div>';
+    : '<div style="flex:1;text-align:center;padding:12px;"><h3>Startnummer '+(liveIdx+1)+'</h3><p class="empty" style="margin:4px 0 12px">Kein Song zugewiesen.</p><button class="primary" data-act="pick" data-e="'+currentEntry.id+'">＋ Song hinzufügen</button></div>';
 
   return '<div class="live-mode-banner">' +
     '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:12px;">' +
-      '<h2 style="color:#fff;margin:0;font-size:1.2rem;">🔴 LIVE MODUS</h2>' +
+      '<h2 style="color:#fff;margin:0;font-size:1.2rem;">🔴 LIVE MODUS (Synchronisiert)</h2>' +
       '<div style="display:flex;gap:8px;">' +
         '<button data-act="prevLive" style="background:var(--panel2);color:#fff;font-weight:600;">◀ Vorheriger</button>' +
         '<button data-act="nextLive" style="background:var(--panel2);color:#fff;font-weight:600;">Nächster ▶</button>' +
@@ -1737,7 +1751,7 @@ function openSettings(){
         S.years=Object.values(yearMap);
         S.years.sort(function(a,b){return b.year-a.year||b.id.localeCompare(a.id);});
 
-        ['ratings','notes','pred','qualPred'].forEach(function(key){
+        ['ratings','notes','pred','qualPred','liveState'].forEach(function(key){
           S[key]=S[key]||{};
           if(imported[key]){
             for(var id in imported[key]){
@@ -1771,10 +1785,47 @@ var A={
   selectWho:function(t){ me = t.dataset.id; localStorage.setItem(MEKEY, me); localStorage.setItem("esc-joined", "true"); dlg.close(); ui.enter=true; render(); return "keep"; },
   openWelcomeModal:function(){ openWelcomeModal(); return "keep"; },
   toggleEditMode:function(){ ui.editMode = !ui.editMode; ui.enter=true; },
-  toggleLiveMode:function(){ ui.liveMode = !ui.liveMode; ui.enter=true; },
-  setLiveIndex:function(t){ ui.liveIndex = parseInt(t.dataset.idx)||0; ui.enter=true; },
-  nextLive:function(){ var y=yearObj(ui.yearId), l=y.shows[ui.tab]||[]; if(l.length){ ui.liveIndex=(ui.liveIndex+1)%l.length; ui.enter=true; } },
-  prevLive:function(){ var y=yearObj(ui.yearId), l=y.shows[ui.tab]||[]; if(l.length){ ui.liveIndex=(ui.liveIndex-1+l.length)%l.length; ui.enter=true; } },
+  
+  toggleLiveMode:function(){
+    if(!ui.yearId) return;
+    S.liveState[ui.yearId] = S.liveState[ui.yearId] || {active: false, index: 0};
+    S.liveState[ui.yearId].active = !S.liveState[ui.yearId].active;
+    save();
+    ui.enter=true;
+  },
+  setLiveIndex:function(t){
+    if(!ui.yearId) return;
+    var idxVal = parseInt(t.dataset.idx)||0;
+    S.liveState[ui.yearId] = S.liveState[ui.yearId] || {active: true, index: 0};
+    S.liveState[ui.yearId].index = idxVal;
+    save();
+    ui.enter=true;
+  },
+  nextLive:function(){
+    if(!ui.yearId) return;
+    var y=yearObj(ui.yearId), l=y.shows[ui.tab]||[];
+    if(l.length){
+      var cur = getLiveIndex();
+      var nextIdx = (cur + 1) % l.length;
+      S.liveState[ui.yearId] = S.liveState[ui.yearId] || {active: true, index: 0};
+      S.liveState[ui.yearId].index = nextIdx;
+      save();
+      ui.enter=true;
+    }
+  },
+  prevLive:function(){
+    if(!ui.yearId) return;
+    var y=yearObj(ui.yearId), l=y.shows[ui.tab]||[];
+    if(l.length){
+      var cur = getLiveIndex();
+      var prevIdx = (cur - 1 + l.length) % l.length;
+      S.liveState[ui.yearId] = S.liveState[ui.yearId] || {active: true, index: 0};
+      S.liveState[ui.yearId].index = prevIdx;
+      save();
+      ui.enter=true;
+    }
+  },
+
   subTab:function(t){ ui.subTab = t.dataset.val; ui.enter=true; }, 
   sortMode:function(t){ ui.sortMode = t.dataset.val; ui.enter=true; },
   ovSubTab:function(t){ ui.ovSubTab = t.dataset.val; ui.enter=true; },
@@ -1792,11 +1843,10 @@ var A={
     save(); return "render";
   },
   
-  home:function(){ui.yearId=null;ui.view="home";ui.liveMode=false;ui.enter=true;},
+  home:function(){ui.yearId=null;ui.view="home";ui.enter=true;},
   openYear:function(t){
     ui.yearId=t.dataset.id;
     ui.view="year";
-    ui.liveMode=false;
     var y=yearObj(ui.yearId);
     ui.tab = (y && y.shows.sf1) ? "sf1" : (y && y.shows.sf2 ? "sf2" : (y && y.shows.final ? "final" : "overview"));
     ui.subTab="points";ui.sortMode="order";ui.ovSubTab="semis";ui.editMode=false;ui.enter=true;
@@ -1988,6 +2038,7 @@ var A={
       if(imported.notes) S.notes = imported.notes;
       if(imported.pred) S.pred = imported.pred;
       if(imported.qualPred) S.qualPred = imported.qualPred;
+      if(imported.liveState) S.liveState = imported.liveState;
 
       save();
       dlg.close();
