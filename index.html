@@ -272,7 +272,7 @@ h3{font-family:var(--display);margin:0 0 12px}
   flex-direction:column;
   align-items:center;
   justify-content:space-between;
-  border:2px solid transparent;
+  border:2.5px solid transparent;
   padding:0;
   line-height:1;
   font-family:inherit;
@@ -460,7 +460,7 @@ dialog input,dialog select{width:100%}
 var COUNTRIES=[
   ["af","Afghanistan"],["al","Albania"],["am","Armenia"],["au","Australia"],["at","Austria"],["az","Azerbaijan"],
   ["bh","Bahrain"],["bd","Bangladesh"],["by","Belarus"],["be","Belgium"],["bt","Bhutan"],["ba","Bosnia and Herzegovina"],
-  ["bn","Brunei"],["bg","Bulgaria"],["kh","Cambodia"],["cn","China"],["hr","Croatia"],["cy","Cyprus"],["cz","Czechia"],
+  ["bn","Brunei"],["bg","Bulgaria"],["kh","Cambodia"],["ca","Canada"],["cn","China"],["hr","Croatia"],["cy","Cyprus"],["cz","Czechia"],
   ["dk","Denmark"],["ee","Estonia"],["fi","Finland"],["fr","France"],["ge","Georgia"],["de","Germany"],["gr","Greece"],
   ["hk","Hong Kong"],["hu","Hungary"],["is","Iceland"],["in","India"],["id","Indonesia"],["ir","Iran"],["iq","Iraq"],
   ["ie","Ireland"],["il","Israel"],["it","Italy"],["jp","Japan"],["jo","Jordan"],["kz","Kazakhstan"],["kw","Kuwait"],
@@ -481,7 +481,7 @@ for(var i=0; i<COUNTRIES.length; i++){ CN[COUNTRIES[i][0]] = COUNTRIES[i][1]; }
 var ISO3={
   af:"AFG", al:"ALB", am:"ARM", au:"AUS", at:"AUT", az:"AZE",
   bh:"BHR", bd:"BGD", by:"BLR", be:"BEL", bt:"BTN", ba:"BIH",
-  bn:"BRN", bg:"BGR", kh:"KHM", cn:"CHN", hr:"CRO", cy:"CYP", cz:"CZE",
+  bn:"BRN", bg:"BGR", kh:"KHM", ca:"CAN", cn:"CHN", hr:"CRO", cy:"CYP", cz:"CZE",
   dk:"DNK", ee:"EST", fi:"FIN", fr:"FRA", ge:"GEO", de:"GER", gr:"GRE",
   hk:"HKG", hu:"HUN", is:"ISL", in:"IND", id:"IDN", ir:"IRN", iq:"IRQ",
   ie:"IRL", il:"ISR", it:"ITA", jp:"JPN", jo:"JOR", kz:"KAZ", kw:"KWT",
@@ -789,10 +789,24 @@ function yearView(){
   tabHtml += '<button class="'+(ui.tab==="battle"?"on":"")+'" data-act="tab" data-tab="battle">Points Battle</button>';
   tabHtml += '<button class="'+(ui.tab==="sb"?"on":"")+'" data-act="tab" data-tab="sb">Scoreboard</button>';
 
+  var hasSf1 = !!y.shows.sf1;
+  var hasSf2 = !!y.shows.sf2;
+  var hasFinal = !!y.shows.final;
+
   return '<div style="padding-top:14px"><button class="ghost" data-act="home">← All Contests</button>'+
     '<button class="ghost danger" data-act="delYear" style="float:right">Delete Contest</button><button class="ghost" data-act="editCity" style="float:right;margin-right:8px">'+(y.city?"Edit":"Add")+' Host City</button></div>'+
     '<h1 class="yeartitle">Eurovision '+esc(titleLabel)+'</h1>'+(y.city?'<p class="hint" style="margin:-6px 0 14px">'+esc(y.city)+'</p>':"")+
-    '<div class="tabs">'+tabHtml+'</div>'+body;
+    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:12px">'+
+      '<div class="tabs" style="margin:0;border:none;padding:0">'+tabHtml+'</div>'+
+      '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
+        '<button class="ghost '+(ui.editMode?'primary':'')+'" data-act="toggleEditMode">✏️ Edit</button>'+
+        (ui.editMode ? 
+          (hasSf1 ? '<button class="ghost sm danger" data-act="removeShow" data-show="sf1">− SF1 entfernen</button>' : '<button class="ghost sm" data-act="addShow" data-show="sf1">＋ SF1 hinzufügen</button>') +
+          (hasSf2 ? '<button class="ghost sm danger" data-act="removeShow" data-show="sf2">− SF2 entfernen</button>' : '<button class="ghost sm" data-act="addShow" data-show="sf2">＋ SF2 hinzufügen</button>') +
+          (hasFinal ? '<button class="ghost sm danger" data-act="removeShow" data-show="final">− Final entfernen</button>' : '<button class="ghost sm" data-act="addShow" data-show="final">＋ Final hinzufügen</button>')
+        : '')+
+      '</div>'+
+    '</div>'+body;
 }
 
 function initials(){
@@ -980,27 +994,13 @@ function showView(sh){
     splitControl = '<div style="display:flex;align-items:center;gap:6px;font-size:0.85rem;color:var(--muted);background:var(--panel2);padding:4px 10px;border-radius:10px;border:1px solid var(--line)"><span>1st Half up to no.:</span><input type="number" min="1" max="'+(list.length-1)+'" value="'+currentSplit+'" data-chg="splitAfter" data-show="'+sh+'" style="width:56px;height:32px;text-align:center;font-weight:700"></div>';
   }
 
-  var showMgmtBtns = "";
-  if (ui.editMode) {
-    var hasSf1 = !!y.shows.sf1;
-    var hasSf2 = !!y.shows.sf2;
-    var hasFinal = !!y.shows.final;
-    showMgmtBtns = '<div style="display:flex;gap:6px;align-items:center;margin-top:8px;width:100%;flex-wrap:wrap">' +
-      (hasSf1 ? '<button class="ghost sm danger" data-act="removeShow" data-show="sf1">− SF1 entfernen</button>' : '<button class="ghost sm" data-act="addShow" data-show="sf1">＋ SF1 hinzufügen</button>') +
-      (hasSf2 ? '<button class="ghost sm danger" data-act="removeShow" data-show="sf2">− SF2 entfernen</button>' : '<button class="ghost sm" data-act="addShow" data-show="sf2">＋ SF2 hinzufügen</button>') +
-      (hasFinal ? '<button class="ghost sm danger" data-act="removeShow" data-show="final">− Final entfernen</button>' : '<button class="ghost sm" data-act="addShow" data-show="final">＋ Final hinzufügen</button>') +
-    '</div>';
-  }
-
   var topBtnBar = '<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px;flex-wrap:wrap;gap:12px">'+
     titleWithBubbles+
     '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'+
       splitControl+
       topControls+
       sortToggleBtn+
-      '<button class="ghost '+(ui.editMode?'primary':'')+'" data-act="toggleEditMode">✏️ Edit</button>'+
     '</div>'+
-    showMgmtBtns+
   '</div>';
 
   var leftList = [], rightList = [];
@@ -1664,7 +1664,9 @@ var A={
   },
   delSlot:function(t){
     var y=yearObj(ui.yearId), l=y.shows[t.dataset.show];
-    if(l.length<=1)return; l.pop(); save();
+    if(l.length <= 0) return; 
+    l.pop(); 
+    save();
   },
   editNo:function(t){ openEditNo(t.dataset.e); return "keep"; },
   saveCustomNo:function(t){
