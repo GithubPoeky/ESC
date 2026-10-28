@@ -48,11 +48,11 @@ body::before {
   100% { transform: translateY(20px) scale(0.97); filter: hue-rotate(-10deg); }
 }
 
-#app { transition: opacity 0.3s ease; }
-#app.enter { animation: popIn 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-@keyframes popIn {
-  0% { opacity: 0; transform: translateY(10px) scale(0.99); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
+#app { transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+#app.enter { animation: yearEnterAnim 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+@keyframes yearEnterAnim {
+  0% { opacity: 0; transform: translateY(24px) scale(0.96); filter: blur(4px); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 }
 
 .wrap{max-width:1600px;margin:0 auto;padding:0 16px 80px}
@@ -91,7 +91,7 @@ button.sm { padding: 4px 12px; font-size: 0.85rem; }
 button:disabled{opacity:.35;cursor:not-allowed;transform:none!important;box-shadow:none!important}
 
 .hero{
-  font-family:var(--display);font-weight:800;font-size:clamp(2.5rem,7vm,5rem);line-height:1.2;margin:48px 0 24px;letter-spacing:-.02em;
+  font-family:var(--display);font-weight:800;font-size:clamp(2.5rem,7vw,5rem);line-height:1.2;margin:48px 0 24px;letter-spacing:-.02em;
   text-align:center;
   background:linear-gradient(135deg, #ff2d95 0%, #ffd166 50%, #7b2cbf 100%);
   -webkit-background-clip:text;
@@ -165,8 +165,8 @@ h3{font-family:var(--display);margin:0 0 12px}
 .no:hover{border-color:var(--gold);color:var(--gold);background:rgba(26, 11, 53, 0.75)}
 
 .row-content{ display:flex; flex-direction:column; gap:6px; min-width:0; align-items:flex-end; text-align:right; }
-.meta{ display:flex; align-items:center; justify-content:flex-end; gap:8px; font-size:0.95rem; flex-wrap:wrap; min-width:0; text-shadow: 0 1px 3px rgba(0,0,0,0.95), 0 0 6px rgba(0,0,0,0.8); font-family: var(--display); }
-.meta b{font-size:1.05rem; font-weight: 800; letter-spacing: -0.01em;}
+.meta{ display:flex; align-items:center; justify-content:flex-end; gap:8px; font-size:1.05rem; flex-wrap:wrap; min-width:0; text-shadow: 0 1px 3px rgba(0,0,0,0.95), 0 0 6px rgba(0,0,0,0.8); font-family: var(--display); }
+.meta b{font-size:1.2rem; font-weight: 800; letter-spacing: -0.01em;}
 .flag{width:22px;height:15px;object-fit:cover;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.25);vertical-align:middle;transform:scale(1.2);display:inline-block;margin:0 2px}
 
 .stats{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
@@ -286,7 +286,7 @@ dialog input,dialog select{width:100%}
 <div class="wrap">
   <div id="app"></div>
 </div>
-<button class="fab" data-act="openNewYearDlg" title="Add new contest">＋</button>
+<div id="fab_container"></div>
 <dialog id="dlg"></dialog>
 
 <script>
@@ -331,13 +331,13 @@ var esc=function(s){return String(s ? s : "").replace(/[&<>"']/g,function(c){ret
 function fresh(){
   return {
     jury:[{id:"j1", name:"Livin"}, {id:"j2", name:"Tabi"}, {id:"j3", name:"Poki"}, {id:"j4", name:"Kiri"}],
-    songs:[], years:[], ratings:{}, pred:{}, qualPred:{}, liveState:{}, presence:{}
+    songs:[], years:[], ratings:{}, pred:{}, qualPred:{}, liveState:{}
   };
 }
 function load(){
   try{
     var d=JSON.parse(localStorage.getItem(KEY));
-    if(d && d.jury){ d.qualPred=d.qualPred||{}; d.liveState=d.liveState||{}; d.presence=d.presence||{}; return d; }
+    if(d && d.jury){ d.qualPred=d.qualPred||{}; d.liveState=d.liveState||{}; return d; }
   }catch(e){}
   return fresh();
 }
@@ -376,7 +376,7 @@ function sortShowsList(list){
 }
 
 function toTree(){
-  var t={jury:{},songs:{},years:{},ratings:S.ratings,pred:S.pred,qualPred:S.qualPred,liveState:S.liveState,presence:S.presence||{}};
+  var t={jury:{},songs:{},years:{},ratings:S.ratings,pred:S.pred,qualPred:S.qualPred,liveState:S.liveState};
   for(var i=0; i<S.jury.length; i++){ t.jury[S.jury[i].id] = {name:S.jury[i].name}; }
   for(var i=0; i<S.songs.length; i++){ var x = S.songs[i]; t.songs[x.id] = {cc:x.cc, artist:x.artist, title:x.title, year:x.year}; }
   for(var i=0; i<S.years.length; i++){
@@ -429,7 +429,7 @@ function fromTree(t){
     }
   }
   r.years.sort(function(a,b){return b.year-a.year||b.id.localeCompare(a.id);});
-  r.ratings=t.ratings||{}; r.pred=t.pred||{}; r.qualPred=t.qualPred||{}; r.liveState=t.liveState||{}; r.presence=t.presence||{};
+  r.ratings=t.ratings||{}; r.pred=t.pred||{}; r.qualPred=t.qualPred||{}; r.liveState=t.liveState||{};
   return r;
 }
 
@@ -507,6 +507,15 @@ function render(){
   else if(ui.yearId) mainHtml = yearView();
 
   $("#app").innerHTML = header() + mainHtml;
+  
+  // Show FAB only in main menu (view === "home" and no yearId)
+  var fabContainer = $("#fab_container");
+  if(ui.view === "home" && !ui.yearId){
+    fabContainer.innerHTML = '<button class="fab" data-act="openNewYearDlg" title="Add new contest">＋</button>';
+  } else {
+    fabContainer.innerHTML = '';
+  }
+
   window.scrollTo(0,sy);
 }
 
@@ -1127,14 +1136,13 @@ function openWelcomeModal(){
   var btns = "";
   for(var i=0; i<S.jury.length; i++){
     var isCurrent = (S.jury[i].id === me);
-    var disabledAttr = isCurrent ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : '';
-    btns += '<button class="primary preset-btn" data-act="selectWho" data-id="'+S.jury[i].id+'" '+disabledAttr+'>'+esc(S.jury[i].name)+(isCurrent?' (Du)':'')+'</button>';
+    btns += '<button class="primary preset-btn" data-act="selectWho" data-id="'+S.jury[i].id+'">'+esc(S.jury[i].name)+(isCurrent?' (Aktuell)':'')+'</button>';
   }
   var isAdminCurrent = (me === "admin");
-  btns += '<button class="preset-btn" data-act="selectWho" data-id="admin" '+(isAdminCurrent?'disabled style="opacity:0.4; cursor:not-allowed;"':'')+' style="border-color:var(--gold);color:var(--gold)">👑 Admin'+(isAdminCurrent?' (Du)':'')+'</button>';
+  btns += '<button class="preset-btn" data-act="selectWho" data-id="admin" style="border-color:var(--gold);color:var(--gold)">👑 Admin'+(isAdminCurrent?' (Aktuell)':'')+'</button>';
   
   dlg.className="";
-  dlg.innerHTML='<h2>Select Profile 👋</h2><p class="hint">Wer bist du?</p><div style="display:grid;grid-template-columns:1fr;gap:10px;margin:16px 0">'+btns+'</div>';
+  dlg.innerHTML='<h2>Select Profile 👋</h2><p class="hint">Wer bist du?</p><div style="display:grid;grid-template-columns:1fr;gap:10px;margin:16px 0">'+btns+'</div><div class="actions" style="justify-content:center;margin-top:12px;"><button class="ghost" data-act="closeDlg">Abbrechen</button></div>';
   if(!dlg.open) dlg.showModal();
 }
 
