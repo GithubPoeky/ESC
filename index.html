@@ -25,7 +25,6 @@ body{
   position: relative;
 }
 
-/* Animierter Hintergrund-Effekt */
 body::before {
   content: "";
   position: fixed;
@@ -61,7 +60,6 @@ input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 input[type=number] { -moz-appearance: textfield; }
 
-/* Custom Checkbox Design */
 input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
@@ -300,7 +298,6 @@ h3{font-family:var(--display);margin:0 0 12px}
 .tile.empty{background:var(--panel2);color:var(--muted)}
 .tile.me{border-color:#fff}
 
-/* Hover reveal ONLY for your own unvoted NQ tip tile */
 .tile.tip-hidden {
   opacity: 0;
   pointer-events: none;
@@ -313,7 +310,6 @@ h3{font-family:var(--display);margin:0 0 12px}
   transform: scale(1);
 }
 
-/* Other jurors' unvoted tiles remain permanently invisible */
 .tile.tip-permanently-hidden {
   opacity: 0;
   pointer-events: none;
@@ -396,6 +392,43 @@ dialog input,dialog select{width:100%}
 #plist{max-height:55vh;overflow:auto;margin:10px 0}
 .net{font-size:.8rem}
 
+/* Such-Dropdown Styles */
+.search-dropdown-container {
+  position: relative;
+  width: 100%;
+}
+.search-dropdown-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 160px;
+  overflow-y: auto;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  z-index: 9999;
+  margin-top: 4px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+  display: none;
+}
+.search-dropdown-results.active {
+  display: block;
+}
+.search-dropdown-item {
+  padding: 7px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.15s ease;
+}
+.search-dropdown-item:hover {
+  background: rgba(255,45,149,0.25);
+  color: var(--gold);
+}
+
 .ov-grid-side{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:24px;margin-top:16px}
 @media(max-width:1200px){.ov-grid-side{grid-template-columns:1fr}}
 .ov-column{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
@@ -413,7 +446,6 @@ dialog input,dialog select{width:100%}
 .ov-pill .flag{width:22px;height:15px;object-fit:cover;border-radius:2px;flex-shrink:0;}
 .ov-place{width:36px;text-align:center;font-weight:800;color:var(--gold);font-size:0.9rem}
 
-/* Winner & Knocked Out (Eliminated) Animations */
 @keyframes goldGlow {
   0% { box-shadow: 0 0 10px rgba(255, 209, 102, 0.4); border-color: var(--gold); }
   50% { box-shadow: 0 0 22px rgba(255, 209, 102, 0.8); border-color: #fff6cc; }
@@ -1168,7 +1200,6 @@ function battle(){
   var fin = [];
   for(var i=0; i<allFin.length; i++){if(songById(allFin[i].songId) && !allFin[i].dq) fin.push(allFin[i]);}
 
-  // Sort by actual place (Place 1 at top, down to last place)
   fin.sort(function(a, b) {
     var pa = (a.place !== undefined && a.place !== null) ? a.place : 9999;
     var pb = (b.place !== undefined && b.place !== null) ? b.place : 9999;
@@ -1303,37 +1334,37 @@ function scoreboard(){
 }
 
 function compareView(){
-  ui.compareCc = ui.compareCc || COUNTRIES[0][0];
-  var ccOpts = "";
-  for(var i=0; i<COUNTRIES.length; i++){ ccOpts += '<option value="'+COUNTRIES[i][0]+'" '+(COUNTRIES[i][0]===ui.compareCc?"selected":"")+'>'+COUNTRIES[i][1]+'</option>'; }
+  var currentCountryName = (ui.compareCc && CN[ui.compareCc]) ? CN[ui.compareCc] : "";
   
   var entries = [];
-  for(var i=0; i<S.years.length; i++){
-    var y = S.years[i];
-    var yearEntries = [];
-    
-    for(var sh in y.shows){
-      var list = y.shows[sh];
-      for(var k=0; k<list.length; k++){
-        var entry = list[k], song = songById(entry.songId);
-        if(song && song.cc === ui.compareCc){
-          yearEntries.push({yearObj: y, showKey: sh, showName: SHOWS[sh], entry: entry, song: song});
+  if (ui.compareCc) {
+    for(var i=0; i<S.years.length; i++){
+      var y = S.years[i];
+      var yearEntries = [];
+      
+      for(var sh in y.shows){
+        var list = y.shows[sh];
+        for(var k=0; k<list.length; k++){
+          var entry = list[k], song = songById(entry.songId);
+          if(song && song.cc === ui.compareCc){
+            yearEntries.push({yearObj: y, showKey: sh, showName: SHOWS[sh], entry: entry, song: song});
+          }
         }
       }
-    }
-    
-    if(yearEntries.length > 0){
-      var chosen = null;
-      for(var k=0; k<yearEntries.length; k++){
-        if(yearEntries[k].showKey === "final"){
-          chosen = yearEntries[k];
-          break;
+      
+      if(yearEntries.length > 0){
+        var chosen = null;
+        for(var k=0; k<yearEntries.length; k++){
+          if(yearEntries[k].showKey === "final"){
+            chosen = yearEntries[k];
+            break;
+          }
         }
+        if(!chosen){
+          chosen = yearEntries[0];
+        }
+        entries.push(chosen);
       }
-      if(!chosen){
-        chosen = yearEntries[0];
-      }
-      entries.push(chosen);
     }
   }
 
@@ -1352,10 +1383,19 @@ function compareView(){
     rowsHtml += '<tr><td><b>'+item.yearObj.year+'</b><br><small>'+item.showName+'</small></td><td>'+flag(item.song.cc)+' <b>'+esc(item.song.title)+'</b></td>'+jCols+'<td class="c"><b>'+(avg==null?"–":sum)+'</b></td><td class="c">'+(avg==null?"–":'<span class="cell" style="'+pc(avg)+'">'+avg.toFixed(1)+'</span>')+'</td></tr>';
   }
   var juryHeaders = ""; for(var j=0; j<S.jury.length; j++){ juryHeaders += '<th class="c">'+esc(S.jury[j].name)+'</th>'; }
+  
+  var contentHtml = !ui.compareCc 
+    ? '<p class="empty">Bitte wähle oben ein Land aus, um den Vergleich zu sehen.</p>'
+    : (rowsHtml ? '<div class="tw"><table><thead><tr><th>Year / Show</th><th>Song</th>'+juryHeaders+'<th class="c">Total</th><th class="c">Ø</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>' : '<p class="empty">No entries found for this country.</p>');
+
   return '<div style="padding-top:14px"><button class="ghost" data-act="home">← Back</button></div>'+
   '<h2>Country Comparison</h2>'+
-  '<div style="margin-bottom:16px"><label>Select Country: <select data-chg="compareCc" style="width:240px;margin-left:8px">'+ccOpts+'</select></label></div>'+
-  (rowsHtml ? '<div class="tw"><table><thead><tr><th>Year / Show</th><th>Song</th>'+juryHeaders+'<th class="c">Total</th><th class="c">Ø</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>' : '<p class="empty">No entries found.</p>');
+  '<div style="margin-bottom:16px;max-width:300px;"><label>Select Country:'+
+    '<div class="search-dropdown-container">'+
+      '<input id="compare_country_input" placeholder="Land suchen..." value="'+esc(currentCountryName)+'" autocomplete="off" style="width:100%">'+
+      '<div id="compare_country_results" class="search-dropdown-results"></div>'+
+    '</div>'+
+  '</label></div>'+ contentHtml;
 }
 
 function libraryView(){
@@ -1417,16 +1457,34 @@ function openSong(id,assign){
   var s=id?songById(id):null; ui.editSong=id||null; ui.assign=assign||null;
   var currentYearObj = ui.yearId ? yearObj(ui.yearId) : null;
   var defaultSongYear = (s && s.year) ? s.year : (currentYearObj && currentYearObj.year ? currentYearObj.year : new Date().getFullYear());
-  var sortedCountries = COUNTRIES.slice().sort(function(a,b){return a[1].localeCompare(b[1]);});
-  var opts=""; for(var i=0; i<sortedCountries.length; i++){ opts += '<option value="'+sortedCountries[i][0]+'" '+((s && s.cc===sortedCountries[i][0])?"selected":"")+'>'+sortedCountries[i][1]+'</option>'; }
+  var initialCc = s ? s.cc : "";
+  var initialCountryName = initialCc ? (CN[initialCc] || "") : "";
+
   dlg.className="";
   dlg.innerHTML='<h3>'+(s?"Edit Song":"New Song")+'</h3>'+
-   '<label>Country<select id="f_cc">'+opts+'</select></label>'+
-   '<label>Artist<input id="f_artist" value="'+esc(s?s.artist:"")+'"></label>'+
-   '<label>Song Title<input id="f_title" value="'+esc(s?s.title:"")+'"></label>'+
-   '<label>Year<input id="f_song_year" type="number" value="'+defaultSongYear+'"></label>'+
+   '<label style="position:relative; z-index:20;">Country'+
+     '<div class="search-dropdown-container">'+
+       '<input id="song_country_input" placeholder="Land auswählen..." value="'+esc(initialCountryName)+'" autocomplete="off" style="width:100%">'+
+       '<input type="hidden" id="f_cc" value="'+esc(initialCc)+'">'+
+       '<div id="song_country_results" class="search-dropdown-results"></div>'+
+     '</div>'+
+   '</label>'+
+   '<label style="position:relative; z-index:1;">Artist<input id="f_artist" value="'+esc(s?s.artist:"")+'"></label>'+
+   '<label style="position:relative; z-index:1;">Song Title<input id="f_title" value="'+esc(s?s.title:"")+'"></label>'+
+   '<label style="position:relative; z-index:1;">Year<input id="f_song_year" type="number" value="'+defaultSongYear+'"></label>'+
    '<div class="actions"><button class="ghost" data-act="closeDlg">Cancel</button><button class="primary" data-act="saveSong">Save</button></div>';
-  if(!dlg.open)dlg.showModal();
+  
+  if(!dlg.open) dlg.showModal();
+  
+  setTimeout(function(){
+    setupCountrySearch("#song_country_input", "#song_country_results", "#f_cc", null);
+    var songInput = $("#song_country_input");
+    if(songInput) {
+      songInput.focus();
+      var event = new Event('focus');
+      songInput.dispatchEvent(event);
+    }
+  }, 50);
 }
 
 function openRatingModal(eId, jurId) {
@@ -1736,7 +1794,7 @@ var A={
   saveSong:function(){
     var artist=$("#f_artist").value.trim(), title=$("#f_title").value.trim(), cc=$("#f_cc").value;
     var songYear=parseInt($("#f_song_year").value)||new Date().getFullYear();
-    if(!artist||!title) return "keep";
+    if(!artist||!title||!cc) return "keep";
     if(ui.editSong){ var x=songById(ui.editSong); x.artist=artist; x.title=title; x.cc=cc; x.year=songYear; }
     else {
       var id="s"+Date.now().toString(36);
@@ -1794,6 +1852,65 @@ var A={
   }
 };
 
+function setupCountrySearch(inputId, resultsId, hiddenInputId, onSelectCallback) {
+  var input = $(inputId);
+  var resultsBox = $(resultsId);
+  var hiddenInput = $(hiddenInputId);
+  if (!input || !resultsBox) return;
+
+  function renderDropdown(filterText) {
+    var query = (filterText || "").toLowerCase();
+    var filtered = COUNTRIES.filter(function(c){
+      return c[1].toLowerCase().indexOf(query) !== -1;
+    });
+
+    var html = "";
+    for(var i=0; i<filtered.length; i++){
+      html += '<div class="search-dropdown-item" data-cc="'+filtered[i][0]+'" data-name="'+esc(filtered[i][1])+'">'+flag(filtered[i][0])+' <span>'+esc(filtered[i][1])+'</span></div>';
+    }
+    resultsBox.innerHTML = html ? html : '<div class="search-dropdown-item" style="color:var(--muted)">Kein Land gefunden</div>';
+    resultsBox.classList.add("active");
+  }
+
+  input.addEventListener("focus", function(){
+    renderDropdown(input.value);
+  });
+
+  input.addEventListener("click", function(){
+    renderDropdown(input.value);
+  });
+
+  input.addEventListener("input", function(){
+    renderDropdown(input.value);
+    if(hiddenInput) hiddenInput.value = "";
+  });
+
+  resultsBox.addEventListener("mousedown", function(ev){
+    // mousedown nutzen, damit das Schließen zuverlässig vor dem Blur greift
+    var item = ev.target.closest(".search-dropdown-item");
+    if(!item || !item.dataset.cc) return;
+    var cc = item.dataset.cc;
+    var name = item.dataset.name;
+    input.value = name;
+    if(hiddenInput) hiddenInput.value = cc;
+    resultsBox.classList.remove("active");
+    if(onSelectCallback) onSelectCallback(cc);
+  });
+
+  input.addEventListener("blur", function(){
+    // Kurzer Timeout, damit Klicks auf die Liste noch registriert werden können
+    setTimeout(function(){
+      resultsBox.classList.remove("active");
+    }, 200);
+  });
+
+  document.addEventListener("click", function(ev){
+    if(!input.contains(ev.target) && !resultsBox.contains(ev.target)){
+      resultsBox.classList.remove("active");
+    }
+  });
+}
+
 document.addEventListener("input",function(ev){
   if(ev.target.id === "lib_search_input"){ ui.q = ev.target.value; render(); var inp=$("#lib_search_input"); if(inp){ inp.focus(); inp.selectionStart=inp.selectionEnd=inp.value.length; } }
   if(ev.target.dataset.chg === "splitAfter"){
@@ -1828,8 +1945,18 @@ var C={
     save(); 
     return "keep"; 
   },
-  pred:function(t){ var id=t.dataset.e, j=t.dataset.j, v=parseInt(t.value); S.pred[id]=S.pred[id]||{}; if(v>0) S.pred[id][j]=v; else delete S.pred[id][j]; save(); },
-  compareCc:function(t){ui.compareCc=t.value;render();}
+  pred:function(t){ var id=t.dataset.e, j=t.dataset.j, v=parseInt(t.value); S.pred[id]=S.pred[id]||{}; if(v>0) S.pred[id][j]=v; else delete S.pred[id][j]; save(); }
+};
+
+var origRender = render;
+render = function() {
+  origRender();
+  if(ui.view === "compare"){
+    setupCountrySearch("#compare_country_input", "#compare_country_results", null, function(cc){
+      ui.compareCc = cc;
+      render();
+    });
+  }
 };
 
 render();
