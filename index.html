@@ -16,6 +16,12 @@
   --number-font:"Protest Strike", sans-serif;
 }
 *{box-sizing:border-box}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg); border-radius: 12px; }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: 12px; border: 2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
 html{background:var(--bg)}
 body{
   margin:0;font-family:var(--body);color:var(--ink);background:
@@ -52,8 +58,9 @@ body::before {
 .wrap{max-width:1600px;margin:0 auto;padding:0 16px 80px}
 header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid var(--line)}
 .brand{font-family:var(--display);font-weight:800;font-size:1.05rem;letter-spacing:.01em}
-.who{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.9rem}
-select,input{font:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;max-width:100%; transition: border-color 0.2s ease;}
+.who{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.9rem;flex-wrap:wrap;}
+
+select,input{font:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 14px;max-width:100%; transition: border-color 0.2s ease;}
 select:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
 input[type=number]::-webkit-inner-spin-button,
@@ -61,44 +68,17 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin
 input[type=number] { -moz-appearance: textfield; }
 
 input[type="checkbox"] {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 22px;
-  height: 22px;
-  background: var(--panel2);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  cursor: pointer;
-  display: inline-grid;
-  place-content: center;
-  transition: all 0.2s ease;
-  vertical-align: middle;
-  margin: 0;
+  appearance: none; -webkit-appearance: none; width: 22px; height: 22px; background: var(--panel2);
+  border: 1px solid var(--line); border-radius: 6px; cursor: pointer; display: inline-grid;
+  place-content: center; transition: all 0.2s ease; vertical-align: middle; margin: 0;
 }
-input[type="checkbox"]:hover {
-  border-color: var(--pink);
-}
-input[type="checkbox"]:checked {
-  background: var(--pink);
-  border-color: var(--pink);
-  box-shadow: 0 0 12px rgba(255,45,149,0.4);
-}
-input[type="checkbox"]::before {
-  content: "";
-  width: 10px;
-  height: 6px;
-  border-left: 2px solid white;
-  border-bottom: 2px solid white;
-  transform: rotate(-45deg) scale(0);
-  transition: transform 0.15s ease-in-out;
-  margin-top: -2px;
-}
-input[type="checkbox"]:checked::before {
-  transform: rotate(-45deg) scale(1);
-}
+input[type="checkbox"]:hover { border-color: var(--pink); }
+input[type="checkbox"]:checked { background: var(--pink); border-color: var(--pink); box-shadow: 0 0 12px rgba(255,45,149,0.4); }
+input[type="checkbox"]::before { content: ""; width: 10px; height: 6px; border-left: 2px solid white; border-bottom: 2px solid white; transform: rotate(-45deg) scale(0); transition: transform 0.15s ease-in-out; margin-top: -2px; }
+input[type="checkbox"]:checked::before { transform: rotate(-45deg) scale(1); }
 
 button{
-  font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);padding:6px 12px;
+  font:inherit;cursor:pointer;border-radius:999px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);padding:8px 18px;
   transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s ease,filter .2s ease,background-color .2s ease,opacity .2s ease,border-color .2s ease;
 }
 button:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 16px rgba(255,45,149,.25)}
@@ -107,23 +87,25 @@ button:active:not(:disabled){transform:scale(.92);box-shadow:none}
 button.primary{background:#9e134c;border-color:#9e134c;color:#fff;font-weight:700}
 button.ghost{background:transparent}
 button.danger{color:#ffb3b3}
+button.sm { padding: 4px 12px; font-size: 0.85rem; }
 button:disabled{opacity:.35;cursor:not-allowed;transform:none!important;box-shadow:none!important}
 
 .hero{
-  font-family:var(--display);font-weight:800;font-size:clamp(2.8rem,8vw,5.6rem);line-height:1.05;margin:48px 0 24px;letter-spacing:-.02em;
+  font-family:var(--display);font-weight:800;font-size:clamp(2.5rem,7vw,5rem);line-height:1.2;margin:48px 0 24px;letter-spacing:-.02em;
   text-align:center;
-  background:linear-gradient(135deg, #ff2d95 0%, #ffd166 100%);
+  background:linear-gradient(135deg, #ff2d95 0%, #ffd166 50%, #7b2cbf 100%);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
+  filter: drop-shadow(0 0 35px rgba(255,45,149,0.4));
 }
 
 h2{font-family:var(--display);font-size:1.5rem;margin:0}
 h3{font-family:var(--display);margin:0 0 12px}
 .hint{color:var(--muted);margin:0 0 14px;font-size:.9rem}
-.yeartitle{font-family:var(--display);font-weight:800;font-size:clamp(2rem,6vw,3.4rem);margin:12px 0 16px;letter-spacing:-.01em}
+.yeartitle{font-family:var(--display);font-weight:800;font-size:clamp(2rem,5vw,3.2rem);margin:12px 0;letter-spacing:-.01em;}
 
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:20px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px}
 
 .yearcard{cursor:pointer;display:flex;flex-direction:column;gap:6px;padding:24px;min-height:140px;justify-content:center; transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease, border-color 0.25s ease;}
 .yearcard:hover{transform:translateY(-6px); box-shadow:0 12px 24px rgba(0,0,0,0.4); border-color:var(--gold);}
@@ -135,10 +117,10 @@ h3{font-family:var(--display);margin:0 0 12px}
 .fab:hover{transform:scale(1.1) rotate(90deg);box-shadow:0 14px 32px rgba(255,45,149,0.7)}
 
 .main-actions{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:32px;justify-content:center}
-.main-actions button{font-family:var(--display);font-weight:700;font-size:1.15rem;padding:14px 24px;border-radius:12px;flex:1;max-width:300px;min-width:220px}
+.main-actions button{font-family:var(--display);font-weight:700;font-size:1.15rem;padding:14px 24px;flex:1;max-width:300px;min-width:220px}
 
-.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px;border-bottom:1px solid var(--line);padding-bottom:10px}
-.tabs button{border-radius:999px;background:transparent}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px;}
+.tabs button{background:transparent}
 .tabs button.on{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:700}
 .tabs button.final-tab{border-color:var(--gold);color:var(--gold);font-weight:700}
 .tabs button.final-tab.on{background:var(--gold);color:var(--bg);border-color:var(--gold)}
@@ -146,301 +128,127 @@ h3{font-family:var(--display);margin:0 0 12px}
 .list{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px}
 @media(max-width:1300px){.list{grid-template-columns:1fr}}
 
-@keyframes simpleFadeUp { 
-  from { opacity: 0; transform: translateY(8px); } 
-  to { opacity: 1; transform: translateY(0); } 
-}
+@keyframes simpleFadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .row{
-  position: relative;
-  overflow: hidden;
-  display:grid;
-  grid-template-columns:44px 1fr auto;
-  gap:12px;
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:10px 12px;
-  align-items:center;
-  animation: simpleFadeUp 0.3s ease-out backwards;
+  position: relative; overflow: hidden; display:grid; grid-template-columns:44px 1fr auto;
+  gap:12px; background:var(--panel); border:1px solid var(--line); border-radius:16px;
+  padding:10px 12px; align-items:center; animation: simpleFadeUp 0.3s ease-out backwards;
   transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-  cursor: pointer;
 }
 .row:hover{border-color:var(--pink);}
 
 .row::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 220px;
-  background-image: var(--flag-url);
-  background-size: cover;
-  background-position: center;
-  opacity: 0.85;
-  mask-image: linear-gradient(to right, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 220px;
+  background-image: var(--flag-url); background-size: cover; background-position: center;
+  opacity: 0.85; mask-image: linear-gradient(to right, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
   -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
-  pointer-events: none;
-  z-index: 0;
+  pointer-events: none; z-index: 0;
 }
 
-.row > * {
-  position: relative;
-  z-index: 1;
-}
+.row > * { position: relative; z-index: 1; }
 
 .cc-code{
-  position: absolute;
-  top: 50%;
-  left: 72px;
-  transform: translateY(-50%);
-  font-family: var(--display);
-  font-size: 0.65rem;
-  font-weight: 800;
-  background: rgba(0,0,0,0.65);
-  color: var(--ink);
-  padding: 3px 6px;
-  border-radius: 4px;
-  border: 1px solid rgba(255,255,255,0.2);
-  letter-spacing: 0.05em;
-  z-index: 2;
-  text-shadow: none;
+  position: absolute; top: 50%; left: 72px; transform: translateY(-50%); font-family: var(--display);
+  font-size: 0.65rem; font-weight: 800; background: rgba(0,0,0,0.65); color: var(--ink);
+  padding: 3px 6px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); letter-spacing: 0.05em; z-index: 2; text-shadow: none;
 }
 
-@media(max-width:700px){
-  .row{grid-template-columns:1fr;gap:8px}
-  .pl{justify-self:start!important}
-}
+@media(max-width:700px){ .row{grid-template-columns:1fr;gap:8px} .pl{justify-self:start!important} }
 
 .no{
-  font-family:var(--display);
-  font-weight:800;
-  font-size:0.95rem;
-  color:var(--ink);
-  background: rgba(26, 11, 53, 0.55);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  border-radius:8px;
-  width:44px;
-  height:44px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  border:1px solid rgba(255, 255, 255, 0.15);
-  flex-shrink:0;
+  font-family:var(--display); font-weight:800; font-size:0.95rem; color:var(--ink);
+  background: rgba(26, 11, 53, 0.55); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  border-radius:12px; width:44px; height:44px; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; border:1px solid rgba(255, 255, 255, 0.15); flex-shrink:0;
   transition:color 0.2s, border-color 0.2s, background-color 0.2s;
 }
 .no:hover{border-color:var(--gold);color:var(--gold);background:rgba(26, 11, 53, 0.75)}
 
-.row-content{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  min-width:0;
-  align-items:flex-end;
-  text-align:right;
-}
-
-.meta{
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  gap:8px;
-  font-size:0.95rem;
-  flex-wrap:wrap;
-  min-width:0;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.95), 0 0 6px rgba(0,0,0,0.8);
-  font-family: var(--display);
-}
+.row-content{ display:flex; flex-direction:column; gap:6px; min-width:0; align-items:flex-end; text-align:right; }
+.meta{ display:flex; align-items:center; justify-content:flex-end; gap:8px; font-size:0.95rem; flex-wrap:wrap; min-width:0; text-shadow: 0 1px 3px rgba(0,0,0,0.95), 0 0 6px rgba(0,0,0,0.8); font-family: var(--display); }
 .meta b{font-size:1.05rem; font-weight: 800; letter-spacing: -0.01em;}
 .flag{width:22px;height:15px;object-fit:cover;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.25);vertical-align:middle;transform:scale(1.2);display:inline-block;margin:0 2px}
 
-.stats{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  flex-wrap:wrap;
-}
+.stats{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .tiles{display:flex;gap:4px}
-
 .tile{
-  width:46px;
-  height:50px;
-  border-radius:10px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:space-between;
-  border:2.5px solid transparent;
-  padding:0;
-  line-height:1;
-  font-family:inherit;
-  overflow:hidden;
+  width:46px; height:50px; border-radius:12px; display:flex; flex-direction:column;
+  align-items:center; justify-content:space-between; border:2.5px solid transparent;
+  padding:0; line-height:1; font-family:inherit; overflow:hidden; cursor:pointer;
 }
-.tile small{
-  font-size:0.6rem;
-  font-weight:700;
-  width:100%;
-  text-align:center;
-  padding:3px 0;
-  background: rgba(0,0,0,0.22);
-  border-bottom: 1px solid rgba(0,0,0,0.15);
-}
-.tile.empty small{
-  background: rgba(255,255,255,0.06);
-  border-bottom-color: var(--line);
-}
-.tile b{
-  font-family:var(--number-font); 
-  font-size:1.35rem; 
-  letter-spacing:0.05em;
-  margin-bottom:3px;
-}
+.tile small{ font-size:0.6rem; font-weight:700; width:100%; text-align:center; padding:3px 0; background: rgba(0,0,0,0.22); border-bottom: 1px solid rgba(0,0,0,0.15); pointer-events:none;}
+.tile.empty small{ background: rgba(255,255,255,0.06); border-bottom-color: var(--line); }
+.tile b{ font-family:var(--number-font); font-size:1.35rem; letter-spacing:0.05em; margin-bottom:3px; pointer-events:none;}
 .tile.empty{background:var(--panel2);color:var(--muted)}
 .tile.me{border-color:#fff}
 
-.tile.tip-hidden {
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.95);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-.row:hover .tile.tip-hidden {
-  opacity: 1;
-  pointer-events: auto;
-  transform: scale(1);
-}
-
-.tile.tip-permanently-hidden {
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.95);
-}
+.tile.tip-hidden { opacity: 0; pointer-events: none; transform: scale(0.95); transition: opacity 0.2s ease, transform 0.2s ease; }
+.row:hover .tile.tip-hidden { opacity: 1; pointer-events: auto; transform: scale(1); }
+.tile.tip-permanently-hidden { opacity: 0; pointer-events: none; transform: scale(0.95); }
 
 .avg{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:44px}
 .avg b{font-family:var(--display);font-size:1.15rem}
 .avg small{font-size:0.6rem;color:var(--muted);letter-spacing:.04em}
 
-.pl{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:2px;
-  justify-self:end;
+.pl{ display:flex; flex-direction:column; align-items:center; gap:2px; justify-self:end; }
+.pl input{
+  width: 56px; height: 48px; text-align: center;
+  font-family: var(--number-font); font-size: 1.6rem; font-weight: normal; 
+  color: var(--gold); background: var(--bg); border: 2px solid var(--gold); border-radius: 12px; padding: 0;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.5); transition: box-shadow 0.2s;
 }
-.pl input{width:56px;height:44px;text-align:center;font-family:var(--display);font-size:1.25rem;font-weight:800;color:var(--gold);background:var(--bg);border:2px solid var(--gold);border-radius:10px;padding:0}
+.pl input:focus { box-shadow: 0 0 12px rgba(255, 209, 102, 0.4); border-color: var(--gold); }
 .pl small{font-size:0.6rem;color:var(--gold);font-weight:700;letter-spacing:.05em}
-
-.notes{
-  color:var(--muted);
-  font-size:0.8rem;
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-  gap:4px 12px;
-  grid-column:1/-1;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.9);
-  text-align: right;
-  font-family: var(--body);
-}
 
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 table{width:100%;border-collapse:collapse}
 th,td{padding:8px 6px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
 th{color:var(--muted);font-weight:500;font-size:.85rem}
-.tw{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 10px}
+.tw{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:6px 10px}
 td.c,th.c{text-align:center}
-.cell{display:inline-block;min-width:34px;padding:3px 8px;border-radius:8px;font-family:var(--number-font);font-size:1.1rem;text-align:center}
+.cell{display:inline-block;min-width:34px;padding:3px 8px;border-radius:10px;font-family:var(--number-font);font-size:1.1rem;text-align:center}
 td input[type=number]{width:72px}
 .dup{border-color:#ff6b6b;color:#ffb3b3}
-.verdict{margin-top:14px;padding:16px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:1.05rem}
+.verdict{margin-top:14px;padding:16px;border-radius:16px;background:var(--panel2);border:1px solid var(--line);font-size:1.05rem}
 .verdict b{font-family:var(--display);font-size:1.3rem}
 .seg{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
 .seg button.on{background:var(--pink);border-color:var(--pink);font-weight:700}
-.autofinal{display:inline-block;background:#7b2cbf;color:#fff;border-radius:4px;padding:0 4px;font-size:0.65rem;font-weight:800;margin-left:4px;white-space:nowrap;flex-shrink:0}
-.rank{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line)}
-.rank .p{font-family:var(--display);font-weight:800;font-size:1.3rem;width:36px;color:var(--gold)}
-.vs{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.autofinal{display:inline-block;background:#7b2cbf;color:#fff;border-radius:6px;padding:0 6px;font-size:0.65rem;font-weight:800;margin-left:4px;white-space:nowrap;flex-shrink:0}
 
-dialog{
-  background:var(--panel);
-  color:var(--ink);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:24px;
-  width:min(440px,92vw);
-  animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
+dialog{ background:var(--panel); color:var(--ink); border:1px solid var(--line); border-radius:24px; padding:24px; width:min(440px,92vw); animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 dialog.wide{width:min(680px,92vw)}
 dialog::backdrop{background:rgba(5,2,15,.85);backdrop-filter:blur(4px);animation:fadeIn .25s ease}
-@keyframes scaleUp {
-  from { opacity: 0; transform: scale(0.92) translateY(16px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
-}
+@keyframes scaleUp { from { opacity: 0; transform: scale(0.92) translateY(16px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 
 dialog label{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;color:var(--muted);font-size:.88rem}
 dialog input,dialog select{width:100%}
 .preset-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:8px;margin:12px 0 16px}
-.preset-btn{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:12px;font-family:var(--display);font-weight:700;color:var(--ink);cursor:pointer;text-align:center;font-size:1.1rem}
+.preset-btn{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:12px;font-family:var(--display);font-weight:700;color:var(--ink);cursor:pointer;text-align:center;font-size:1.1rem}
 .preset-btn:hover{border-color:var(--pink);background:rgba(255,45,149,.15)}
 
 .empty{color:var(--muted);padding:20px 0}
 .sm-group{display:flex;gap:4px;margin-left:auto;flex-shrink:0}
-.sm{padding:2px 6px;font-size:0.75rem}
 .prow{display:flex;gap:6px;align-items:center;border-bottom:1px solid var(--line)}
 .pbtn{flex:1;display:flex;gap:10px;align-items:center;text-align:left;background:transparent;border:0;padding:8px 4px}
 .pbtn small{color:var(--muted)}
-#plist{max-height:55vh;overflow:auto;margin:10px 0}
-.net{font-size:.8rem}
+#plist{max-height:55vh;overflow:auto;margin:10px 0; padding-right:6px;}
 
-/* Such-Dropdown Styles */
-.search-dropdown-container {
-  position: relative;
-  width: 100%;
-}
-.search-dropdown-results {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  max-height: 160px;
-  overflow-y: auto;
-  background: var(--panel2);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  z-index: 9999;
-  margin-top: 4px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
-  display: none;
-}
-.search-dropdown-results.active {
-  display: block;
-}
-.search-dropdown-item {
-  padding: 7px 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background 0.15s ease;
-}
-.search-dropdown-item:hover {
-  background: rgba(255,45,149,0.25);
-  color: var(--gold);
-}
+.search-dropdown-container { position: relative; width: 100%; }
+.search-dropdown-results { position: absolute; top: 100%; left: 0; right: 0; max-height: 160px; overflow-y: auto; background: var(--panel2); border: 1px solid var(--line); border-radius: 12px; z-index: 9999; margin-top: 4px; box-shadow: 0 8px 20px rgba(0,0,0,0.6); display: none; }
+.search-dropdown-results.active { display: block; }
+.search-dropdown-item { padding: 8px 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem; transition: background 0.15s ease; }
+.search-dropdown-item:hover { background: rgba(255,45,149,0.25); color: var(--gold); }
 
 .ov-grid-side{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:24px;margin-top:16px}
 @media(max-width:1200px){.ov-grid-side{grid-template-columns:1fr}}
-.ov-column{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
-.ov-col-title{font-family:var(--display);font-weight:800;font-size:1.1rem;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center;margin-bottom:16px;color:var(--ink)}
+.ov-column{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px}
+.ov-col-title{font-family:var(--display);font-weight:800;font-size:1.1rem;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center;margin-bottom:16px;color:var(--ink)}
 
 .ov-row-item{display:flex;align-items:center;gap:4px;margin-bottom:8px;justify-content:space-between}
 .ov-pts{display:flex;gap:4px}
-.ov-pt{width:34px;height:34px;display:grid;place-items:center;font-family:var(--number-font);font-size:1.1rem;border-radius:8px;background:var(--panel2);border:1px solid var(--line)}
+.ov-pt{width:34px;height:34px;display:grid;place-items:center;font-family:var(--number-font);font-size:1.1rem;border-radius:10px;background:var(--panel2);border:1px solid var(--line)}
 .ov-pt.none{color:var(--muted);opacity:0.4}
-.ov-pill{flex:1;height:38px;border-radius:8px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);display:flex;align-items:center;justify-content:space-between;padding:0 10px;font:700 0.85rem var(--display);overflow:hidden;}
+.ov-pill{flex:1;height:38px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);display:flex;align-items:center;justify-content:space-between;padding:0 10px;font:700 0.85rem var(--display);overflow:hidden;}
 .ov-pill .song-info{display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;}
 .ov-pill .song-info span{overflow:hidden;text-overflow:ellipsis;font-size:0.8rem;font-weight:400;color:var(--muted);}
 .ov-pill .song-info b{font-size:0.85rem;color:var(--ink);font-weight:600;}
@@ -453,88 +261,24 @@ dialog input,dialog select{width:100%}
   50% { box-shadow: 0 0 22px rgba(255, 209, 102, 0.8); border-color: #fff6cc; }
   100% { box-shadow: 0 0 10px rgba(255, 209, 102, 0.4); border-color: var(--gold); }
 }
-.row.winner {
-  border: 2px solid var(--gold);
-  animation: goldGlow 2.5s infinite ease-in-out;
-}
-.row.winner .meta b {
-  background: linear-gradient(135deg, #ffd166 0%, #ffae00 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 10px rgba(255,209,102,0.3);
-}
+.row.winner { border: 2px solid var(--gold); animation: goldGlow 2.5s infinite ease-in-out; }
+.row.winner .meta b { background: linear-gradient(135deg, #ffd166 0%, #ffae00 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 2px 10px rgba(255,209,102,0.3); }
 
-.row.out {
-  opacity: 0.35;
-  filter: grayscale(0.8) blur(0.3px);
-  background: rgba(17,6,36,0.3);
-  border-color: rgba(50, 25, 95, 0.6);
-}
+.row.out { opacity: 0.35; filter: grayscale(0.8) blur(0.3px); background: rgba(17,6,36,0.3); border-color: rgba(50, 25, 95, 0.6); }
 .row.out .tiles { filter: none !important; opacity: 1 !important; }
-
-.row.dq {
-  opacity: 0.25;
-  filter: grayscale(1) blur(0.5px);
-  background: rgba(214, 40, 57, 0.05);
-  border-color: rgba(214, 40, 57, 0.3);
-}
+.row.dq { opacity: 0.25; filter: grayscale(1) blur(0.5px); background: rgba(214, 40, 57, 0.05); border-color: rgba(214, 40, 57, 0.3); }
 .row.autofinal-row{border-color:#9d4edd}
 
 /* Live Mode Styles */
-.live-mode-banner {
-  background: var(--panel);
-  border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 12px 32px rgba(0,0,0,0.5);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  border: 1px solid var(--line);
-}
-.live-current-card {
-  background: var(--panel2);
-  border: 2px solid var(--gold);
-  border-radius: 12px;
-  padding: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.live-current-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(255,209,102,0.2);
-}
-.live-queue-grid {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  padding-bottom: 8px;
-}
-.live-queue-item {
-  background: var(--panel2);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 10px 14px;
-  min-width: 150px;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: all 0.2s ease;
-}
-.live-queue-item:hover {
-  border-color: var(--pink);
-  transform: translateY(-2px);
-}
-.live-queue-item.active {
-  border-color: var(--gold);
-  background: var(--panel);
-  box-shadow: 0 0 14px rgba(255,209,102,0.3);
-}
+.live-mode-banner { background: var(--panel); border-radius: 20px; padding: 24px; margin-bottom: 24px; box-shadow: 0 12px 32px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 16px; border: 1px solid var(--line); }
+.live-current-card { background: var(--panel2); border: 2px solid var(--gold); border-radius: 16px; padding: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.live-current-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,209,102,0.2); }
+.live-queue-grid { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; }
+.live-queue-item { background: var(--panel2); border: 1px solid var(--line); border-radius: 14px; padding: 10px 14px; min-width: 150px; cursor: pointer; flex-shrink: 0; transition: all 0.2s ease; }
+.live-queue-item:hover { border-color: var(--pink); transform: translateY(-2px); }
+.live-queue-item.active { border-color: var(--gold); background: var(--panel); box-shadow: 0 0 14px rgba(255,209,102,0.3); }
 
+.live-big-number:hover { transform: scale(1.15) rotate(-3deg); text-shadow: 0 0 16px rgba(255,255,255,0.4); color: var(--gold); }
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 </style>
 </head>
@@ -564,30 +308,18 @@ var COUNTRIES=[
   ["vn","Vietnam"],["ye","Yemen"]
 ];
 
-var CN={};
-for(var i=0; i<COUNTRIES.length; i++){ CN[COUNTRIES[i][0]] = COUNTRIES[i][1]; }
-
+var CN={}; for(var i=0; i<COUNTRIES.length; i++){ CN[COUNTRIES[i][0]] = COUNTRIES[i][1]; }
 var ISO3={
-  af:"AFG", al:"ALB", am:"ARM", au:"AUS", at:"AUT", az:"AZE",
-  bh:"BHR", bd:"BGD", by:"BLR", be:"BEL", bt:"BTN", ba:"BIH",
-  bn:"BRN", bg:"BGR", kh:"KHM", ca:"CAN", cn:"CHN", hr:"CRO", cy:"CYP", cz:"CZE",
-  dk:"DNK", ee:"EST", fi:"FIN", fr:"FRA", ge:"GEO", de:"GER", gr:"GRE",
-  hk:"HKG", hu:"HUN", is:"ISL", in:"IND", id:"IDN", ir:"IRN", iq:"IRQ",
-  ie:"IRL", il:"ISR", it:"ITA", jp:"JPN", jo:"JOR", kz:"KAZ", kw:"KWT",
-  kg:"KGZ", la:"LAO", lb:"LBN", lv:"LVA", lt:"LTU", lu:"LUX", mo:"MAC",
-  my:"MYS", mv:"MDV", mt:"MLT", md:"MDA", mc:"MCO", mn:"MNG", me:"MNE",
-  ma:"MAR", mm:"MMR", np:"NPL", nl:"NED", nz:"NZL", kp:"PRK",
-  mk:"MKD", no:"NOR", om:"OMN", pk:"PAK", ps:"PSE", ph:"PHL",
-  pl:"POL", pt:"POR", qa:"QAT", ro:"ROU", ru:"RUS", sa:"SAU", sm:"SMR",
-  rs:"SRB", sg:"SGP", sk:"SVK", si:"SVN", kr:"KOR", es:"ESP", lk:"LKA", se:"SWE",
-  ch:"SUI", sy:"SYR", tw:"TWN", tj:"TJK", th:"THA", tr:"TUR",
-  tm:"TKM", ua:"UKR", ae:"ARE", gb:"GBR", uz:"UZB",
-  vn:"VNM", ye:"YEM"
+  af:"AFG", al:"ALB", am:"ARM", au:"AUS", at:"AUT", az:"AZE", bh:"BHR", bd:"BGD", by:"BLR", be:"BEL", bt:"BTN", ba:"BIH",
+  bn:"BRN", bg:"BGR", kh:"KHM", ca:"CAN", cn:"CHN", hr:"CRO", cy:"CYP", cz:"CZE", dk:"DNK", ee:"EST", fi:"FIN", fr:"FRA", 
+  ge:"GEO", de:"GER", gr:"GRE", hk:"HKG", hu:"HUN", is:"ISL", in:"IND", id:"IDN", ir:"IRN", iq:"IRQ", ie:"IRL", il:"ISR", 
+  it:"ITA", jp:"JPN", jo:"JOR", kz:"KAZ", kw:"KWT", kg:"KGZ", la:"LAO", lb:"LBN", lv:"LVA", lt:"LTU", lu:"LUX", mo:"MAC",
+  my:"MYS", mv:"MDV", mt:"MLT", md:"MDA", mc:"MCO", mn:"MNG", me:"MNE", ma:"MAR", mm:"MMR", np:"NPL", nl:"NED", nz:"NZL", 
+  kp:"PRK", mk:"MKD", no:"NOR", om:"OMN", pk:"PAK", ps:"PSE", ph:"PHL", pl:"POL", pt:"POR", qa:"QAT", ro:"ROU", ru:"RUS", 
+  sa:"SAU", sm:"SMR", rs:"SRB", sg:"SGP", sk:"SVK", si:"SVN", kr:"KOR", es:"ESP", lk:"LKA", se:"SWE", ch:"SUI", sy:"SYR", 
+  tw:"TWN", tj:"TJK", th:"THA", tr:"TUR", tm:"TKM", ua:"UKR", ae:"ARE", gb:"GBR", uz:"UZB", vn:"VNM", ye:"YEM"
 };
-function getIso3(cc) {
-  if (!cc) return "";
-  return ISO3[cc.toLowerCase()] || cc.toUpperCase();
-}
+function getIso3(cc) { return (!cc) ? "" : (ISO3[cc.toLowerCase()] || cc.toUpperCase()); }
 
 var SHOWS={sf1:"Semi-final 1",sf2:"Semi-final 2",final:"Grand Final"};
 var DEF_N={sf1:15,sf2:15,final:26};
@@ -597,14 +329,15 @@ var $=function(s){return document.querySelector(s);};
 var esc=function(s){return String(s ? s : "").replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});};
 
 function fresh(){
-  var jList = [];
-  for(var i=1; i<=4; i++){ jList.push({id:"j"+i, name:"Player "+i}); }
-  return {jury:jList, songs:[], years:[], ratings:{}, pred:{}, notes:{}, qualPred:{}, liveState:{}};
+  return {
+    jury:[{id:"j1", name:"Livin"}, {id:"j2", name:"Tabi"}, {id:"j3", name:"Poki"}, {id:"j4", name:"Kiri"}],
+    songs:[], years:[], ratings:{}, pred:{}, qualPred:{}, liveState:{}, presence:{}
+  };
 }
 function load(){
   try{
     var d=JSON.parse(localStorage.getItem(KEY));
-    if(d && d.jury){ d.notes = d.notes || {}; d.qualPred = d.qualPred || {}; d.liveState = d.liveState || {}; return d; }
+    if(d && d.jury){ d.qualPred=d.qualPred||{}; d.liveState=d.liveState||{}; d.presence=d.presence||{}; return d; }
   }catch(e){}
   return fresh();
 }
@@ -612,56 +345,26 @@ var S=load();
 var me=localStorage.getItem(MEKEY)||"j1";
 var ui={big:null,q:"",view:"home",yearId:null,tab:"sf1",subTab:"points",sortMode:"order",ovSubTab:"semis",sbShow:"final",editMode:false,assign:null,editSong:null,libYear:"",libSort:"name",compareCc:null,enter:false};
 
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){showAlert("Error", "Could not save in this browser.");}push();}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){showAlert("Error", "Could not save.");}push();}
 
-function getRatings(e){
-  if(!e) return {};
-  if(e.songId && S.ratings[e.songId]) return S.ratings[e.songId];
-  if(S.ratings[e.id]) return S.ratings[e.id];
-  return {};
-}
+function getRatings(e){ if(!e) return {}; if(e.songId && S.ratings[e.songId]) return S.ratings[e.songId]; if(S.ratings[e.id]) return S.ratings[e.id]; return {}; }
+function getQualPred(e){ if(!e) return {}; if(S.qualPred[e.id]) return S.qualPred[e.id]; return {}; }
 
-function getNotes(e){
-  if(!e) return {};
-  if(e.songId && S.notes[e.songId]) return S.notes[e.songId];
-  if(S.notes[e.id]) return S.notes[e.id];
-  return {};
-}
-
-function getQualPred(e){
-  if(!e) return {};
-  if(S.qualPred[e.id]) return S.qualPred[e.id];
-  return {};
-}
-
-var dlg=$("#dlg");
-dlg.addEventListener("close",function(){render();});
+var dlg=$("#dlg"); dlg.addEventListener("close",function(){render();});
 var _pendingConfirmCallback = null;
 
 function showAlert(title, text) {
-  dlg.className = "";
-  dlg.innerHTML = '<h3>' + esc(title) + '</h3>' +
-    '<p class="hint">' + esc(text) + '</p>' +
-    '<div class="actions"><button class="primary" data-act="closeDlg">OK</button></div>';
+  dlg.className = ""; dlg.innerHTML = '<h3>' + esc(title) + '</h3><p class="hint">' + esc(text) + '</p><div class="actions"><button class="primary" data-act="closeDlg">OK</button></div>';
   if (!dlg.open) dlg.showModal();
 }
-
 function openConfirm(title, text, onYes) {
   _pendingConfirmCallback = onYes;
-  dlg.className = "";
-  dlg.innerHTML = '<h3>' + esc(title) + '</h3>' +
-    '<p class="hint">' + esc(text) + '</p>' +
-    '<div class="actions">' +
-      '<button class="ghost" data-act="closeDlg">Cancel</button>' +
-      '<button class="primary" data-act="confirmYes">Confirm</button>' +
-    '</div>';
+  dlg.className = ""; dlg.innerHTML = '<h3>' + esc(title) + '</h3><p class="hint">' + esc(text) + '</p><div class="actions"><button class="ghost" data-act="closeDlg">Cancel</button><button class="primary" data-act="confirmYes">Confirm</button></div>';
   if (!dlg.open) dlg.showModal();
 }
 
 var DB=(localStorage.getItem("esc-db")||"https://esc-connect-7bdfe-default-rtdb.europe-west1.firebasedatabase.app").replace(/\/+$/,"");
 var lastFlat={},busy=0,net=DB?"connecting":"local";
-var netText=function(){return {local:"Local only",connecting:"Connecting…",online:"● Shared",error:"Offline, retrying"}[net];};
-var badge=function(){var n=$("#net");if(n)n.textContent=netText();};
 
 function sortShowsList(list){
   return list.sort(function(a, b) {
@@ -673,15 +376,14 @@ function sortShowsList(list){
 }
 
 function toTree(){
-  var t={jury:{},songs:{},years:{},ratings:S.ratings,notes:S.notes,pred:S.pred,qualPred:S.qualPred,liveState:S.liveState};
+  var t={jury:{},songs:{},years:{},ratings:S.ratings,pred:S.pred,qualPred:S.qualPred,liveState:S.liveState,presence:S.presence||{}};
   for(var i=0; i<S.jury.length; i++){ t.jury[S.jury[i].id] = {name:S.jury[i].name}; }
   for(var i=0; i<S.songs.length; i++){ var x = S.songs[i]; t.songs[x.id] = {cc:x.cc, artist:x.artist, title:x.title, year:x.year}; }
   for(var i=0; i<S.years.length; i++){
     var y = S.years[i];
-    var o={year:y.year, suffix:y.suffix, city:y.city, splitAfter: y.splitAfter, shows:{}};
+    var o={year:y.year, suffix:y.suffix, city:y.city, hostCc:y.hostCc, splitAfter: y.splitAfter, shows:{}};
     for(var sh in y.shows){
-      o.shows[sh]={};
-      var shList = y.shows[sh];
+      o.shows[sh]={}; var shList = y.shows[sh];
       for(var k=0; k<shList.length; k++){
         var e = shList[k]; o.shows[sh][e.id] = {n:e.customNo, songId:e.songId, place:e.place, dq:e.dq, autoFinal: e.autoFinal};
       }
@@ -716,20 +418,18 @@ function fromTree(t){
             var shObj = o.shows[sh] || {}; var arr = [];
             for(var id2 in shObj){
               if(shObj.hasOwnProperty(id2)){
-                var e = shObj[id2];
-                arr.push({id:id2, songId:e.songId, place:e.place, customNo:e.n, dq:e.dq, autoFinal: e.autoFinal});
+                var e = shObj[id2]; arr.push({id:id2, songId:e.songId, place:e.place, customNo:e.n, dq:e.dq, autoFinal: e.autoFinal});
               }
             }
-            sortShowsList(arr);
-            shows[sh] = arr;
+            sortShowsList(arr); shows[sh] = arr;
           }
         }
       }
-      r.years.push({id:id, year:+o.year||+id.split("_")[0], suffix:o.suffix||"", city:o.city, splitAfter: o.splitAfter, shows:shows});
+      r.years.push({id:id, year:+o.year||+id.split("_")[0], suffix:o.suffix||"", city:o.city, hostCc:o.hostCc, splitAfter: o.splitAfter, shows:shows});
     }
   }
   r.years.sort(function(a,b){return b.year-a.year||b.id.localeCompare(a.id);});
-  r.ratings=t.ratings||{}; r.notes=t.notes||{}; r.pred=t.pred||{}; r.qualPred=t.qualPred||{}; r.liveState=t.liveState||{};
+  r.ratings=t.ratings||{}; r.pred=t.pred||{}; r.qualPred=t.qualPred||{}; r.liveState=t.liveState||{}; r.presence=t.presence||{};
   return r;
 }
 
@@ -746,22 +446,49 @@ function push(){
   for(var k in lastFlat)if(!(k in cur))p[k]=null;
   if(!Object.keys(p).length)return;
   var prev=lastFlat;lastFlat=cur;busy++;
-  fetch(DB+"/.json",{method:"PATCH",body:JSON.stringify(p)}).then(function(r){if(!r.ok)throw 0;net="online";}).catch(function(){lastFlat=prev;net="error";}).finally(function(){busy--;badge();});
+  fetch(DB+"/.json",{method:"PATCH",body:JSON.stringify(p)}).then(function(r){if(!r.ok)throw 0;net="online";}).catch(function(){lastFlat=prev;net="error";}).finally(function(){busy--;});
 }
 
 function pull(first){
   if(!DB||busy)return;
   fetch(DB+"/.json").then(function(res){return res.json();}).then(function(t){
     net="online";
-    if(!t){if(first===true)push();badge();return;}
+    if(!t){if(first===true)push();return;}
     var f=flat(t);
-    if(same(f,lastFlat)){badge();return;}
+    if(same(f,lastFlat)) return;
     var a=document.activeElement;
     if(first!==true&&(dlg.open||(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))))return;
     S=fromTree(t);lastFlat=f;
     try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
     render();
-  }).catch(function(){net="error";badge();});
+  }).catch(function(){net="error";});
+}
+
+// Presence Heartbeat
+setInterval(function(){
+  S.presence = S.presence || {};
+  S.presence[me] = { t: Date.now() };
+  push();
+  updatePresenceUI();
+}, 10000);
+
+function updatePresenceUI(){
+  var container = $("#presence_container");
+  if(!container) return;
+  var now = Date.now();
+  var pMap = S.presence || {};
+  var viewersHtml = "";
+  for(var i=0; i<S.jury.length; i++){
+    var p = pMap[S.jury[i].id];
+    if(p && (now - p.t < 35000) && S.jury[i].id !== me){
+      viewersHtml += '<span style="display:inline-block;background:var(--panel);border:1px solid #189650;border-radius:999px;padding:4px 10px;font-size:0.8rem;color:#4ade80;font-weight:700;">🟢 '+esc(S.jury[i].name)+'</span>';
+    }
+  }
+  var ap = pMap["admin"];
+  if(ap && (now - ap.t < 35000) && me !== "admin"){
+    viewersHtml += '<span style="display:inline-block;background:var(--panel);border:1px solid #189650;border-radius:999px;padding:4px 10px;font-size:0.8rem;color:#4ade80;font-weight:700;">🟢 Admin</span>';
+  }
+  container.innerHTML = viewersHtml;
 }
 
 var songById=function(id){ for(var i=0; i<S.songs.length; i++) if(S.songs[i].id===id) return S.songs[i]; return null; };
@@ -778,47 +505,27 @@ var flag=function(cc){return '<img class="flag" data-cc="'+cc+'" src="https://fl
 function flagFb(i){
   var cc=i.dataset.cc;
   if(!i.dataset.s){i.dataset.s=1;i.removeAttribute("srcset");i.src="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/"+cc+".svg";return;}
-  var sp=document.createElement("span");
-  var chars = cc.toUpperCase().split("");
-  var text = "";
+  var sp=document.createElement("span"); var chars = cc.toUpperCase().split(""); var text = "";
   for(var k=0; k<chars.length; k++){ text += String.fromCodePoint(127397 + chars[k].charCodeAt(0)); }
-  sp.textContent = text + " ";
-  i.replaceWith(sp);
+  sp.textContent = text + " "; i.replaceWith(sp);
 }
 
 var pc=function(p){
-  var t=Math.max(0,Math.min(1,(p-1)/9));
-  var R=[214,40,57],W=[255,255,255],G=[24,150,80];
+  var t=Math.max(0,Math.min(1,(p-1)/9)); var R=[214,40,57],W=[255,255,255],G=[24,150,80];
   var mix=function(a,b,k){return [Math.round(a[0]+(b[0]-a[0])*k), Math.round(a[1]+(b[1]-a[1])*k), Math.round(a[2]+(b[2]-a[2])*k)];};
-  var rgb=t<.5?mix(R,W,t*2):mix(W,G,(t-.5)*2);
-  var r=rgb[0],g=rgb[1],b=rgb[2];
-  var lum=(r*299+g*587+b*114)/1000;
+  var rgb=t<.5?mix(R,W,t*2):mix(W,G,(t-.5)*2); var r=rgb[0],g=rgb[1],b=rgb[2]; var lum=(r*299+g*587+b*114)/1000;
   var style = "background:rgb("+r+","+g+","+b+");color:"+(lum>150?"#1d1d1d":"#fff");
   if(Number(p) === 10){ style += ";border:2.5px solid var(--gold);box-shadow:0 0 10px rgba(255,209,102,0.8)"; }
   return style;
 };
 var idx=function(id){return +String(id).split("-").pop();};
 
-function isLiveActive(){
-  if(!ui.yearId) return false;
-  var st = S.liveState[ui.yearId];
-  return st && st.active === true;
-}
-
-function getLiveIndex(){
-  if(!ui.yearId) return 0;
-  var st = S.liveState[ui.yearId];
-  return (st && st.index !== undefined) ? st.index : 0;
-}
+function isLiveActive(){ if(!ui.yearId) return false; var st = S.liveState[ui.yearId]; return st && st.active === true; }
+function getLiveIndex(){ if(!ui.yearId) return 0; var st = S.liveState[ui.yearId]; return (st && st.index !== undefined) ? st.index : 0; }
 
 function render(){
   var sy=window.scrollY;
-  if(ui.enter) {
-    var app = $("#app");
-    app.classList.remove("enter"); 
-    void app.offsetWidth; 
-    app.classList.add("enter");
-  }
+  if(ui.enter) { var app = $("#app"); app.classList.remove("enter"); void app.offsetWidth; app.classList.add("enter"); }
   ui.enter=false;
   
   var mainHtml = home();
@@ -828,14 +535,18 @@ function render(){
 
   $("#app").innerHTML = header() + mainHtml;
   window.scrollTo(0,sy);
+  updatePresenceUI();
 }
 
 function header(){
-  var currentName = (me === "admin") ? "👑 Admin" : esc(jname(me));
-  return '<header><div class="brand">Eurovision Song Contest Scoreboard</div>'+
-  '<div class="who"><span id="net" class="net">'+netText()+'</span> Profile: '+
-    '<button class="ghost" data-act="openWelcomeModal" style="font-weight:700;color:var(--gold);border-color:var(--line)">'+currentName+'</button>'+
-    '<button class="ghost" data-act="settings" title="Names, export, import">Settings</button></div></header>';
+  var currentName = (me === "admin") ? "👑 Admin" : "👤 " + esc(jname(me));
+  return '<header>'+
+    '<div class="brand">Eurovision Song Contest Scoreboard</div>'+
+    '<div class="who">'+
+      '<div id="presence_container" style="display:flex;gap:6px;margin-right:8px;"></div>'+
+      '<button class="ghost" data-act="openWelcomeModal" style="font-weight:700;color:var(--gold);border:1px solid var(--gold);padding:6px 14px;background:rgba(255,209,102,0.1)">'+currentName+'</button>'+
+      '<button class="ghost" data-act="settings" title="Settings, Export, Import" style="padding:6px 14px;background:var(--panel2)">⚙️ Settings</button>'+
+    '</div></header>';
 }
 
 function home(){
@@ -877,45 +588,59 @@ function yearView(){
 
   var liveActive = isLiveActive();
   var body = "";
-  if(liveActive){
-    body = liveModeView(ui.tab);
-  } else {
-    if(y.shows[ui.tab]) body=showView(ui.tab);
-    else if(ui.tab==="overview") body=overviewTab();
-    else if(ui.tab==="battle") body=battle();
-    else if(ui.tab==="sb") body=scoreboard();
-  }
+  if(liveActive) body = liveModeView(ui.tab);
+  else if(y.shows[ui.tab]) body=showView(ui.tab);
+  else if(ui.tab==="overview") body=overviewTab();
+  else if(ui.tab==="battle") body=battle();
+  else if(ui.tab==="sb") body=scoreboard();
 
   var titleLabel = y.year + (y.suffix ? " (" + y.suffix + ")" : "");
-  var tabHtml = "";
-  if(y.shows.sf1) tabHtml += '<button class="'+(ui.tab==="sf1"?"on":"")+'" data-act="tab" data-tab="sf1">Semi-final 1</button>';
-  if(y.shows.sf2) tabHtml += '<button class="'+(ui.tab==="sf2"?"on":"")+'" data-act="tab" data-tab="sf2">Semi-final 2</button>';
-  tabHtml += '<button class="'+(ui.tab==="overview"?"on":"")+'" data-act="tab" data-tab="overview">Overview</button>';
-  if(y.shows.final) tabHtml += '<button class="'+(ui.tab==="final"?"on":"")+' final-tab" data-act="tab" data-tab="final">Grand Final</button>';
-  tabHtml += '<button class="'+(ui.tab==="battle"?"on":"")+'" data-act="tab" data-tab="battle">Points Battle</button>';
-  tabHtml += '<button class="'+(ui.tab==="sb"?"on":"")+'" data-act="tab" data-tab="sb">Scoreboard</button>';
+  var hasSf1 = !!y.shows.sf1, hasSf2 = !!y.shows.sf2, hasFinal = !!y.shows.final;
 
-  var hasSf1 = !!y.shows.sf1;
-  var hasSf2 = !!y.shows.sf2;
-  var hasFinal = !!y.shows.final;
+  var topBar = '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;flex-wrap:wrap;gap:12px;">'+
+    '<button class="ghost" data-act="home" style="padding-left:0;font-size:1.05rem;">← Zurück</button>'+
+    '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
+      '<button class="ghost '+(ui.editMode?'primary':'')+'" data-act="toggleEditMode">✏️ Edit</button>'+
+      (!liveActive && ui.editMode ? 
+        (hasSf1 ? '<button class="ghost sm danger" data-act="removeShow" data-show="sf1">− SF1</button>' : '<button class="ghost sm" data-act="addShow" data-show="sf1">＋ SF1</button>') +
+        (hasSf2 ? '<button class="ghost sm danger" data-act="removeShow" data-show="sf2">− SF2</button>' : '<button class="ghost sm" data-act="addShow" data-show="sf2">＋ SF2</button>') +
+        (hasFinal ? '<button class="ghost sm danger" data-act="removeShow" data-show="final">− Final</button>' : '<button class="ghost sm" data-act="addShow" data-show="final">＋ Final</button>') +
+        '<button class="ghost sm danger" data-act="delYear">Contest löschen</button>'
+      : '')+
+    '</div>'+
+  '</div>';
+
+  var hostDisplay = '';
+  if(y.city || y.hostCc){
+    var hFlag = y.hostCc ? flag(y.hostCc) : '🌍';
+    var hName = y.city ? esc(y.city) : esc(CN[y.hostCc]||'');
+    var editHostBtn = ui.editMode ? '<button class="ghost sm" data-act="editCity" style="padding:2px 8px;font-size:0.8rem;margin-left:8px;" title="Host ändern">✏️</button>' : '';
+    hostDisplay = '<div style="display:flex;align-items:center;justify-content:center;gap:12px;margin:8px 0 20px;font-size:1.6rem;color:var(--gold);font-weight:700;"><span style="transform:scale(1.5);">'+hFlag+'</span> '+hName+editHostBtn+'</div>';
+  } else if(ui.editMode) {
+    hostDisplay = '<div style="text-align:center;margin:8px 0 20px;"><button class="ghost sm" data-act="editCity">＋ Host City hinzufügen</button></div>';
+  }
+
+  var headerSection = '<h1 class="yeartitle" style="text-align:center;margin-bottom:'+(hostDisplay?'4px':'24px')+'">Eurovision '+esc(titleLabel)+'</h1>' + hostDisplay;
 
   var liveBtnStyle = liveActive ? 'background:#ff2d95;color:#fff;border-color:#ff2d95;font-weight:700;' : 'background:var(--panel2);color:var(--gold);border-color:var(--gold);font-weight:700;';
 
-  return '<div style="padding-top:14px"><button class="ghost" data-act="home">← All Contests</button>'+
-    '<button class="ghost danger" data-act="delYear" style="float:right">Delete Contest</button><button class="ghost" data-act="editCity" style="float:right;margin-right:8px">'+(y.city?"Edit":"Add")+' Host City</button></div>'+
-    '<h1 class="yeartitle">Eurovision '+esc(titleLabel)+'</h1>'+(y.city?'<p class="hint" style="margin:-6px 0 14px">'+esc(y.city)+'</p>':"")+
-    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:12px">'+
-      '<div class="tabs" style="margin:0;border:none;padding:0">'+tabHtml+'</div>'+
-      '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
-        '<button data-act="toggleLiveMode" style="'+liveBtnStyle+'">🔴 '+(liveActive?'Live-Modus beenden':'Live Mode')+'</button>'+
-        (!liveActive ? '<button class="ghost '+(ui.editMode?'primary':'')+'" data-act="toggleEditMode">✏️ Edit</button>' : '')+
-        (!liveActive && ui.editMode ? 
-          (hasSf1 ? '<button class="ghost sm danger" data-act="removeShow" data-show="sf1">− SF1</button>' : '<button class="ghost sm" data-act="addShow" data-show="sf1">＋ SF1</button>') +
-          (hasSf2 ? '<button class="ghost sm danger" data-act="removeShow" data-show="sf2">− SF2</button>' : '<button class="ghost sm" data-act="addShow" data-show="sf2">＋ SF2</button>') +
-          (hasFinal ? '<button class="ghost sm danger" data-act="removeShow" data-show="final">− Final</button>' : '<button class="ghost sm" data-act="addShow" data-show="final">＋ Final</button>')
-        : '')+
-      '</div>'+
-    '</div>'+body;
+  var tabNav = '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:16px;border-bottom:1px solid var(--line);padding-bottom:12px;">'+
+    '<div class="tabs">'+
+      (y.shows.sf1 ? '<button class="'+(ui.tab==="sf1"?"on":"")+'" data-act="tab" data-tab="sf1">Semi-final 1</button>' : '')+
+      (y.shows.sf2 ? '<button class="'+(ui.tab==="sf2"?"on":"")+'" data-act="tab" data-tab="sf2">Semi-final 2</button>' : '')+
+      (y.shows.final ? '<button class="'+(ui.tab==="final"?"on":"")+' final-tab" data-act="tab" data-tab="final">Grand Final</button>' : '')+
+    '</div>'+
+    '<div style="display:flex;align-items:center;">'+
+      '<button data-act="toggleLiveMode" style="'+liveBtnStyle+'">🔴 '+(liveActive?'Live-Modus beenden':'Live Mode')+'</button>'+
+    '</div>'+
+    '<div class="tabs">'+
+      '<button class="'+(ui.tab==="overview"?"on":"")+'" data-act="tab" data-tab="overview">Overview</button>'+
+      '<button class="'+(ui.tab==="battle"?"on":"")+'" data-act="tab" data-tab="battle">Points Battle</button>'+
+      '<button class="'+(ui.tab==="sb"?"on":"")+'" data-act="tab" data-tab="sb">Scoreboard</button>'+
+    '</div>'+
+  '</div>';
+
+  return topBar + headerSection + tabNav + body;
 }
 
 function liveModeView(sh){
@@ -928,7 +653,6 @@ function liveModeView(sh){
   var currentEntry = list[liveIdx];
   var s = songById(currentEntry.songId);
   var r = getRatings(currentEntry);
-  var nt = getNotes(currentEntry);
 
   var queueHtml = '';
   for(var i=0; i<list.length; i++){
@@ -944,46 +668,45 @@ function liveModeView(sh){
   var juryRatingBox = '';
   for(var j=0; j<S.jury.length; j++){
     var jur = S.jury[j], val = r[jur.id];
-    juryRatingBox += '<div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center;flex:1;min-width:90px;'+(val?pc(val):'')+'">' +
-      '<div style="font-size:0.75rem;font-weight:700;color:var(--muted);margin-bottom:4px;">'+esc(jur.name)+'</div>' +
-      '<div style="font-family:var(--number-font);font-size:1.8rem;">'+(val!==undefined&&val!==null?val:'–')+'</div>' +
-      (nt[jur.id] ? '<div style="font-size:0.75rem;margin-top:4px;color:var(--ink);opacity:0.8;">'+esc(nt[jur.id])+'</div>' : '') +
+    var isMe = (jur.id === me) || (me === "admin");
+    var displayVal = (val!==undefined&&val!==null) ? val : '–';
+    
+    var clickEvent = isMe ? 'data-act="openPick" data-e="'+currentEntry.id+'" data-jur="'+jur.id+'" title="Punkte ändern"' : 'data-act="openPick" data-e="'+currentEntry.id+'" data-jur="'+jur.id+'"';
+    
+    juryRatingBox += '<div style="background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px 12px;text-align:center;flex:1;min-width:90px;'+(val?pc(val):'')+'">' +
+      '<div style="font-size:0.85rem;font-weight:700;color:var(--muted);margin-bottom:12px;">'+esc(jur.name)+'</div>' +
+      '<div class="live-big-number" '+clickEvent+' style="font-family:var(--number-font);font-size:3.5rem;cursor:pointer;display:inline-block;line-height:1;transition:all 0.2s;">'+displayVal+'</div>' +
     '</div>';
   }
 
   var currentSongDisplay = s ? 
-    '<div style="display:flex;align-items:center;gap:20px;width:100%;">' +
-      '<div style="transform:scale(2.2);margin:0 16px;">'+flag(s.cc)+'</div>' +
+    '<div style="display:flex;align-items:center;gap:24px;width:100%;">' +
+      '<div style="transform:scale(2.5);margin:0 24px;">'+flag(s.cc)+'</div>' +
       '<div style="flex:1;">' +
-        '<div style="font-size:0.85rem;color:var(--gold);font-weight:700;margin-bottom:2px;">AKTUELL AUF DER BÜHNE · Startnummer '+(liveIdx+1)+'</div>' +
-        '<h2 style="font-size:2.4rem;margin:0 0 4px;">'+esc(s.title)+'</h2>' +
-        '<p style="font-size:1.3rem;color:var(--muted);margin:0;">'+esc(s.artist)+' ('+esc(CN[s.cc]||s.cc.toUpperCase())+')</p>' +
+        '<div style="font-size:0.9rem;color:var(--gold);font-weight:700;margin-bottom:4px;">AKTUELL AUF DER BÜHNE · Startnummer '+(liveIdx+1)+'</div>' +
+        '<h2 style="font-size:2.8rem;margin:0 0 4px;">'+esc(s.title)+'</h2>' +
+        '<p style="font-size:1.4rem;color:var(--muted);margin:0;">'+esc(s.artist)+' ('+esc(CN[s.cc]||s.cc.toUpperCase())+')</p>' +
       '</div>' +
-      '<div style="font-size:0.9rem;color:var(--muted);text-align:right;">Klicken zum Bewerten ✏️</div>' +
     '</div>'
     : '<div style="flex:1;text-align:center;padding:12px;"><h3>Startnummer '+(liveIdx+1)+'</h3><p class="empty" style="margin:4px 0 12px">Kein Song zugewiesen.</p><button class="primary" data-act="pick" data-e="'+currentEntry.id+'">＋ Song hinzufügen</button></div>';
 
   return '<div class="live-mode-banner">' +
-    '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:12px;">' +
-      '<h2 style="color:#fff;margin:0;font-size:1.2rem;">🔴 LIVE MODUS (Synchronisiert)</h2>' +
-      '<div style="display:flex;gap:8px;">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:16px;">' +
+      '<h2 style="color:#fff;margin:0;font-size:1.3rem;">🔴 LIVE MODUS</h2>' +
+      '<div style="display:flex;gap:12px;">' +
         '<button data-act="prevLive" style="background:var(--panel2);color:#fff;font-weight:600;">◀ Vorheriger</button>' +
         '<button data-act="nextLive" style="background:var(--panel2);color:#fff;font-weight:600;">Nächster ▶</button>' +
       '</div>' +
     '</div>' +
-    '<div class="live-current-card" data-act="openDetailModal" data-e="'+currentEntry.id+'">' + currentSongDisplay + '</div>' +
-    '<div style="display:flex;gap:10px;margin-top:4px;">'+juryRatingBox+'</div>' +
+    '<div class="live-current-card">' + currentSongDisplay + '</div>' +
+    '<div style="display:flex;gap:12px;margin-top:8px;">'+juryRatingBox+'</div>' +
   '</div>' +
-  '<h3 style="margin-bottom:8px;">Running Order (Klicke zum Umschalten)</h3>' +
+  '<h3 style="margin-bottom:10px;">Running Order</h3>' +
   '<div class="live-queue-grid">'+queueHtml+'</div>';
 }
 
 function initials(){
-  var first=[];
-  for(var i=0; i<S.jury.length; i++){
-    var n = S.jury[i].name.trim();
-    first.push((n[0]||"?").toUpperCase());
-  }
+  var first=[]; for(var i=0; i<S.jury.length; i++){ first.push((S.jury[i].name.trim()[0]||"?").toUpperCase()); }
   var res = [];
   for(var i=0; i<first.length; i++){
     var c = first[i], count = 0;
@@ -995,7 +718,6 @@ function initials(){
 
 function overviewTab(){
   var y = yearObj(ui.yearId), lab = initials();
-  
   var hasSemis = !!(y.shows.sf1 || y.shows.sf2);
   var subTabsHtml = '';
   if (hasSemis) {
@@ -1007,11 +729,8 @@ function overviewTab(){
 
   var getPtsHeader = function(alignRight){
     var h = '<div style="display:flex;gap:4px;margin-bottom:6px;'+(alignRight?'justify-content:flex-end':'justify-content:flex-start')+';padding:0 2px;">';
-    for(var j=0; j<S.jury.length; j++){
-      h += '<div style="width:34px;text-align:center;font-size:0.75rem;font-weight:700;color:var(--muted);" title="'+esc(S.jury[j].name)+'">'+esc(lab[j])+'</div>';
-    }
-    h += '</div>';
-    return h;
+    for(var j=0; j<S.jury.length; j++){ h += '<div style="width:34px;text-align:center;font-size:0.75rem;font-weight:700;color:var(--muted);" title="'+esc(S.jury[j].name)+'">'+esc(lab[j])+'</div>'; }
+    h += '</div>'; return h;
   };
 
   if(ui.ovSubTab === 'final' || !hasSemis){
@@ -1021,12 +740,10 @@ function overviewTab(){
       var e = list[i], s = songById(e.songId), r = getRatings(e);
       var pts = '<div class="ov-pts">';
       for(var j=0; j<S.jury.length; j++){
-        var v = r[S.jury[j].id];
-        pts += '<span class="ov-pt'+(v!==undefined&&v!==null?"":" none")+'" style="'+(v?pc(v):"")+'">'+(v!==undefined&&v!==null?v:"")+'</span>';
+        var v = r[S.jury[j].id]; pts += '<span class="ov-pt'+(v!==undefined&&v!==null?"":" none")+'" style="'+(v?pc(v):"")+'">'+(v!==undefined&&v!==null?v:"")+'</span>';
       }
       pts += '</div>';
-      var out = e.dq;
-      var pl = e.place ? '<span class="ov-place">'+e.place+'.</span>' : '<span class="ov-place">–</span>';
+      var out = e.dq; var pl = e.place ? '<span class="ov-place">'+e.place+'.</span>' : '<span class="ov-place">–</span>';
       var pill = s ? '<span class="ov-pill'+(out?" out":"")+(e.dq?" dq":"")+'"><div class="song-info">'+flag(s.cc)+'<span><b>'+esc(s.title)+'</b> – '+esc(s.artist)+'</span></div></span>' : '<span class="ov-pill out"><div class="song-info"><span>–</span></div></span>';
       rowsOv += '<div class="ov-row-item">'+pts+pill+pl+'</div>';
     }
@@ -1035,46 +752,24 @@ function overviewTab(){
   }
 
   var renderSideCol = function(shKey, title, isMirror){
-    var list = y.shows[shKey] || [];
-    var rows = "";
+    var list = y.shows[shKey] || []; var rows = "";
     for(var i=0; i<list.length; i++){
       var e = list[i], s = songById(e.songId), r = getRatings(e);
       var pts = '<div class="ov-pts">';
-      for(var j=0; j<S.jury.length; j++){
-        var v = r[S.jury[j].id];
-        pts += '<span class="ov-pt'+(v!==undefined&&v!==null?"":" none")+'" style="'+(v?pc(v):"")+'">'+(v!==undefined&&v!==null?v:"")+'</span>';
-      }
+      for(var j=0; j<S.jury.length; j++){ var v = r[S.jury[j].id]; pts += '<span class="ov-pt'+(v!==undefined&&v!==null?"":" none")+'" style="'+(v?pc(v):"")+'">'+(v!==undefined&&v!==null?v:"")+'</span>'; }
       pts += '</div>';
-      var out = (e.place && e.place>10) || e.dq;
-      var pl = e.place ? '<span class="ov-place">'+e.place+'.</span>' : '<span class="ov-place">–</span>';
+      var out = (e.place && e.place>10) || e.dq; var pl = e.place ? '<span class="ov-place">'+e.place+'.</span>' : '<span class="ov-place">–</span>';
       var pill = s ? '<span class="ov-pill'+(out?" out":"")+(e.dq?" dq":"")+'"><div class="song-info">'+flag(s.cc)+'<span><b>'+esc(s.title)+'</b> – '+esc(s.artist)+'</span></div></span>' : '<span class="ov-pill out"><div class="song-info"><span>–</span></div></span>';
-      
-      if(isMirror){
-        rows += '<div class="ov-row-item">'+pl+pill+pts+'</div>';
-      } else {
-        rows += '<div class="ov-row-item">'+pts+pill+pl+'</div>';
-      }
+      if(isMirror){ rows += '<div class="ov-row-item">'+pl+pill+pts+'</div>'; } else { rows += '<div class="ov-row-item">'+pts+pill+pl+'</div>'; }
     }
-
-    return '<div class="ov-column">' +
-      '<div class="ov-col-title">'+title+'</div>' +
-      getPtsHeader(isMirror) +
-      '<div style="display:flex;flex-direction:column;gap:8px">'+rows+'</div>' +
-    '</div>';
+    return '<div class="ov-column"><div class="ov-col-title">'+title+'</div>'+getPtsHeader(isMirror)+'<div style="display:flex;flex-direction:column;gap:8px">'+rows+'</div></div>';
   };
 
   var gridCols = '';
-  if(y.shows.sf1 && y.shows.sf2){
-    gridCols = renderSideCol("sf1", "Semi-final 1", false) + renderSideCol("sf2", "Semi-final 2", true);
-  } else if(y.shows.sf1){
-    gridCols = renderSideCol("sf1", "Semi-final 1", false);
-  } else if(y.shows.sf2){
-    gridCols = renderSideCol("sf2", "Semi-final 2", false);
-  }
+  if(y.shows.sf1 && y.shows.sf2){ gridCols = renderSideCol("sf1", "Semi-final 1", false) + renderSideCol("sf2", "Semi-final 2", true); }
+  else if(y.shows.sf1){ gridCols = renderSideCol("sf1", "Semi-final 1", false); } else if(y.shows.sf2){ gridCols = renderSideCol("sf2", "Semi-final 2", false); }
 
-  return '<h2>Overview</h2><p class="hint">Everyone\'s points side by side. Disqualified or non-qualifying countries are greyed out.</p>' +
-    subTabsHtml +
-    '<div class="ov-grid-side">' + gridCols + '</div>';
+  return '<h2>Overview</h2><p class="hint">Everyone\'s points side by side. Disqualified or non-qualifying countries are greyed out.</p>' + subTabsHtml + '<div class="ov-grid-side">' + gridCols + '</div>';
 }
 
 function showView(sh){
@@ -1093,41 +788,49 @@ function showView(sh){
     }
   }
 
+  var maxPts = -1, minPts = 99999;
+  for(var jId in juryTotals){
+    if(juryTotals[jId] > maxPts) maxPts = juryTotals[jId];
+    if(juryTotals[jId] < minPts) minPts = juryTotals[jId];
+  }
+  if(maxPts === minPts || maxPts === 0) { maxPts = -1; minPts = 99999; }
+
   var nqStats = {};
   for(var j=0; j<S.jury.length; j++){ nqStats[S.jury[j].id] = { correct: 0, totalGuessed: 0 }; }
   if(sh !== "final"){
     for(var i=0; i<listRaw.length; i++){
-      var e = listRaw[i];
-      var qp = getQualPred(e);
-      var actualNQ = (e.place !== undefined && e.place !== null) ? (e.place > 10) : null;
+      var e = listRaw[i], qp = getQualPred(e), actualNQ = (e.place !== undefined && e.place !== null) ? (e.place > 10) : null;
       if(actualNQ !== null){
         for(var j=0; j<S.jury.length; j++){
-          var jId = S.jury[j].id;
-          if(qp[jId] === false){
-            nqStats[jId].totalGuessed++;
-            if(actualNQ === true){
-              nqStats[jId].correct++;
-            }
+          if(qp[S.jury[j].id] === false){ 
+            nqStats[S.jury[j].id].totalGuessed++; 
+            if(actualNQ === true){ nqStats[S.jury[j].id].correct++; } 
           }
         }
       }
     }
   }
 
-  var juryBubblesHtml = '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">';
+  var juryBubblesHtml = '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;">';
   for(var j=0; j<S.jury.length; j++){
     var jId = S.jury[j].id;
-    var ptsText = juryTotals[jId] + ' pts';
+    var total = juryTotals[jId];
+    var ptsCol = "color:var(--gold)";
+    if(total === maxPts) ptsCol = "color:#4ade80; text-shadow: 0 0 10px rgba(74,222,128,0.4)";
+    if(total === minPts) ptsCol = "color:#ffb3b3; text-shadow: 0 0 10px rgba(255,179,179,0.4)";
+
+    var ptsText = total + ' pts';
     var nqExtra = '';
     if(sh !== "final"){
       var st = nqStats[jId];
-      nqExtra = ' <span style="font-size:0.7rem;font-weight:600;color:var(--muted);border-left:1px solid var(--line);padding-left:6px;">' + st.correct + ' / ' + st.totalGuessed + ' NQs</span>';
+      var glowStyle = (st.totalGuessed > 0 && st.correct === st.totalGuessed) 
+        ? 'color:var(--gold);text-shadow:0 0 12px rgba(255,209,102,1);' 
+        : 'color:var(--muted);';
+      nqExtra = ' <span style="font-size:0.75rem;font-weight:700;border-left:1px solid var(--line);padding-left:6px;'+glowStyle+'">' + st.correct + ' / ' + st.totalGuessed + ' NQs</span>';
     }
-    juryBubblesHtml += '<div style="background:var(--panel2);border:1px solid var(--line);padding:4px 10px;border-radius:999px;font-size:0.8rem;font-weight:700;display:inline-flex;align-items:center;gap:6px;"><span style="color:var(--muted)">'+esc(S.jury[j].name)+'</span><span style="color:var(--gold)">'+ptsText+'</span>'+nqExtra+'</div>';
+    juryBubblesHtml += '<div style="background:var(--panel2);border:1px solid var(--line);padding:6px 14px;border-radius:999px;font-size:0.85rem;font-weight:700;display:inline-flex;align-items:center;gap:8px;"><span style="color:var(--ink)">'+esc(S.jury[j].name)+'</span><span style="'+ptsCol+'">'+ptsText+'</span>'+nqExtra+'</div>';
   }
   juryBubblesHtml += '</div>';
-
-  var titleWithBubbles = '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:12px;"><h2>'+SHOWS[sh]+'</h2>'+juryBubblesHtml+'</div>';
 
   var list = listRaw.slice();
   if (ui.sortMode === 'place') {
@@ -1139,61 +842,44 @@ function showView(sh){
     });
   }
 
-  var cnt={};
-  for(var i=0; i<listRaw.length; i++){ if(listRaw[i].place) cnt[listRaw[i].place] = (cnt[listRaw[i].place]||0) + 1; }
+  var cnt={}; for(var i=0; i<listRaw.length; i++){ if(listRaw[i].place) cnt[listRaw[i].place] = (cnt[listRaw[i].place]||0) + 1; }
 
   var topControls = "";
   if(sh !== "final"){
-    topControls = '<div class="tabs" style="border:none;margin:0;padding:3px;background:var(--panel2);border-radius:10px;display:inline-flex;gap:4px">' +
+    topControls = '<div class="tabs" style="border:none;margin:0;padding:4px;background:var(--panel2);border-radius:999px;display:inline-flex;gap:4px">' +
       '<button class="'+(ui.subTab!=='tips'?'on':'')+'" style="border:none;margin:0" data-act="subTab" data-val="points">Points</button>' +
       '<button class="'+(ui.subTab==='tips'?'on':'')+'" style="border:none;margin:0" data-act="subTab" data-val="tips">NQ Tips</button>' +
     '</div>';
   }
-
-  var sortToggleBtn = '<div class="tabs" style="border:none;margin:0;padding:3px;background:var(--panel2);border-radius:10px;display:inline-flex;gap:4px">' +
+  var sortToggleBtn = '<div class="tabs" style="border:none;margin:0;padding:4px;background:var(--panel2);border-radius:999px;display:inline-flex;gap:4px">' +
     '<button class="'+(ui.sortMode==='order'?'on':'')+'" style="border:none;margin:0" data-act="sortMode" data-val="order">Order</button>' +
     '<button class="'+(ui.sortMode==='place'?'on':'')+'" style="border:none;margin:0" data-act="sortMode" data-val="place">Placement</button>' +
   '</div>';
 
   var splitControl = "";
   if(ui.editMode && list.length > 1) {
-    y.splitAfter = y.splitAfter || {};
-    var defaultSplit = Math.floor(list.length / 2);
-    var currentSplit = y.splitAfter[sh] !== undefined ? y.splitAfter[sh] : defaultSplit;
-    splitControl = '<div style="display:flex;align-items:center;gap:6px;font-size:0.85rem;color:var(--muted);background:var(--panel2);padding:4px 10px;border-radius:10px;border:1px solid var(--line)"><span>1st Half up to no.:</span><input type="number" min="1" max="'+(list.length-1)+'" value="'+currentSplit+'" data-chg="splitAfter" data-show="'+sh+'" style="width:56px;height:32px;text-align:center;font-weight:700"></div>';
+    y.splitAfter = y.splitAfter || {}; var defaultSplit = Math.floor(list.length / 2); var currentSplit = y.splitAfter[sh] !== undefined ? y.splitAfter[sh] : defaultSplit;
+    splitControl = '<div style="display:flex;align-items:center;gap:6px;font-size:0.85rem;color:var(--muted);background:var(--panel2);padding:4px 10px;border-radius:999px;border:1px solid var(--line)"><span>1. Hälfte bis Nr.:</span><input type="number" min="1" max="'+(list.length-1)+'" value="'+currentSplit+'" data-chg="splitAfter" data-show="'+sh+'" style="width:56px;height:32px;text-align:center;font-weight:700"></div>';
   }
 
-  var topBtnBar = '<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px;flex-wrap:wrap;gap:12px">'+
-    titleWithBubbles+
-    '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'+
-      splitControl+
-      topControls+
-      sortToggleBtn+
-    '</div>'+
+  var topBtnBar = '<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 14px;flex-wrap:wrap;gap:12px">'+
+    '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;flex:1;justify-content:flex-start;">'+topControls+splitControl+'</div>'+
+    '<div style="display:flex;justify-content:center;align-items:center;flex:auto;">' + juryBubblesHtml + '</div>' +
+    '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;flex:1;justify-content:flex-end;">'+sortToggleBtn+'</div>'+
   '</div>';
 
   var leftList = [], rightList = [];
-  y.splitAfter = y.splitAfter || {};
-  var splitAt = y.splitAfter[sh] !== undefined ? y.splitAfter[sh] : Math.floor(list.length / 2);
-
+  y.splitAfter = y.splitAfter || {}; var splitAt = y.splitAfter[sh] !== undefined ? y.splitAfter[sh] : Math.floor(list.length / 2);
   for(var i=0; i<list.length; i++){
-    var item = list[i];
-    var currentPosition = i + 1;
-    var originalIdx = listRaw.indexOf(item);
-    if(currentPosition > splitAt && ui.sortMode === 'order') {
-      rightList.push({item: item, index: originalIdx !== -1 ? originalIdx : i});
-    } else if(ui.sortMode === 'place') {
-      if(i >= Math.ceil(list.length / 2)) rightList.push({item: item, index: originalIdx !== -1 ? originalIdx : i});
-      else leftList.push({item: item, index: originalIdx !== -1 ? originalIdx : i});
-    } else {
-      leftList.push({item: item, index: originalIdx !== -1 ? originalIdx : i});
-    }
+    var item = list[i], currentPosition = i + 1, originalIdx = listRaw.indexOf(item);
+    if(currentPosition > splitAt && ui.sortMode === 'order') { rightList.push({item: item, index: originalIdx !== -1 ? originalIdx : i}); }
+    else if(ui.sortMode === 'place') { if(i >= Math.ceil(list.length / 2)) rightList.push({item: item, index: originalIdx !== -1 ? originalIdx : i}); else leftList.push({item: item, index: originalIdx !== -1 ? originalIdx : i}); } 
+    else { leftList.push({item: item, index: originalIdx !== -1 ? originalIdx : i}); }
   }
 
   var renderCard = function(obj){
     var e = obj.item, i = obj.index, s = songById(e.songId), r = getRatings(e);
-    var activeJur = me;
-    var nt = getNotes(e), qp = getQualPred(e);
+    var qp = getQualPred(e);
     var isAutoFinal = (e.autoFinal !== undefined) ? e.autoFinal : (s && ['de', 'fr', 'it', 'es', 'gb', 'kr'].indexOf(s.cc) !== -1);
     var actualQ = (e.place !== undefined && e.place !== null) ? (e.place <= 10) : null;
     
@@ -1204,40 +890,24 @@ function showView(sh){
       } else {
         var tipsHtml = "";
         for(var j=0; j<S.jury.length; j++){
-          var jur = S.jury[j], jQual = qp[jur.id], isMe = (jur.id === me) || (me === "admin");
-          var isCurrentProfile = (jur.id === me) || (me === "admin");
+          var jur = S.jury[j], jQual = qp[jur.id], isMe = (jur.id === me) || (me === "admin"), isCurrentProfile = (jur.id === me) || (me === "admin");
           var txt = jQual === false ? "NQ" : "–";
-          var bg = "var(--panel2)", col = "var(--muted)", border = "2.5px solid transparent";
-          var extraClass = "";
+          var bg = "var(--panel2)", col = "var(--muted)", border = "2.5px solid transparent", extraClass = "";
           
           if (jQual === false) { col = "#ffb3b3"; border = "2.5px solid #d62839"; bg = "rgba(214,40,57,0.1)"; }
-          
           if (actualQ !== null && jQual !== undefined) {
-            if (jQual === false) {
-              if (actualQ === false) { bg = "#189650"; col = "#fff"; border = "2.5px solid #4ade80"; } 
-              else { bg = "#d62839"; col = "#fff"; border = "2.5px solid #ffb3b3"; }
-            }
+            if (jQual === false) { if (actualQ === false) { bg = "#189650"; col = "#fff"; border = "2.5px solid #4ade80"; } else { bg = "#d62839"; col = "#fff"; border = "2.5px solid #ffb3b3"; } }
           }
-          
-          if (jQual === undefined) {
-            if (isCurrentProfile) {
-              extraClass = " tip-hidden";
-            } else {
-              extraClass = " tip-permanently-hidden";
-            }
-          }
+          if (jQual === undefined) { if (isCurrentProfile) { extraClass = " tip-hidden"; } else { extraClass = " tip-permanently-hidden"; } }
           
           var clickAttr = isMe ? 'data-act="toggleQual" data-e="'+e.id+'" data-jur="'+jur.id+'"' : '';
           var curStyle = isMe ? 'cursor:pointer;' : 'cursor:default;';
-          
           tipsHtml += '<button class="tile '+(isMe?"me":"empty")+extraClass+'" style="background:'+bg+';color:'+col+';border:'+border+';'+curStyle+'" '+clickAttr+' title="'+esc(jur.name)+'"><small style="background:transparent;border:none;padding:1px 0">'+esc(lab[j])+'</small><b>'+txt+'</b></button>';
         }
         mainStatsHtml = '<div class="tiles">'+tipsHtml+'</div>';
       }
-    } 
-    else {
-      var vals = [];
-      for(var j=0; j<S.jury.length; j++){ if(r[S.jury[j].id]) vals.push(r[S.jury[j].id]); }
+    } else {
+      var vals = []; for(var j=0; j<S.jury.length; j++){ if(r[S.jury[j].id]) vals.push(r[S.jury[j].id]); }
       var sum = 0; for(var v=0; v<vals.length; v++){ sum += vals[v]; }
       var avg = vals.length ? sum / vals.length : null;
 
@@ -1253,14 +923,8 @@ function showView(sh){
       mainStatsHtml = '<div class="tiles">'+tiles+'</div><div class="avg"><b>'+(avg==null?"–":avg.toFixed(1))+'</b><small>AVG</small></div>';
     }
 
-    var notesStr = "";
-    for(var j=0; j<S.jury.length; j++){
-      if(nt[S.jury[j].id]){ notesStr += '<span><b>'+esc(S.jury[j].name)+':</b> '+esc(nt[S.jury[j].id])+'</span>'; }
-    }
-
     var afTag = (sh !== "final" && isAutoFinal) ? '<span class="autofinal">AQ</span>' : "";
     var placeVal = (e.place !== undefined && e.place !== null) ? e.place : "";
-    
     var rawNo = e.customNo !== undefined && e.customNo !== null && e.customNo !== "" ? parseFloat(e.customNo) : idx(e.id);
     var displayNo = (rawNo % 1 !== 0) ? '➔' : rawNo;
 
@@ -1287,107 +951,59 @@ function showView(sh){
     var rowStyle = (s && s.cc) ? ' style="--flag-url: url(\'https://flagcdn.com/' + s.cc + '.svg\')"' : '';
     var ccBadge = (s && s.cc) ? '<div class="cc-code">'+esc(getIso3(s.cc))+'</div>' : '';
 
-    return '<div class="row '+rowClass+'"'+rowStyle+' data-act="openDetailModal" data-e="'+e.id+'">'+
-      ccBadge+
-      '<div class="no" data-act="editNo" data-e="'+e.id+'" title="Change order/status">'+esc(displayNo)+'</div>'+
-      '<div class="row-content">'+
-        mainContent+
-        (notesStr?'<div class="notes">'+notesStr+'</div>':'')+
-      '</div>'+
-      '<div style="display:flex;align-items:center;gap:12px">'+
-        '<div class="stats">'+mainStatsHtml+'</div>'+
-        placeInputHtml+
-      '</div>'+
-    '</div>';
+    return '<div class="row '+rowClass+'"'+rowStyle+'>'+
+      ccBadge+'<div class="no" data-act="editNo" data-e="'+e.id+'" title="Change order/status">'+esc(displayNo)+'</div>'+
+      '<div class="row-content">'+mainContent+'</div>'+
+      '<div style="display:flex;align-items:center;gap:12px"><div class="stats">'+mainStatsHtml+'</div>'+placeInputHtml+'</div></div>';
   };
 
-  var leftColHtml = "";
-  for(var i=0; i<leftList.length; i++){ leftColHtml += renderCard(leftList[i]); }
-  var rightColHtml = "";
-  for(var i=0; i<rightList.length; i++){ rightColHtml += renderCard(rightList[i]); }
+  var leftColHtml = ""; for(var i=0; i<leftList.length; i++){ leftColHtml += renderCard(leftList[i]); }
+  var rightColHtml = ""; for(var i=0; i<rightList.length; i++){ rightColHtml += renderCard(rightList[i]); }
 
   var editActions = ui.editMode ? '<div class="actions"><button class="ghost" data-act="addSlot" data-show="'+sh+'">＋ Running Order</button><button class="ghost" data-act="delSlot" data-show="'+sh+'">− Remove Last</button></div>' : '';
 
   return topBtnBar + 
     '<div style="display:flex;justify-content:space-between;color:var(--muted);font-weight:700;font-size:0.85rem;padding:0 4px;margin:12px 0 6px"><div>1st Half</div><div>2nd Half</div></div>' +
-    '<div class="list" style="margin-top:0">' +
-      '<div style="display:flex;flex-direction:column;gap:12px">'+leftColHtml+'</div>' +
-      '<div style="display:flex;flex-direction:column;gap:12px">'+rightColHtml+'</div>' +
-    '</div>'+
-    editActions +
-    '<div class="actions" style="margin-top:16px"><button class="ghost" data-act="openLibraryView">Song Library</button></div>';
+    '<div class="list" style="margin-top:0"><div style="display:flex;flex-direction:column;gap:12px">'+leftColHtml+'</div><div style="display:flex;flex-direction:column;gap:12px">'+rightColHtml+'</div></div>'+
+    editActions;
 }
 
 function switcher(key){
-  var y = yearObj(ui.yearId);
-  var res = "";
-  for(var sh in SHOWS){
-    if(y && y.shows[sh]){
-      res += '<button class="'+(ui[key]===sh?"on":"")+'" data-act="'+key+'" data-show="'+sh+'">'+SHOWS[sh]+'</button>';
-    }
-  }
-  if(key === "sbShow"){
-    res += '<button class="'+(ui[key]==="all"?"on":"")+'" data-act="'+key+'" data-show="all">All Songs</button>';
-  }
+  var y = yearObj(ui.yearId), res = "";
+  for(var sh in SHOWS){ if(y && y.shows[sh]){ res += '<button class="'+(ui[key]===sh?"on":"")+'" data-act="'+key+'" data-show="'+sh+'">'+SHOWS[sh]+'</button>'; } }
+  if(key === "sbShow"){ res += '<button class="'+(ui[key]==="all"?"on":"")+'" data-act="'+key+'" data-show="all">All Songs</button>'; }
   return '<div class="seg">'+res+'</div>';
 }
 
 function battle(){
   var y=yearObj(ui.yearId), allFin=y.shows.final || [];
-  var fin = [];
-  for(var i=0; i<allFin.length; i++){if(songById(allFin[i].songId) && !allFin[i].dq) fin.push(allFin[i]);}
-
-  fin.sort(function(a, b) {
-    var pa = (a.place !== undefined && a.place !== null) ? a.place : 9999;
-    var pb = (b.place !== undefined && b.place !== null) ? b.place : 9999;
-    return pa - pb;
-  });
+  var fin = []; for(var i=0; i<allFin.length; i++){if(songById(allFin[i].songId) && !allFin[i].dq) fin.push(allFin[i]);}
+  fin.sort(function(a, b) { var pa = (a.place !== undefined && a.place !== null) ? a.place : 9999; var pb = (b.place !== undefined && b.place !== null) ? b.place : 9999; return pa - pb; });
 
   var dupSets = {};
   for(var j=0; j<S.jury.length; j++){
-    var jId = S.jury[j].id;
-    var c = {};
-    for(var i=0; i<fin.length; i++){
-      var v = (S.pred[fin[i].id] || {})[jId];
-      if(v) c[v] = (c[v] || 0) + 1;
-    }
+    var jId = S.jury[j].id, c = {};
+    for(var i=0; i<fin.length; i++){ var v = (S.pred[fin[i].id] || {})[jId]; if(v) c[v] = (c[v] || 0) + 1; }
     dupSets[jId] = c;
   }
 
-  var guessHeaders = "";
-  var diffHeaders = "";
-  for(var j=0; j<S.jury.length; j++){
-    guessHeaders += '<th class="c">'+esc(S.jury[j].name)+' (Tipp)</th>';
-    diffHeaders += '<th class="c">'+esc(S.jury[j].name)+' (Abw.)</th>';
-  }
+  var guessHeaders = "", diffHeaders = "";
+  for(var j=0; j<S.jury.length; j++){ guessHeaders += '<th class="c">'+esc(S.jury[j].name)+' (Tipp)</th>'; diffHeaders += '<th class="c">'+esc(S.jury[j].name)+' (Abw.)</th>'; }
 
-  var rows="";
-  var jurorTotals = {};
+  var rows="", jurorTotals = {};
   for(var j=0; j<S.jury.length; j++){ jurorTotals[S.jury[j].id] = {sum: 0, count: 0}; }
 
   for(var i=0; i<fin.length; i++){
     var e=fin[i], s=songById(e.songId), p=S.pred[e.id]||{}, act=e.place;
-    var guessCells="";
-    var diffCells="";
+    var guessCells="", diffCells="";
     
     for(var j=0; j<S.jury.length; j++){
-      var jId = S.jury[j].id;
-      var v = p[jId];
-      var valStr = (v !== undefined && v !== null) ? v : "";
-      var isDup = v && dupSets[jId][v] > 1;
-      
+      var jId = S.jury[j].id, v = p[jId], valStr = (v !== undefined && v !== null) ? v : "", isDup = v && dupSets[jId][v] > 1;
       guessCells += '<td class="c"><input type="number" min="1" max="'+fin.length+'" value="'+valStr+'" class="'+(isDup?"dup":"")+'" data-chg="pred" data-e="'+e.id+'" data-j="'+jId+'" style="width:60px;text-align:center"></td>';
-      
       var diffCell = "–";
       if(v !== undefined && v !== null && act !== undefined && act !== null){
-        var d = Math.abs(v - act);
-        jurorTotals[jId].sum += d;
-        jurorTotals[jId].count++;
-        if(d === 0){
-          diffCell = '<span class="cell" style="'+pc(10)+';font-size:0.85rem;padding:3px 8px;">🎯 0</span>';
-        } else {
-          diffCell = '<span class="cell" style="'+pc(Math.max(1, 10 - d))+';font-size:0.85rem;padding:3px 8px;">'+d+'</span>';
-        }
+        var d = Math.abs(v - act); jurorTotals[jId].sum += d; jurorTotals[jId].count++;
+        if(d === 0){ diffCell = '<span class="cell" style="'+pc(10)+';font-size:0.85rem;padding:3px 8px;">🎯 0</span>'; } else { diffCell = '<span class="cell" style="'+pc(Math.max(1, 10 - d))+';font-size:0.85rem;padding:3px 8px;">'+d+'</span>'; }
       }
       diffCells += '<td class="c">'+diffCell+'</td>';
     }
@@ -1396,29 +1012,21 @@ function battle(){
   }
 
   var rankings = [];
-  for(var j=0; j<S.jury.length; j++){
-    var jId = S.jury[j].id;
-    if(jurorTotals[jId].count > 0){
-      rankings.push({name: S.jury[j].name, sum: jurorTotals[jId].sum, count: jurorTotals[jId].count});
-    }
-  }
+  for(var j=0; j<S.jury.length; j++){ var jId = S.jury[j].id; if(jurorTotals[jId].count > 0){ rankings.push({name: S.jury[j].name, sum: jurorTotals[jId].sum, count: jurorTotals[jId].count}); } }
   rankings.sort(function(a, b){ return a.sum - b.sum; });
 
   var verdictHtml = '<span class="hint">Trage die Tipps und tatsächlichen Plätze ein, um das Leaderboard zu sehen.</span>';
   if(rankings.length > 0){
     var rankList = "";
     for(var r=0; r<rankings.length; r++){
-      var item = rankings[r];
-      var medal = r === 0 ? "👑 " : (r === 1 ? "🥈 " : (r === 2 ? "🥉 " : ""));
+      var item = rankings[r], medal = r === 0 ? "👑 " : (r === 1 ? "🥈 " : (r === 2 ? "🥉 " : ""));
       rankList += '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line)"><span>'+medal+'<b>'+esc(item.name)+'</b></span><span><b>'+item.sum+'</b> Fehlerpunkte ('+item.count+' verglichen)</span></div>';
     }
     verdictHtml = '<h3 style="margin-bottom:8px">Leaderboard</h3><div style="display:flex;flex-direction:column;gap:4px">'+rankList+'</div>';
   }
 
   return '<h2>Points Battle</h2><p class="hint">Tippe die Platzierungen nebeneinander. Die Abweichungen werden in separaten Spalten rechts daneben angezeigt (🎯 bei Volltreffer). Songs sind nach dem tatsächlichen Ergebnis sortiert (Platz 1 oben).</p>'+
-  (fin.length?'<div class="tw" style="margin-top:12px"><table><thead><tr><th>Country</th>'+guessHeaders+diffHeaders+'<th class="c">Actual</th></tr></thead>'+
-  '<tbody>'+rows+'</tbody></table></div>'+
-  '<div class="verdict">'+verdictHtml+'</div>'
+  (fin.length?'<div class="tw" style="margin-top:12px"><table><thead><tr><th>Country</th>'+guessHeaders+diffHeaders+'<th class="c">Actual</th></tr></thead><tbody>'+rows+'</tbody></table></div><div class="verdict">'+verdictHtml+'</div>'
   :'<p class="empty">Bitte wähle zuerst Songs für das Grand Final aus.</p>');
 }
 
@@ -1431,39 +1039,26 @@ function scoreboard(){
     var seenSongs = new Set();
     for(var sKey in y.shows){
       var sList = y.shows[sKey] || [];
-      for(var k=0; k<sList.length; k++){
-        if(sList[k].songId && !seenSongs.has(sList[k].songId)){
-          seenSongs.add(sList[k].songId);
-          rawList.push(sList[k]);
-        }
-      }
+      for(var k=0; k<sList.length; k++){ if(sList[k].songId && !seenSongs.has(sList[k].songId)){ seenSongs.add(sList[k].songId); rawList.push(sList[k]); } }
     }
-  } else {
-    rawList = y.shows[sh] || [];
-  }
+  } else { rawList = y.shows[sh] || []; }
 
   var rows = [];
   for(var i=0; i<rawList.length; i++){
     var e = rawList[i];
     if(songById(e.songId) && !e.dq){
-      var r = getRatings(e);
-      var vals = [];
+      var r = getRatings(e), vals = [];
       for(var j=0; j<S.jury.length; j++){if(r[S.jury[j].id]) vals.push(r[S.jury[j].id]); }
       var sum = 0; for(var v=0; v<vals.length; v++){ sum+=vals[v]; }
       rows.push({e:e, s:songById(e.songId), r:r, avg:vals.length?sum/vals.length:null, sum:sum});
     }
   }
   rows.sort(function(a,b){ return ((b.avg!==null?b.avg:-1)-(a.avg!==null?a.avg:-1)); });
-  var juryHeaders = "";
-  for(var j=0; j<S.jury.length; j++){ juryHeaders += '<th class="c">'+esc(S.jury[j].name)+'</th>'; }
+  var juryHeaders = ""; for(var j=0; j<S.jury.length; j++){ juryHeaders += '<th class="c">'+esc(S.jury[j].name)+'</th>'; }
   var tbody = "";
   for(var i=0; i<rows.length; i++){
-    var x = rows[i];
-    var jCols = "";
-    for(var j=0; j<S.jury.length; j++){
-      var p = x.r[S.jury[j].id];
-      jCols += '<td class="c">'+(p?'<span class="cell" style="'+pc(p)+'">'+p+'</span>':"–")+'</td>';
-    }
+    var x = rows[i], jCols = "";
+    for(var j=0; j<S.jury.length; j++){ var p = x.r[S.jury[j].id]; jCols += '<td class="c">'+(p?'<span class="cell" style="'+pc(p)+'">'+p+'</span>':"–")+'</td>'; }
     tbody += '<tr><td>'+(x.avg==null?"–":i+1)+'</td><td>'+flag(x.s.cc)+' '+esc(CN[x.s.cc])+'</td><td>'+esc(x.s.title)+'</td>'+jCols+'<td class="c">'+(x.avg==null?"–":x.sum)+'</td><td class="c">'+(x.avg==null?"–":'<span class="cell" style="'+pc(x.avg)+'">'+x.avg.toFixed(1)+'</span>')+'</td></tr>';
   }
   return '<h2>Scoreboard</h2><p class="hint">Average points, highest first.</p>'+switcher("sbShow")+
@@ -1472,34 +1067,21 @@ function scoreboard(){
 
 function compareView(){
   var currentCountryName = (ui.compareCc && CN[ui.compareCc]) ? CN[ui.compareCc] : "";
-  
   var entries = [];
   if (ui.compareCc) {
     for(var i=0; i<S.years.length; i++){
-      var y = S.years[i];
-      var yearEntries = [];
-      
+      var y = S.years[i], yearEntries = [];
       for(var sh in y.shows){
         var list = y.shows[sh];
         for(var k=0; k<list.length; k++){
           var entry = list[k], song = songById(entry.songId);
-          if(song && song.cc === ui.compareCc){
-            yearEntries.push({yearObj: y, showKey: sh, showName: SHOWS[sh], entry: entry, song: song});
-          }
+          if(song && song.cc === ui.compareCc){ yearEntries.push({yearObj: y, showKey: sh, showName: SHOWS[sh], entry: entry, song: song}); }
         }
       }
-      
       if(yearEntries.length > 0){
         var chosen = null;
-        for(var k=0; k<yearEntries.length; k++){
-          if(yearEntries[k].showKey === "final"){
-            chosen = yearEntries[k];
-            break;
-          }
-        }
-        if(!chosen){
-          chosen = yearEntries[0];
-        }
+        for(var k=0; k<yearEntries.length; k++){ if(yearEntries[k].showKey === "final"){ chosen = yearEntries[k]; break; } }
+        if(!chosen){ chosen = yearEntries[0]; }
         entries.push(chosen);
       }
     }
@@ -1513,10 +1095,7 @@ function compareView(){
     var sum = 0; for(var v=0; v<vals.length; v++){ sum+=vals[v]; }
     var avg = vals.length ? sum/vals.length : null;
     var jCols = "";
-    for(var j=0; j<S.jury.length; j++){
-      var p = r[S.jury[j].id];
-      jCols += '<td class="c">'+(p?'<span class="cell" style="'+pc(p)+'">'+p+'</span>':"–")+'</td>';
-    }
+    for(var j=0; j<S.jury.length; j++){ var p = r[S.jury[j].id]; jCols += '<td class="c">'+(p?'<span class="cell" style="'+pc(p)+'">'+p+'</span>':"–")+'</td>'; }
     rowsHtml += '<tr><td><b>'+item.yearObj.year+'</b><br><small>'+item.showName+'</small></td><td>'+flag(item.song.cc)+' <b>'+esc(item.song.title)+'</b></td>'+jCols+'<td class="c"><b>'+(avg==null?"–":sum)+'</b></td><td class="c">'+(avg==null?"–":'<span class="cell" style="'+pc(avg)+'">'+avg.toFixed(1)+'</span>')+'</td></tr>';
   }
   var juryHeaders = ""; for(var j=0; j<S.jury.length; j++){ juryHeaders += '<th class="c">'+esc(S.jury[j].name)+'</th>'; }
@@ -1525,13 +1104,9 @@ function compareView(){
     ? '<p class="empty">Bitte wähle oben ein Land aus, um den Vergleich zu sehen.</p>'
     : (rowsHtml ? '<div class="tw"><table><thead><tr><th>Year / Show</th><th>Song</th>'+juryHeaders+'<th class="c">Total</th><th class="c">Ø</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>' : '<p class="empty">No entries found for this country.</p>');
 
-  return '<div style="padding-top:14px"><button class="ghost" data-act="home">← Back</button></div>'+
-  '<h2>Country Comparison</h2>'+
+  return '<div style="padding-top:14px"><button class="ghost" data-act="home">← Back</button></div><h2>Country Comparison</h2>'+
   '<div style="margin-bottom:16px;max-width:300px;"><label>Select Country:'+
-    '<div class="search-dropdown-container">'+
-      '<input id="compare_country_input" placeholder="Land suchen..." value="'+esc(currentCountryName)+'" autocomplete="off" style="width:100%">'+
-      '<div id="compare_country_results" class="search-dropdown-results"></div>'+
-    '</div>'+
+    '<div class="search-dropdown-container"><input id="compare_country_input" placeholder="Land suchen..." value="'+esc(currentCountryName)+'" autocomplete="off" style="width:100%"><div id="compare_country_results" class="search-dropdown-results"></div></div>'+
   '</label></div>'+ contentHtml;
 }
 
@@ -1558,14 +1133,12 @@ function libraryView(){
       '<div style="display:flex;gap:8px"><button class="ghost sm" data-act="editSongMain" data-id="'+x.id+'">Edit</button><button class="ghost sm danger" data-act="delSongMain" data-id="'+x.id+'">Delete</button></div>'+
     '</div>';
   }
-  return '<div style="padding-top:14px"><button class="ghost" data-act="home">← Back</button></div>'+
-  '<h2>Song Library</h2>'+
+  return '<div style="padding-top:14px"><button class="ghost" data-act="home">← Back</button></div><h2>Song Library</h2>'+
   '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:16px 0">'+
     '<input id="lib_search_input" placeholder="Search..." value="'+esc(ui.q)+'" style="flex:1;min-width:180px">'+
     '<select id="lib_year_select" style="width:130px">'+yearOpts+'</select>'+
     '<button class="primary" data-act="addNewSongMain">＋ New Song</button>'+
-  '</div>'+
-  '<div class="card" style="padding:0 16px">'+(pHtml ? pHtml : '<p class="empty">No matching songs found.</p>')+'</div>';
+  '</div><div class="card" style="padding:0 16px">'+(pHtml ? pHtml : '<p class="empty">No matching songs found.</p>')+'</div>';
 }
 
 function openNewYearModal(){
@@ -1581,10 +1154,16 @@ function openNewYearModal(){
 
 function openWelcomeModal(){
   var btns = "";
-  for(var i=0; i<S.jury.length; i++){ btns += '<button class="primary preset-btn" data-act="selectWho" data-id="'+S.jury[i].id+'">'+esc(S.jury[i].name)+'</button>'; }
-  btns += '<button class="preset-btn" data-act="selectWho" data-id="admin" style="border-color:var(--gold);color:var(--gold)">👑 Admin</button>';
+  for(var i=0; i<S.jury.length; i++){
+    var isCurrent = (S.jury[i].id === me);
+    var disabledAttr = isCurrent ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : '';
+    btns += '<button class="primary preset-btn" data-act="selectWho" data-id="'+S.jury[i].id+'" '+disabledAttr+'>'+esc(S.jury[i].name)+(isCurrent?' (Du)':'')+'</button>';
+  }
+  var isAdminCurrent = (me === "admin");
+  btns += '<button class="preset-btn" data-act="selectWho" data-id="admin" '+(isAdminCurrent?'disabled style="opacity:0.4; cursor:not-allowed;"':'')+' style="border-color:var(--gold);color:var(--gold)">👑 Admin'+(isAdminCurrent?' (Du)':'')+'</button>';
+  
   dlg.className="";
-  dlg.innerHTML='<h2>Select Profile 👋</h2><p class="hint">Who are you?</p><div style="display:grid;grid-template-columns:1fr;gap:10px;margin:16px 0">'+btns+'</div>';
+  dlg.innerHTML='<h2>Select Profile 👋</h2><p class="hint">Wer bist du?</p><div style="display:grid;grid-template-columns:1fr;gap:10px;margin:16px 0">'+btns+'</div>';
   if(!dlg.open) dlg.showModal();
 }
 
@@ -1616,69 +1195,45 @@ function openSong(id,assign){
   setTimeout(function(){
     setupCountrySearch("#song_country_input", "#song_country_results", "#f_cc", null);
     var songInput = $("#song_country_input");
-    if(songInput) {
-      songInput.focus();
-      var event = new Event('focus');
-      songInput.dispatchEvent(event);
-    }
+    if(songInput) { songInput.focus(); var event = new Event('focus'); songInput.dispatchEvent(event); }
   }, 50);
 }
 
 function openDetailModal(eId){
-  var e = findEntry(eId);
-  if(!e) return;
-  var s = songById(e.songId);
-  var r = getRatings(e);
-  var nt = getNotes(e);
+  var e = findEntry(eId); if(!e) return;
+  var s = songById(e.songId), r = getRatings(e);
 
-  if(!s){
-    openPicker(eId);
-    return;
-  }
+  if(!s){ openPicker(eId); return; }
 
   var juryBoxes = "";
   for(var j=0; j<S.jury.length; j++){
-    var jur = S.jury[j];
-    var val = r[jur.id];
-    var note = nt[jur.id] || "";
-    var isMe = (jur.id === me) || (me === "admin");
-
+    var jur = S.jury[j], val = r[jur.id], isMe = (jur.id === me) || (me === "admin");
     var row1="", row2="";
     for(var p=1; p<=10; p++){
-      var bHtml = '<button class="rate-modal-btn" style="'+pc(p)+';width:36px;height:40px;font-family:var(--number-font);font-size:1.1rem;border-radius:8px;border:2px solid '+(val===p?'#fff':'transparent')+';cursor:pointer;display:grid;place-items:center;" data-act="rateModal" data-e="'+eId+'" data-jur="'+jur.id+'" data-p="'+p+'">'+p+'</button>';
+      var bHtml = '<button class="rate-modal-btn" style="'+pc(p)+';width:36px;height:40px;font-family:var(--number-font);font-size:1.1rem;border-radius:12px;border:2px solid '+(val===p?'#fff':'transparent')+';cursor:pointer;display:grid;place-items:center;padding:0;" data-act="rateModal" data-e="'+eId+'" data-jur="'+jur.id+'" data-p="'+p+'">'+p+'</button>';
       if(p<=5) row1+=bHtml; else row2+=bHtml;
     }
 
-    juryBoxes += '<div style="background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
-        '<b>'+esc(jur.name)+'</b>' +
-        '<span style="font-family:var(--number-font);font-size:1.3rem;color:var(--gold);">'+(val!==undefined&&val!==null?val+'/10 Pts':'–')+'</span>' +
+    juryBoxes += '<div style="background:var(--panel2);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">' +
+        '<b>'+esc(jur.name)+'</b><span style="font-family:var(--number-font);font-size:1.3rem;color:var(--gold);">'+(val!==undefined&&val!==null?val+'/10 Pts':'–')+'</span>' +
       '</div>' +
-      (isMe ? '<div style="display:flex;gap:4px;justify-content:center;margin-bottom:6px;">'+row1+'</div><div style="display:flex;gap:4px;justify-content:center;margin-bottom:10px;">'+row2+'</div>' : '') +
-      '<label style="margin:0;font-size:0.8rem;">Notiz:' +
-        '<input type="text" value="'+esc(note)+'" data-chg="note" data-e="'+eId+'" data-jur="'+jur.id+'" placeholder="Notiz für '+esc(jur.name)+'..." style="margin-top:2px;font-size:0.85rem;">' +
-      '</label>' +
-    '</div>';
+      (isMe ? '<div style="display:flex;gap:4px;justify-content:center;margin-bottom:8px;">'+row1+'</div><div style="display:flex;gap:4px;justify-content:center;margin-bottom:12px;">'+row2+'</div>' : '') +
+      '</div>';
   }
 
   dlg.className = "wide";
   dlg.innerHTML = '<div style="text-align:center;margin-bottom:16px;">' +
     '<div style="margin-bottom:8px;transform:scale(1.5);display:inline-block;">'+flag(s.cc)+'</div>' +
-    '<h2 style="margin:6px 0 2px;">'+esc(s.title)+'</h2>' +
-    '<p style="color:var(--muted);margin:0;font-size:1.05rem;">'+esc(s.artist)+' ('+esc(CN[s.cc]||s.cc.toUpperCase())+')</p>' +
-  '</div>' +
-  '<div style="max-height:60vh;overflow-y:auto;padding-right:4px;">'+juryBoxes+'</div>' +
+    '<h2 style="margin:6px 0 2px;">'+esc(s.title)+'</h2><p style="color:var(--muted);margin:0;font-size:1.05rem;">'+esc(s.artist)+' ('+esc(CN[s.cc]||s.cc.toUpperCase())+')</p></div>' +
+  '<div style="max-height:60vh;overflow-y:auto;padding-right:8px;">'+juryBoxes+'</div>' +
   '<div class="actions" style="margin-top:16px;justify-content:space-between;">' +
-    '<button class="ghost danger" data-act="pick" data-e="'+eId+'">Song wechseln</button>' +
-    '<button class="primary" data-act="closeDlg">Fertig</button>' +
-  '</div>';
+    '<button class="ghost danger" data-act="pick" data-e="'+eId+'">Song wechseln</button><button class="primary" data-act="closeDlg">Fertig</button></div>';
 
   if(!dlg.open) dlg.showModal();
 }
 
-function openRatingModal(eId, jurId) {
-  openDetailModal(eId);
-}
+function openRatingModal(eId, jurId) { openDetailModal(eId); }
 
 function openPicker(entryId){ ui.assign=entryId; pickerHtml(); }
 function pickerHtml(){
@@ -1714,7 +1269,7 @@ function openEditNo(entryId){
   var isAutoFinal = (e.autoFinal !== undefined) ? e.autoFinal : (s && ['de', 'fr', 'it', 'es', 'gb', 'kr'].indexOf(s.cc) !== -1);
   dlg.className="";
   dlg.innerHTML='<h3>Running Order & Status</h3>'+
-   '<label>Custom Position / Number (e.g. 6 or 6.5)<input id="custom_no_input" value="'+esc(cur)+'"></label>'+
+   '<label>Custom Position / Number (z.B. 6 oder 6.5)<input id="custom_no_input" value="'+esc(cur)+'"></label>'+
    '<label style="flex-direction:row;align-items:center;gap:10px;margin-top:14px;cursor:pointer"><input type="checkbox" id="custom_autofinal_input" '+(isAutoFinal?'checked':'')+'> Auto Qualifier (AQ)</label>'+
    '<div class="actions"><button class="ghost" data-act="closeDlg">Cancel</button><button class="primary" data-act="saveCustomNo" data-e="'+entryId+'">Save</button></div>';
   if(!dlg.open) dlg.showModal();
@@ -1723,8 +1278,8 @@ function openEditNo(entryId){
 function openSettings(){
   var jLabels = ""; for(var i=0; i<S.jury.length; i++){ jLabels += '<label>'+S.jury[i].id.toUpperCase()+' Name<input data-jn="'+S.jury[i].id+'" value="'+esc(S.jury[i].name)+'"></label>'; }
   dlg.className="";
-  dlg.innerHTML='<h3>Settings</h3>'+jLabels+'<label>Database URL<input id="dburl" value="'+esc(DB)+'"></label>'+
-   '<div class="actions"><button data-act="export">Export</button><label style="background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px;cursor:pointer;flex:1;text-align:center">Import<input id="imp" type="file" style="display:none"></label><button class="ghost" data-act="openJsonEditor">JSON bearbeiten</button></div>'+
+  dlg.innerHTML='<h3>Settings</h3>'+jLabels+
+   '<div class="actions" style="margin-top:16px"><button class="ghost" data-act="export">Export Data</button><label style="background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:8px 18px;cursor:pointer;text-align:center">Import Data<input id="imp" type="file" style="display:none"></label><button class="ghost" data-act="openJsonEditor">JSON</button></div>'+
    '<div class="actions"><button class="ghost" data-act="closeDlg">Close</button><button class="primary" data-act="saveNames">Save</button></div>';
   if(!dlg.open)dlg.showModal();
   
@@ -1734,38 +1289,15 @@ function openSettings(){
     r.onload=function(){
       try{
         var imported=JSON.parse(r.result);
-        
-        var juryMap={};
-        S.jury.forEach(function(j){ juryMap[j.id]=j; });
-        if(imported.jury){ imported.jury.forEach(function(j){ juryMap[j.id]=j; }); }
-        S.jury=Object.values(juryMap);
-
-        var songMap={};
-        S.songs.forEach(function(s){ songMap[s.id]=s; });
-        if(imported.songs){ imported.songs.forEach(function(s){ songMap[s.id]=s; }); }
-        S.songs=Object.values(songMap);
-
-        var yearMap={};
-        S.years.forEach(function(y){ yearMap[y.id]=y; });
-        if(imported.years){ imported.years.forEach(function(y){ yearMap[y.id]=y; }); }
-        S.years=Object.values(yearMap);
+        var juryMap={}; S.jury.forEach(function(j){ juryMap[j.id]=j; }); if(imported.jury){ imported.jury.forEach(function(j){ juryMap[j.id]=j; }); } S.jury=Object.values(juryMap);
+        var songMap={}; S.songs.forEach(function(s){ songMap[s.id]=s; }); if(imported.songs){ imported.songs.forEach(function(s){ songMap[s.id]=s; }); } S.songs=Object.values(songMap);
+        var yearMap={}; S.years.forEach(function(y){ yearMap[y.id]=y; }); if(imported.years){ imported.years.forEach(function(y){ yearMap[y.id]=y; }); } S.years=Object.values(yearMap);
         S.years.sort(function(a,b){return b.year-a.year||b.id.localeCompare(a.id);});
-
-        ['ratings','notes','pred','qualPred','liveState'].forEach(function(key){
+        ['ratings','pred','qualPred','liveState'].forEach(function(key){
           S[key]=S[key]||{};
-          if(imported[key]){
-            for(var id in imported[key]){
-              if(imported[key].hasOwnProperty(id)){
-                S[key][id]=Object.assign({}, S[key][id]||{}, imported[key][id]);
-              }
-            }
-          }
+          if(imported[key]){ for(var id in imported[key]){ if(imported[key].hasOwnProperty(id)){ S[key][id]=Object.assign({}, S[key][id]||{}, imported[key][id]); } } }
         });
-
-        save();
-        dlg.close();
-        render();
-        showAlert("Success", "Data successfully merged!");
+        save(); dlg.close(); render(); showAlert("Success", "Data successfully merged!");
       }catch(e){showAlert("Error","Invalid file");}
     };
     r.readAsText(f);
@@ -1774,9 +1306,8 @@ function openSettings(){
 
 function openJsonEditor(){
   dlg.className="wide";
-  dlg.innerHTML='<h3>JSON Editor</h3>'+
-    '<p class="hint">Bearbeite den gesamten JSON-State direkt hier:</p>'+
-    '<textarea id="raw_json_input" style="width:100%;height:320px;font-family:monospace;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical;font-size:0.85rem;">'+esc(JSON.stringify(S, null, 2))+'</textarea>'+
+  dlg.innerHTML='<h3>JSON Editor</h3><p class="hint">Bearbeite den gesamten JSON-State direkt hier:</p>'+
+    '<textarea id="raw_json_input" style="width:100%;height:320px;font-family:monospace;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:12px;resize:vertical;font-size:0.85rem;">'+esc(JSON.stringify(S, null, 2))+'</textarea>'+
     '<div class="actions"><button class="ghost" data-act="settings">Zurück</button><button class="primary" data-act="saveRawJson">Speichern & Anwenden</button></div>';
   if(!dlg.open) dlg.showModal();
 }
@@ -1784,397 +1315,214 @@ function openJsonEditor(){
 var A={
   selectWho:function(t){ me = t.dataset.id; localStorage.setItem(MEKEY, me); localStorage.setItem("esc-joined", "true"); dlg.close(); ui.enter=true; render(); return "keep"; },
   openWelcomeModal:function(){ openWelcomeModal(); return "keep"; },
-  toggleEditMode:function(){ ui.editMode = !ui.editMode; ui.enter=true; },
+  toggleEditMode:function(){ ui.editMode = !ui.editMode; render(); },
   
   toggleLiveMode:function(){
     if(!ui.yearId) return;
     S.liveState[ui.yearId] = S.liveState[ui.yearId] || {active: false, index: 0};
-    S.liveState[ui.yearId].active = !S.liveState[ui.yearId].active;
-    save();
-    ui.enter=true;
+    S.liveState[ui.yearId].active = !S.liveState[ui.yearId].active; save(); render();
   },
   setLiveIndex:function(t){
     if(!ui.yearId) return;
     var idxVal = parseInt(t.dataset.idx)||0;
     S.liveState[ui.yearId] = S.liveState[ui.yearId] || {active: true, index: 0};
-    S.liveState[ui.yearId].index = idxVal;
-    save();
-    ui.enter=true;
+    S.liveState[ui.yearId].index = idxVal; save(); render();
   },
   nextLive:function(){
-    if(!ui.yearId) return;
-    var y=yearObj(ui.yearId), l=y.shows[ui.tab]||[];
-    if(l.length){
-      var cur = getLiveIndex();
-      var nextIdx = (cur + 1) % l.length;
-      S.liveState[ui.yearId] = S.liveState[ui.yearId] || {active: true, index: 0};
-      S.liveState[ui.yearId].index = nextIdx;
-      save();
-      ui.enter=true;
-    }
+    if(!ui.yearId) return; var y=yearObj(ui.yearId), l=y.shows[ui.tab]||[];
+    if(l.length){ var cur = getLiveIndex(), nextIdx = (cur + 1) % l.length; S.liveState[ui.yearId] = S.liveState[ui.yearId] || {active: true, index: 0}; S.liveState[ui.yearId].index = nextIdx; save(); render(); }
   },
   prevLive:function(){
-    if(!ui.yearId) return;
-    var y=yearObj(ui.yearId), l=y.shows[ui.tab]||[];
-    if(l.length){
-      var cur = getLiveIndex();
-      var prevIdx = (cur - 1 + l.length) % l.length;
-      S.liveState[ui.yearId] = S.liveState[ui.yearId] || {active: true, index: 0};
-      S.liveState[ui.yearId].index = prevIdx;
-      save();
-      ui.enter=true;
-    }
+    if(!ui.yearId) return; var y=yearObj(ui.yearId), l=y.shows[ui.tab]||[];
+    if(l.length){ var cur = getLiveIndex(), prevIdx = (cur - 1 + l.length) % l.length; S.liveState[ui.yearId] = S.liveState[ui.yearId] || {active: true, index: 0}; S.liveState[ui.yearId].index = prevIdx; save(); render(); }
   },
 
-  subTab:function(t){ ui.subTab = t.dataset.val; ui.enter=true; }, 
-  sortMode:function(t){ ui.sortMode = t.dataset.val; ui.enter=true; },
-  ovSubTab:function(t){ ui.ovSubTab = t.dataset.val; ui.enter=true; },
-  openDetailModal:function(t){ openDetailModal(t.dataset.e); return "keep"; },
+  subTab:function(t){ ui.subTab = t.dataset.val; render(); }, 
+  sortMode:function(t){ ui.sortMode = t.dataset.val; render(); }, 
+  ovSubTab:function(t){ ui.ovSubTab = t.dataset.val; render(); },
   
   toggleQual:function(t){
-    var eId = t.dataset.e, jurId = t.dataset.jur;
-    S.qualPred[eId] = S.qualPred[eId] || {};
+    var eId = t.dataset.e, jurId = t.dataset.jur; S.qualPred[eId] = S.qualPred[eId] || {};
     var cur = S.qualPred[eId][jurId];
-    if (cur === undefined) {
-      S.qualPred[eId][jurId] = false;
-    } else {
-      delete S.qualPred[eId][jurId]; 
-    }
-    save(); return "render";
+    if (cur === undefined) { S.qualPred[eId][jurId] = false; } else { delete S.qualPred[eId][jurId]; }
+    save(); render();
   },
   
-  home:function(){ui.yearId=null;ui.view="home";ui.enter=true;},
+  home:function(){ui.yearId=null;ui.view="home";ui.enter=true; render();},
   openYear:function(t){
-    ui.yearId=t.dataset.id;
-    ui.view="year";
-    var y=yearObj(ui.yearId);
+    ui.yearId=t.dataset.id; ui.view="year"; var y=yearObj(ui.yearId);
     ui.tab = (y && y.shows.sf1) ? "sf1" : (y && y.shows.sf2 ? "sf2" : (y && y.shows.final ? "final" : "overview"));
-    ui.subTab="points";ui.sortMode="order";ui.ovSubTab="semis";ui.editMode=false;ui.enter=true;
+    ui.subTab="points";ui.sortMode="order";ui.ovSubTab="semis";ui.editMode=false;ui.enter=true; render();
   },
-  openCompare:function(){ui.view="compare";ui.enter=true;},
-  openLibraryView:function(){ui.view="library";ui.enter=true;},
-  addNewSongMain:function(){openSong(null,null);return "keep";},
-  editSongMain:function(t){openSong(t.dataset.id,null);return "keep";},
+  openCompare:function(){ui.view="compare";ui.enter=true; render();}, openLibraryView:function(){ui.view="library";ui.enter=true; render();}, addNewSongMain:function(){openSong(null,null);return "keep";}, editSongMain:function(t){openSong(t.dataset.id,null);return "keep";},
   delSongMain:function(t){
-    var id=t.dataset.id;
-    openConfirm("Delete Song","Delete from library?",function(){
-      S.songs=S.songs.filter(function(x){return x.id!==id;});save();render();
-    });
-    return "keep";
+    var id=t.dataset.id; openConfirm("Delete Song","Delete from library?",function(){ S.songs=S.songs.filter(function(x){return x.id!==id;});save();render(); }); return "keep";
   },
   openNewYearDlg:function(){openNewYearModal();return "keep";},
-  tab:function(t){ui.tab=t.dataset.tab;ui.subTab="points";ui.sortMode="order";ui.ovSubTab="semis";ui.editMode=false;ui.enter=true;},
-  openPick:function(t){
-    openRatingModal(t.dataset.e, t.dataset.jur || me);
-    return "keep";
-  },
+  tab:function(t){ui.tab=t.dataset.tab;ui.subTab="points";ui.sortMode="order";ui.ovSubTab="semis";ui.editMode=false;ui.enter=true; render();},
+  openPick:function(t){ openRatingModal(t.dataset.e, t.dataset.jur || me); return "keep"; },
   rateModal:function(t){
-    var id = t.dataset.e, p = +t.dataset.p, jurId = t.dataset.jur;
-    var e = findEntry(id);
-    var key = (e && e.songId) ? e.songId : id;
+    var id = t.dataset.e, p = +t.dataset.p, jurId = t.dataset.jur, e = findEntry(id), key = (e && e.songId) ? e.songId : id;
     S.ratings[key] = S.ratings[key] || {};
-    
-    if (S.ratings[key][jurId] === p) delete S.ratings[key][jurId];
-    else S.ratings[key][jurId] = p;
-    
-    save();
-    openDetailModal(id);
-    return "keep";
+    if (S.ratings[key][jurId] === p) delete S.ratings[key][jurId]; else S.ratings[key][jurId] = p;
+    save(); openDetailModal(id); return "keep";
   },
-  sbShow:function(t){ui.sbShow=t.dataset.show;},
+  sbShow:function(t){ui.sbShow=t.dataset.show; render();},
   saveNewYear:function(){
     var yNum=parseInt($("#ny_year").value), suffix=($("#ny_suffix").value||"").trim();
     if(!yNum) return "keep";
     var id = yNum + (suffix ? "_" + suffix.toLowerCase() : "_main");
     if(yearObj(id)) return "keep";
     var shows={};
-    for(var sh in SHOWS){
-      if(sh === "sf1" || sh === "sf2" || sh === "final"){
-        shows[sh]=[];
-        for(var i=1; i<=DEF_N[sh]; i++){ shows[sh].push({id:id+"-"+sh+"-"+i}); }
-      }
-    }
+    for(var sh in SHOWS){ if(sh === "sf1" || sh === "sf2" || sh === "final"){ shows[sh]=[]; for(var i=1; i<=DEF_N[sh]; i++){ shows[sh].push({id:id+"-"+sh+"-"+i}); } } }
     S.years.push({id:id,year:yNum,suffix:suffix,city:$("#ny_city").value.trim()||undefined,shows:shows});
     S.years.sort(function(a,b){return b.year-a.year;});
-    save(); dlg.close(); ui.yearId=id; ui.view="year"; ui.tab="sf1"; ui.subTab="points"; ui.sortMode="order"; ui.ovSubTab="semis"; ui.enter=true;
+    save(); dlg.close(); ui.yearId=id; ui.view="year"; ui.tab="sf1"; ui.subTab="points"; ui.sortMode="order"; ui.ovSubTab="semis"; ui.enter=true; render();
   },
   delYear:function(){
-    var y=yearObj(ui.yearId);
-    openConfirm("Delete Contest","Really delete contest?",function(){
+    var y=yearObj(ui.yearId); openConfirm("Contest löschen","Willst du diesen kompletten Contest löschen?",function(){
       S.years=S.years.filter(function(x){return x!==y;});save();ui.yearId=null;ui.view="home";ui.enter=true;render();
-    });
-    return "keep";
+    }); return "keep";
   },
-  addShow:function(t){
-    var y=yearObj(ui.yearId);
-    var sh=t.dataset.show;
-    if(y && !y.shows[sh]){
-      y.shows[sh] = [];
-      var count = DEF_N[sh] || 25;
-      for(var i=1; i<=count; i++){ y.shows[sh].push({id:y.id+"-"+sh+"-"+i}); }
-      save();
-      ui.enter=true;
-    }
-  },
+  addShow:function(t){ var y=yearObj(ui.yearId), sh=t.dataset.show; if(y && !y.shows[sh]){ y.shows[sh] = []; var count = DEF_N[sh] || 25; for(var i=1; i<=count; i++){ y.shows[sh].push({id:y.id+"-"+sh+"-"+i}); } save(); render(); } },
   removeShow:function(t){
-    var y=yearObj(ui.yearId);
-    var sh=t.dataset.show;
+    var y=yearObj(ui.yearId), sh=t.dataset.show;
     openConfirm("Show entfernen", "Möchtest du " + SHOWS[sh] + " wirklich entfernen? Alle Tipps und Einträge gehen verloren.", function(){
-      delete y.shows[sh];
-      if(ui.tab === sh) ui.tab = y.shows.sf1 ? "sf1" : (y.shows.sf2 ? "sf2" : (y.shows.final ? "final" : "overview"));
-      if(ui.sbShow === sh) ui.sbShow = y.shows.final ? "final" : Object.keys(y.shows)[0];
-      save();
-      render();
+      delete y.shows[sh]; if(ui.tab === sh) ui.tab = y.shows.sf1 ? "sf1" : (y.shows.sf2 ? "sf2" : (y.shows.final ? "final" : "overview"));
+      if(ui.sbShow === sh) ui.sbShow = y.shows.final ? "final" : Object.keys(y.shows)[0]; save(); render();
     });
   },
-  moveUp:function(t){
-    var y=yearObj(ui.yearId), l=y.shows[t.dataset.show], idx_pos=+t.dataset.idx;
-    if(idx_pos>0){ var tmp=l[idx_pos]; l[idx_pos]=l[idx_pos-1]; l[idx_pos-1]=tmp; save(); }
-  },
-  moveDown:function(t){
-    var y=yearObj(ui.yearId), l=y.shows[t.dataset.show], idx_pos=+t.dataset.idx;
-    if(idx_pos<l.length-1){ var tmp=l[idx_pos]; l[idx_pos]=l[idx_pos+1]; l[idx_pos+1]=tmp; save(); }
-  },
-  addSlot:function(t){
-    var y=yearObj(ui.yearId), l=y.shows[t.dataset.show];
-    l.push({id:y.id+"-"+t.dataset.show+"-"+(l.length+1)}); save();
-  },
-  delSlot:function(t){
-    var y=yearObj(ui.yearId), l=y.shows[t.dataset.show];
-    if(l.length <= 0) return; 
-    l.pop(); 
-    save();
-  },
+  moveUp:function(t){ var y=yearObj(ui.yearId), l=y.shows[t.dataset.show], idx_pos=+t.dataset.idx; if(idx_pos>0){ var tmp=l[idx_pos]; l[idx_pos]=l[idx_pos-1]; l[idx_pos-1]=tmp; save(); render(); } },
+  moveDown:function(t){ var y=yearObj(ui.yearId), l=y.shows[t.dataset.show], idx_pos=+t.dataset.idx; if(idx_pos<l.length-1){ var tmp=l[idx_pos]; l[idx_pos]=l[idx_pos+1]; l[idx_pos+1]=tmp; save(); render(); } },
+  addSlot:function(t){ var y=yearObj(ui.yearId), l=y.shows[t.dataset.show]; l.push({id:y.id+"-"+t.dataset.show+"-"+(l.length+1)}); save(); render(); },
+  delSlot:function(t){ var y=yearObj(ui.yearId), l=y.shows[t.dataset.show]; if(l.length <= 0) return; l.pop(); save(); render(); },
   editNo:function(t){ openEditNo(t.dataset.e); return "keep"; },
   saveCustomNo:function(t){
     var e=findEntry(t.dataset.e), inp=$("#custom_no_input"), afChk=$("#custom_autofinal_input");
     if(e){
-      if(inp){ 
-        var v = inp.value.trim(); 
-        var parsedNum = parseFloat(v);
-        if(v === "" || (parsedNum === idx(e.id))) delete e.customNo; 
-        else e.customNo = !isNaN(parsedNum) ? parsedNum : v; 
-      }
-      if(afChk){ 
-        e.autoFinal=afChk.checked; 
-        if(e.autoFinal) {
-          delete e.place;
-        }
-      }
-      
-      for(var i=0; i<S.years.length; i++){
-        var y = S.years[i];
-        for(var sh in y.shows){
-          var list = y.shows[sh];
-          for(var k=0; k<list.length; k++){
-            if(list[k].id === e.id){ sortShowsList(list); break; }
-          }
-        }
-      }
-      save();
+      if(inp){ var v = inp.value.trim(), parsedNum = parseFloat(v); if(v === "" || (parsedNum === idx(e.id))) delete e.customNo; else e.customNo = !isNaN(parsedNum) ? parsedNum : v; }
+      if(afChk){ e.autoFinal=afChk.checked; if(e.autoFinal) delete e.place; }
+      for(var i=0; i<S.years.length; i++){ var y = S.years[i]; for(var sh in y.shows){ var list = y.shows[sh]; for(var k=0; k<list.length; k++){ if(list[k].id === e.id){ sortShowsList(list); break; } } } }
+      save(); render();
     }
     dlg.close();
   },
-  toggleDq:function(t){ var e=findEntry(t.dataset.e); e.dq=!e.dq; save(); },
-  addSong:function(){openSong(null,ui.assign);return "keep";},
-  editSong:function(t){openSong(t.dataset.id,null);return "keep";},
-  pick:function(t){openPicker(t.dataset.e);return "keep";},
-  choose:function(t){
-    var e=findEntry(ui.assign), id=t.dataset.id;
-    e.songId=id; save(); dlg.close(); openDetailModal(e.id); return "keep";
-  },
-  delSong:function(t){
-    var id=t.dataset.id;
-    openConfirm("Delete Song","Delete from library?",function(){
-      S.songs=S.songs.filter(function(x){return x.id!==id;}); save(); fillList();
-    });
-    return "keep";
-  },
+  toggleDq:function(t){ var e=findEntry(t.dataset.e); e.dq=!e.dq; save(); render(); },
+  addSong:function(){openSong(null,ui.assign);return "keep";}, editSong:function(t){openSong(t.dataset.id,null);return "keep";}, pick:function(t){openPicker(t.dataset.e);return "keep";},
+  choose:function(t){ var e=findEntry(ui.assign), id=t.dataset.id; e.songId=id; save(); dlg.close(); openDetailModal(e.id); return "keep"; },
+  delSong:function(t){ var id=t.dataset.id; openConfirm("Delete Song","Delete from library?",function(){ S.songs=S.songs.filter(function(x){return x.id!==id;}); save(); fillList(); }); return "keep"; },
   saveSong:function(){
-    var artist=$("#f_artist").value.trim(), title=$("#f_title").value.trim(), cc=$("#f_cc").value;
-    var songYear=parseInt($("#f_song_year").value)||new Date().getFullYear();
+    var artist=$("#f_artist").value.trim(), title=$("#f_title").value.trim(), cc=$("#f_cc").value, songYear=parseInt($("#f_song_year").value)||new Date().getFullYear();
     if(!artist||!title||!cc) return "keep";
     if(ui.editSong){ var x=songById(ui.editSong); x.artist=artist; x.title=title; x.cc=cc; x.year=songYear; }
     else {
-      var id="s"+Date.now().toString(36);
-      S.songs.push({id:id,cc:cc,artist:artist,title:title,year:songYear});
-      if(ui.assign){ 
-        var e=findEntry(ui.assign); 
-        if(e) e.songId=id; 
-      }
+      var id="s"+Date.now().toString(36); S.songs.push({id:id,cc:cc,artist:artist,title:title,year:songYear});
+      if(ui.assign){ var e=findEntry(ui.assign); if(e) e.songId=id; }
     }
-    save(); 
-    if(ui.assign){ 
-      var assignedId = ui.assign;
-      dlg.close(); 
-      openDetailModal(assignedId); 
-    } else { 
-      render(); 
-    } 
-    return "keep";
+    save(); if(ui.assign){ var assignedId = ui.assign; dlg.close(); openDetailModal(assignedId); } else { render(); } return "keep";
   },
   editCity:function(){
     var y=yearObj(ui.yearId);
     dlg.className="";
-    dlg.innerHTML='<h3>Host City</h3><label>City<input id="city_input" value="'+esc(y.city||"")+'"></label><div class="actions"><button class="ghost" data-act="closeDlg">Cancel</button><button class="primary" data-act="saveCity">Save</button></div>';
-    if(!dlg.open) dlg.showModal(); return "keep";
+    dlg.innerHTML='<h3>Host City & Country</h3>'+
+      '<label style="position:relative; z-index:20;">Country (Flagge)'+
+        '<div class="search-dropdown-container">'+
+          '<input id="city_country_input" placeholder="Land auswählen..." value="'+esc(y.hostCc ? CN[y.hostCc] : "")+'" autocomplete="off" style="width:100%">'+
+          '<input type="hidden" id="f_city_cc" value="'+esc(y.hostCc||"")+'">'+
+          '<div id="city_country_results" class="search-dropdown-results"></div>'+
+        '</div>'+
+      '</label>'+
+      '<label style="position:relative; z-index:1;">City<input id="city_input" value="'+esc(y.city||"")+'"></label>'+
+      '<div class="actions"><button class="ghost" data-act="closeDlg">Cancel</button><button class="primary" data-act="saveCity">Save</button></div>';
+    if(!dlg.open) dlg.showModal();
+    setTimeout(function(){ setupCountrySearch("#city_country_input", "#city_country_results", "#f_city_cc", null); }, 50);
+    return "keep";
   },
-  saveCity:function(){ var y=yearObj(ui.yearId), inp=$("#city_input"); if(y&&inp){ y.city=inp.value.trim()||undefined; save(); } dlg.close(); },
-  closeDlg:function(){dlg.close();return "keep";},
-  confirmYes:function(){ dlg.close(); if(_pendingConfirmCallback){ var cb=_pendingConfirmCallback; _pendingConfirmCallback=null; cb(); } return "keep"; },
-  settings:function(){openSettings();return "keep";},
-  openJsonEditor:function(){openJsonEditor();return "keep";},
+  saveCity:function(){ var y=yearObj(ui.yearId), inp=$("#city_input"), ccInp=$("#f_city_cc"); if(y&&inp){ y.city=inp.value.trim()||undefined; y.hostCc=ccInp.value||undefined; save(); } dlg.close(); render(); },
+  closeDlg:function(){dlg.close();return "keep";}, confirmYes:function(){ dlg.close(); if(_pendingConfirmCallback){ var cb=_pendingConfirmCallback; _pendingConfirmCallback=null; cb(); } return "keep"; },
+  settings:function(){openSettings();return "keep";}, openJsonEditor:function(){openJsonEditor();return "keep";},
   saveRawJson:function(){
     try {
-      var rawText = $("#raw_json_input").value;
-      var imported = JSON.parse(rawText);
-      if(imported.jury) S.jury = imported.jury;
-      if(imported.songs) S.songs = imported.songs;
-      if(imported.years) {
-        S.years = imported.years;
-        S.years.sort(function(a,b){return b.year-a.year||b.id.localeCompare(a.id);});
-      }
+      var rawText = $("#raw_json_input").value; var imported = JSON.parse(rawText);
+      if(imported.jury) S.jury = imported.jury; if(imported.songs) S.songs = imported.songs;
+      if(imported.years) { S.years = imported.years; S.years.sort(function(a,b){return b.year-a.year||b.id.localeCompare(a.id);}); }
       if(imported.ratings) S.ratings = imported.ratings;
-      if(imported.notes) S.notes = imported.notes;
-      if(imported.pred) S.pred = imported.pred;
-      if(imported.qualPred) S.qualPred = imported.qualPred;
-      if(imported.liveState) S.liveState = imported.liveState;
-
-      save();
-      dlg.close();
-      render();
-      showAlert("Erfolg", "JSON erfolgreich aktualisiert und gespeichert!");
-    } catch(e) {
-      showAlert("Fehler", "Ungültiges JSON-Format: " + e.message);
-    }
-    return "keep";
+      if(imported.pred) S.pred = imported.pred; if(imported.qualPred) S.qualPred = imported.qualPred; if(imported.liveState) S.liveState = imported.liveState;
+      save(); dlg.close(); render(); showAlert("Erfolg", "JSON erfolgreich aktualisiert und gespeichert!");
+    } catch(e) { showAlert("Fehler", "Ungültiges JSON-Format: " + e.message); } return "keep";
   },
   saveNames:function(){
     var inputs = document.querySelectorAll("[data-jn]");
-    for(var i=0; i<inputs.length; i++){
-      var jId = inputs[i].dataset.jn, val = inputs[i].value.trim();
-      if(val){ for(var k=0; k<S.jury.length; k++){ if(S.jury[k].id===jId) S.jury[k].name=val; } }
-    }
-    save(); dlg.close(); return "keep";
+    for(var i=0; i<inputs.length; i++){ var jId = inputs[i].dataset.jn, val = inputs[i].value.trim(); if(val){ for(var k=0; k<S.jury.length; k++){ if(S.jury[k].id===jId) S.jury[k].name=val; } } }
+    save(); dlg.close(); render(); return "keep";
   },
   export:function(){
-    var blob=new Blob([JSON.stringify(S,null,1)],{type:"application/json"});
-    var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="esc.json"; a.click(); return "keep";
+    var blob=new Blob([JSON.stringify(S,null,1)],{type:"application/json"}); var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="esc.json"; a.click(); return "keep";
   }
 };
 
 function setupCountrySearch(inputId, resultsId, hiddenInputId, onSelectCallback) {
-  var input = $(inputId);
-  var resultsBox = $(resultsId);
-  var hiddenInput = $(hiddenInputId);
+  var input = $(inputId), resultsBox = $(resultsId), hiddenInput = $(hiddenInputId);
   if (!input || !resultsBox) return;
 
   function renderDropdown(filterText) {
-    var query = (filterText || "").toLowerCase();
-    var filtered = COUNTRIES.filter(function(c){
-      return c[1].toLowerCase().indexOf(query) !== -1;
-    });
-
+    var query = (filterText || "").toLowerCase(), filtered = COUNTRIES.filter(function(c){ return c[1].toLowerCase().indexOf(query) !== -1; });
     var html = "";
-    for(var i=0; i<filtered.length; i++){
-      html += '<div class="search-dropdown-item" data-cc="'+filtered[i][0]+'" data-name="'+esc(filtered[i][1])+'">'+flag(filtered[i][0])+' <span>'+esc(filtered[i][1])+'</span></div>';
-    }
+    for(var i=0; i<filtered.length; i++){ html += '<div class="search-dropdown-item" data-cc="'+filtered[i][0]+'" data-name="'+esc(filtered[i][1])+'">'+flag(filtered[i][0])+' <span>'+esc(filtered[i][1])+'</span></div>'; }
     resultsBox.innerHTML = html ? html : '<div class="search-dropdown-item" style="color:var(--muted)">Kein Land gefunden</div>';
     resultsBox.classList.add("active");
   }
 
-  input.addEventListener("focus", function(){
-    renderDropdown(input.value);
-  });
-
-  input.addEventListener("click", function(){
-    renderDropdown(input.value);
-  });
-
-  input.addEventListener("input", function(){
-    renderDropdown(input.value);
-    if(hiddenInput) hiddenInput.value = "";
-  });
-
+  input.addEventListener("focus", function(){ renderDropdown(input.value); });
+  input.addEventListener("click", function(){ renderDropdown(input.value); });
+  input.addEventListener("input", function(){ renderDropdown(input.value); if(hiddenInput) hiddenInput.value = ""; });
   resultsBox.addEventListener("mousedown", function(ev){
-    var item = ev.target.closest(".search-dropdown-item");
-    if(!item || !item.dataset.cc) return;
-    var cc = item.dataset.cc;
-    var name = item.dataset.name;
-    input.value = name;
-    if(hiddenInput) hiddenInput.value = cc;
-    resultsBox.classList.remove("active");
-    if(onSelectCallback) onSelectCallback(cc);
+    var item = ev.target.closest(".search-dropdown-item"); if(!item || !item.dataset.cc) return;
+    input.value = item.dataset.name; if(hiddenInput) hiddenInput.value = item.dataset.cc;
+    resultsBox.classList.remove("active"); if(onSelectCallback) onSelectCallback(item.dataset.cc);
   });
-
-  input.addEventListener("blur", function(){
-    setTimeout(function(){
-      resultsBox.classList.remove("active");
-    }, 200);
-  });
-
-  document.addEventListener("click", function(ev){
-    if(!input.contains(ev.target) && !resultsBox.contains(ev.target)){
-      resultsBox.classList.remove("active");
-    }
-  });
+  input.addEventListener("blur", function(){ setTimeout(function(){ resultsBox.classList.remove("active"); }, 200); });
+  document.addEventListener("click", function(ev){ if(!input.contains(ev.target) && !resultsBox.contains(ev.target)){ resultsBox.classList.remove("active"); } });
 }
 
 document.addEventListener("input",function(ev){
   if(ev.target.id === "lib_search_input"){ ui.q = ev.target.value; render(); var inp=$("#lib_search_input"); if(inp){ inp.focus(); inp.selectionStart=inp.selectionEnd=inp.value.length; } }
-  if(ev.target.dataset.chg === "splitAfter"){
-    var y = yearObj(ui.yearId);
-    if(y){
-      y.splitAfter = y.splitAfter || {};
-      y.splitAfter[ev.target.dataset.show] = parseInt(ev.target.value) || 1;
-      save();
-      render();
-    }
-  }
-  if(ev.target.dataset.chg === "note"){
-    var eId = ev.target.dataset.e, jurId = ev.target.dataset.jur, val = ev.target.value;
-    var e = findEntry(eId);
-    var key = (e && e.songId) ? e.songId : eId;
-    S.notes[key] = S.notes[key] || {};
-    if(val.trim()) S.notes[key][jurId] = val;
-    else delete S.notes[key][jurId];
+  if(ev.target.dataset.chg === "splitAfter"){ var y = yearObj(ui.yearId); if(y){ y.splitAfter = y.splitAfter || {}; y.splitAfter[ev.target.dataset.show] = parseInt(ev.target.value) || 1; save(); render(); } }
+  
+  if(ev.target.dataset.chg === "place"){
+    var e = findEntry(ev.target.dataset.e);
+    var v = parseInt(ev.target.value);
+    if(v>0) e.place = v; else delete e.place;
     save();
+    var row = ev.target.closest(".row");
+    if(row){
+      var isOut = (e.place !== undefined && e.place !== null && e.place > 10);
+      if(isOut) row.classList.add("out"); else row.classList.remove("out");
+    }
   }
 });
 
 document.addEventListener("change",function(ev){
   if(ev.target.id === "lib_year_select"){ ui.libYear = ev.target.value; render(); }
   var t=ev.target.closest("[data-chg]"); if(!t) return;
-  if(t.dataset.chg === "splitAfter" || t.dataset.chg === "note") return;
+  if(t.dataset.chg === "splitAfter" || t.dataset.chg === "place") return;
   if(C[t.dataset.chg](t)!=="keep") render();
 });
 
 document.addEventListener("click",function(ev){
-  var t=ev.target.closest("[data-act]"); 
-  if(!t||!A[t.dataset.act]) return;
-  var r=A[t.dataset.act](t);
-  if(r!=="keep") render();
+  var t=ev.target.closest("[data-act]"); if(!t||!A[t.dataset.act]) return;
+  var r=A[t.dataset.act](t); if(r!=="keep") render();
 });
 
 var C={
-  place:function(t){ 
-    var e=findEntry(t.dataset.e), v=parseInt(t.value); 
-    if(v>0) e.place=v; else delete e.place; 
-    save(); 
-    return "keep"; 
-  },
+  place:function(t){ var e=findEntry(t.dataset.e), v=parseInt(t.value); if(v>0) e.place=v; else delete e.place; save(); return "keep"; },
   pred:function(t){ var id=t.dataset.e, j=t.dataset.j, v=parseInt(t.value); S.pred[id]=S.pred[id]||{}; if(v>0) S.pred[id][j]=v; else delete S.pred[id][j]; save(); }
 };
 
 var origRender = render;
 render = function() {
   origRender();
-  if(ui.view === "compare"){
-    setupCountrySearch("#compare_country_input", "#compare_country_results", null, function(cc){
-      ui.compareCc = cc;
-      render();
-    });
-  }
+  if(ui.view === "compare"){ setupCountrySearch("#compare_country_input", "#compare_country_results", null, function(cc){ ui.compareCc = cc; render(); }); }
 };
 
 render();
