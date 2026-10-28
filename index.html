@@ -91,7 +91,7 @@ button.sm { padding: 4px 12px; font-size: 0.85rem; }
 button:disabled{opacity:.35;cursor:not-allowed;transform:none!important;box-shadow:none!important}
 
 .hero{
-  font-family:var(--display);font-weight:800;font-size:clamp(2.5rem,7vw,5rem);line-height:1.2;margin:48px 0 24px;letter-spacing:-.02em;
+  font-family:var(--display);font-weight:800;font-size:clamp(2.5rem,7vm,5rem);line-height:1.2;margin:48px 0 24px;letter-spacing:-.02em;
   text-align:center;
   background:linear-gradient(135deg, #ff2d95 0%, #ffd166 50%, #7b2cbf 100%);
   -webkit-background-clip:text;
@@ -216,7 +216,7 @@ td input[type=number]{width:72px}
 .autofinal{display:inline-block;background:#7b2cbf;color:#fff;border-radius:6px;padding:0 6px;font-size:0.65rem;font-weight:800;margin-left:4px;white-space:nowrap;flex-shrink:0}
 
 dialog{ background:var(--panel); color:var(--ink); border:1px solid var(--line); border-radius:24px; padding:24px; width:min(440px,92vw); animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-dialog.wide{width:min(680px,92vw)}
+dialog.wide{width:min(520px,92vw)}
 dialog::backdrop{background:rgba(5,2,15,.85);backdrop-filter:blur(4px);animation:fadeIn .25s ease}
 @keyframes scaleUp { from { opacity: 0; transform: scale(0.92) translateY(16px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 
@@ -464,33 +464,6 @@ function pull(first){
   }).catch(function(){net="error";});
 }
 
-// Presence Heartbeat
-setInterval(function(){
-  S.presence = S.presence || {};
-  S.presence[me] = { t: Date.now() };
-  push();
-  updatePresenceUI();
-}, 10000);
-
-function updatePresenceUI(){
-  var container = $("#presence_container");
-  if(!container) return;
-  var now = Date.now();
-  var pMap = S.presence || {};
-  var viewersHtml = "";
-  for(var i=0; i<S.jury.length; i++){
-    var p = pMap[S.jury[i].id];
-    if(p && (now - p.t < 35000) && S.jury[i].id !== me){
-      viewersHtml += '<span style="display:inline-block;background:var(--panel);border:1px solid #189650;border-radius:999px;padding:4px 10px;font-size:0.8rem;color:#4ade80;font-weight:700;">🟢 '+esc(S.jury[i].name)+'</span>';
-    }
-  }
-  var ap = pMap["admin"];
-  if(ap && (now - ap.t < 35000) && me !== "admin"){
-    viewersHtml += '<span style="display:inline-block;background:var(--panel);border:1px solid #189650;border-radius:999px;padding:4px 10px;font-size:0.8rem;color:#4ade80;font-weight:700;">🟢 Admin</span>';
-  }
-  container.innerHTML = viewersHtml;
-}
-
 var songById=function(id){ for(var i=0; i<S.songs.length; i++) if(S.songs[i].id===id) return S.songs[i]; return null; };
 var yearObj=function(id){ for(var i=0; i<S.years.length; i++) if(S.years[i].id===id) return S.years[i]; return null; };
 var jname=function(id){ if(id === "admin") return "Admin"; for(var i=0; i<S.jury.length; i++) if(S.jury[i].id===id) return S.jury[i].name; return id; };
@@ -535,7 +508,6 @@ function render(){
 
   $("#app").innerHTML = header() + mainHtml;
   window.scrollTo(0,sy);
-  updatePresenceUI();
 }
 
 function header(){
@@ -543,7 +515,6 @@ function header(){
   return '<header>'+
     '<div class="brand">Eurovision Song Contest Scoreboard</div>'+
     '<div class="who">'+
-      '<div id="presence_container" style="display:flex;gap:6px;margin-right:8px;"></div>'+
       '<button class="ghost" data-act="openWelcomeModal" style="font-weight:700;color:var(--gold);border:1px solid var(--gold);padding:6px 14px;background:rgba(255,209,102,0.1)">'+currentName+'</button>'+
       '<button class="ghost" data-act="settings" title="Settings, Export, Import" style="padding:6px 14px;background:var(--panel2)">⚙️ Settings</button>'+
     '</div></header>';
@@ -1205,28 +1176,24 @@ function openDetailModal(eId){
 
   if(!s){ openPicker(eId); return; }
 
-  var juryBoxes = "";
-  for(var j=0; j<S.jury.length; j++){
-    var jur = S.jury[j], val = r[jur.id], isMe = (jur.id === me) || (me === "admin");
-    var row1="", row2="";
-    for(var p=1; p<=10; p++){
-      var bHtml = '<button class="rate-modal-btn" style="'+pc(p)+';width:36px;height:40px;font-family:var(--number-font);font-size:1.1rem;border-radius:12px;border:2px solid '+(val===p?'#fff':'transparent')+';cursor:pointer;display:grid;place-items:center;padding:0;" data-act="rateModal" data-e="'+eId+'" data-jur="'+jur.id+'" data-p="'+p+'">'+p+'</button>';
-      if(p<=5) row1+=bHtml; else row2+=bHtml;
-    }
+  var activeJuryId = (me === "admin") ? (S.jury[0] ? S.jury[0].id : "j1") : me;
+  var val = r[activeJuryId];
 
-    juryBoxes += '<div style="background:var(--panel2);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px;">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">' +
-        '<b>'+esc(jur.name)+'</b><span style="font-family:var(--number-font);font-size:1.3rem;color:var(--gold);">'+(val!==undefined&&val!==null?val+'/10 Pts':'–')+'</span>' +
-      '</div>' +
-      (isMe ? '<div style="display:flex;gap:4px;justify-content:center;margin-bottom:8px;">'+row1+'</div><div style="display:flex;gap:4px;justify-content:center;margin-bottom:12px;">'+row2+'</div>' : '') +
-      '</div>';
+  var row1="", row2="";
+  for(var p=1; p<=10; p++){
+    var bHtml = '<button class="rate-modal-btn" style="'+pc(p)+';width:48px;height:52px;font-family:var(--number-font);font-size:1.5rem;border-radius:14px;border:3px solid '+(val===p?'#fff':'transparent')+';cursor:pointer;display:grid;place-items:center;padding:0;" data-act="rateModal" data-e="'+eId+'" data-jur="'+activeJuryId+'" data-p="'+p+'">'+p+'</button>';
+    if(p<=5) row1+=bHtml; else row2+=bHtml;
   }
 
-  dlg.className = "wide";
+  dlg.className = "";
   dlg.innerHTML = '<div style="text-align:center;margin-bottom:16px;">' +
     '<div style="margin-bottom:8px;transform:scale(1.5);display:inline-block;">'+flag(s.cc)+'</div>' +
     '<h2 style="margin:6px 0 2px;">'+esc(s.title)+'</h2><p style="color:var(--muted);margin:0;font-size:1.05rem;">'+esc(s.artist)+' ('+esc(CN[s.cc]||s.cc.toUpperCase())+')</p></div>' +
-  '<div style="max-height:60vh;overflow-y:auto;padding-right:8px;">'+juryBoxes+'</div>' +
+  '<div style="background:var(--panel2);border:1px solid var(--line);border-radius:18px;padding:20px;text-align:center;margin-bottom:16px;">' +
+    '<div style="font-family:var(--number-font);font-size:2rem;color:var(--gold);margin-bottom:16px;">'+(val!==undefined&&val!==null?val+'/10 Pts':'– Pts')+'</div>' +
+    '<div style="display:flex;gap:8px;justify-content:center;margin-bottom:10px;">'+row1+'</div>' +
+    '<div style="display:flex;gap:8px;justify-content:center;">'+row2+'</div>' +
+  '</div>' +
   '<div class="actions" style="margin-top:16px;justify-content:space-between;">' +
     '<button class="ghost danger" data-act="pick" data-e="'+eId+'">Song wechseln</button><button class="primary" data-act="closeDlg">Fertig</button></div>';
 
