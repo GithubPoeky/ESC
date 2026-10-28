@@ -1306,17 +1306,37 @@ function compareView(){
   ui.compareCc = ui.compareCc || COUNTRIES[0][0];
   var ccOpts = "";
   for(var i=0; i<COUNTRIES.length; i++){ ccOpts += '<option value="'+COUNTRIES[i][0]+'" '+(COUNTRIES[i][0]===ui.compareCc?"selected":"")+'>'+COUNTRIES[i][1]+'</option>'; }
+  
   var entries = [];
   for(var i=0; i<S.years.length; i++){
     var y = S.years[i];
+    var yearEntries = [];
+    
     for(var sh in y.shows){
       var list = y.shows[sh];
       for(var k=0; k<list.length; k++){
         var entry = list[k], song = songById(entry.songId);
-        if(song && song.cc === ui.compareCc){ entries.push({yearObj: y, showName: SHOWS[sh], entry: entry, song: song}); }
+        if(song && song.cc === ui.compareCc){
+          yearEntries.push({yearObj: y, showKey: sh, showName: SHOWS[sh], entry: entry, song: song});
+        }
       }
     }
+    
+    if(yearEntries.length > 0){
+      var chosen = null;
+      for(var k=0; k<yearEntries.length; k++){
+        if(yearEntries[k].showKey === "final"){
+          chosen = yearEntries[k];
+          break;
+        }
+      }
+      if(!chosen){
+        chosen = yearEntries[0];
+      }
+      entries.push(chosen);
+    }
   }
+
   entries.sort(function(a,b){ return b.yearObj.year - a.yearObj.year; });
   var rowsHtml = "";
   for(var i=0; i<entries.length; i++){
